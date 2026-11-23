@@ -21,3 +21,14 @@ function drawP5W(){const ctx=cv('cp5w'),k=+$('p5skin').value,R=100e3*Math.pow(20
   txt(ctx,'LED current: '+fI(I),690,148,PAL.white,14);txt(ctx,b>0.97?'full brightness ✓':b>0.3?'dim':'barely glows',690,170,b>0.97?PAL.green:PAL.amber,13);}
 loop((dt,now)=>{if(vis('cp5w'))drawP5W();});
 })();
+
+(function(){   // demo
+// P5 touch switch
+function P5(){const ctx=cv('cp5'),touch=(CT%4)<2;
+  wire(ctx,[[60,30],[700,30]],PAL.redSoft);txt(ctx,'+9 V',56,34,PAL.redSoft,11,'right');wire(ctx,[[60,230],[700,230]],PAL.blue);txt(ctx,'0 V',56,234,PAL.blue,11,'right');
+  part(ctx,'res',150,30,150,90,{label:'1 kΩ'});ctx.fillStyle='#d4af37';ctx.fillRect(140,92,20,10);ctx.fillRect(140,122,20,10);txt(ctx,'touch pads',120,116,'#d4af37',11,'right');
+  if(touch)txt(ctx,'☝️',178,122,PAL.white,26);if(touch)__PR(ctx,{t:'part',k:'res',a:[150,90],b:[150,132],o:{label:'500 kΩ'}});wire(ctx,[[150,132],[150,160],[256,160]]);npnQ(ctx,290,160,touch);wire(ctx,[[300,194],[300,200],[356,200]]);npnQ(ctx,390,200,touch);wire(ctx,[[400,234],[400,230]]);
+  wire(ctx,[[300,126],[300,110],[520,110]]);wire(ctx,[[400,110],[400,166]]);part(ctx,'res',520,30,520,72,{label:'470 Ω'});part(ctx,'led',520,72,520,110,{glow:touch?1:0});
+  txt(ctx,touch?'finger on the pads: LED ON':'no touch: off',590,120,touch?PAL.good:PAL.muted,14);txt(ctx,'gain ≈ 200 × 200 = 40,000',590,145,PAL.muted,11);}
+loop((dt,now)=>{if(vis('cp5'))P5(dt);});
+})();

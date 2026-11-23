@@ -81,6 +81,9 @@ Copy an existing chip (e.g. `339`) as a start.
 **A circuit project** – copy `pages/circuits/projects/p26.py` and `p26.js` to `pNN.py` / `pNN.js`, edit the content,
 the breadboard layout (`BBL.pNN`, see the breadboard map: rows a–j, rails tp/tn/bp/bn, columns 1–60) and the demo,
 then add `'pNN'` to its theme in `themes.py`. The menu, the intro table and the numbering follow.
+In a project's demo, `cv(id)` gives a cleared canvas context, `vis(id)` tells if it is on screen, and `CT` is the page
+clock in seconds (advanced before the project loops run). Shared demo pieces live in `circuits/lib.js`
+(e.g. `ddInit`/`drawDD` for the dice without Arduino, `motorDraw`, `mGraph`).
 
 **A shop item** – a row in `pages/shopping/items.py`. The build warns when a project's "You need" names a part
 whose "used in" doesn't list that project.
