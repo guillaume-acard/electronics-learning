@@ -221,7 +221,7 @@ PAGES = [
            'tag': '26 breadboard projects grouped by theme (dice, siren, fuzz pedal, counter, thermometers, infrared alarm, motors and more), with parts lists '
                   'and variants to try, plus two real-life builds.',
            'facts': ['🧰 Parts lists', '🧪 Variants to test', '🔊 Buzzer · 🔋 Charger · 🌙 Night lamp']},
-  'js': ['@helpers', '@helpers2', 'page.js', 'demos.js'],
+  'js': ['@helpers', '@helpers2', 'lib.js', 'projects/*.js', 'init.js'],   # shared, one file per project, then wiring + loops
   'card': {'svg': '<svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" '
                   'stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg>',
            'title': 'Circuits to build',

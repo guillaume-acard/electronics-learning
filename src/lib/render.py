@@ -87,8 +87,19 @@ const requestAnimationFrame=cb=>window.requestAnimationFrame(function tick(t){{i
 
 # ---------------------------------------------------------------- the whole site
 
+def load_page_components(pages):
+    """A page may have its own components in pages/<dir>/page.py (e.g. the circuits project template)."""
+    import sys
+    for p in pages:
+        f = f'pages/{p["dir"]}/page.py'
+        if os.path.exists(f):
+            sys.path.insert(0, os.path.dirname(f))
+            load_module(f, 'page_' + p['id'])
+
+
 def build_site(site):
     pages, links = site.PAGES, getattr(site, 'LINKS', {})
+    load_page_components(pages)
     pages_html, files = '', {}
     for i, p in enumerate(pages):
         ctx = {'page': p['id'], 'dir': p['dir'], 'site': pages, 'links': links}

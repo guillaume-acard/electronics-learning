@@ -88,16 +88,17 @@ def number_sections(page_html):
 def section_menu(page_id, page_html):
     """If sections carry data-menu="Label" (+ data-icon, data-group, data-short), wrap the page in the
     left-menu layout. The menu (id "<page>-menu") is driven by sectionMenu() in shared/js/core.js."""
-    items = re.findall(r'<section id="([\w-]+)"([^>]*\bdata-menu="[^"]*"[^>]*)>', page_html)
+    items = re.findall(r'<(?:section id="([\w-]+)"|template)([^>]*\bdata-menu="[^"]*"[^>]*)>', page_html)
     if not items:
         return page_html
     menu = ''
     for sid, attrs in items:
         a = dict(re.findall(r'data-([\w-]+)="([^"]*)"', attrs))
+        href = a.get('href') or '#' + sid          # <template data-menu=".." data-href=".."> = a link that is not a section
         if 'group' in a:
             short = f' data-short="{a["short"]}"' if a.get('short') else ''
             menu += f'<h4{short}>{a["group"]}</h4>'
-        menu += f'<a href="#{sid}"><span class="n">{a.get("icon", "")}</span>{a["menu"]}</a>'
+        menu += f'<a href="{href}"><span class="n">{a.get("icon", "")}</span>{a["menu"]}</a>'
     return (f'<div class="cl-layout"><aside class="cl-menu" id="{page_id}-menu">{menu}</aside>'
             f'<div class="cl-content">{page_html}</div></div>')
 
