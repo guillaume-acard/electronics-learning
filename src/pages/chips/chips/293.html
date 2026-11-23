@@ -1,0 +1,18 @@
+<section id="s293" data-menu="L293D motor driver" data-icon="⇄">
+  <h2><span class="num">#</span>L293D H-bridge: a motor forwards and backwards</h2>
+  <p><b>What it does:</b> it drives <b>two DC motors</b> in <b>both directions</b>, from logic signals (buttons, an Arduino). Up to <b>600 mA</b> per motor (1.2 A peaks), with a motor supply from 4.5 to 36 V on pin 8 and a separate logic supply on pin 16. The "D" means the <b>flyback diodes are built in</b>: no extra diodes for the motor's switch-off spikes.</p>
+  <p><b>How it works inside: the H-bridge.</b> To reverse a DC motor, you reverse the current through it. An H-bridge is four switches arranged like the letter <b>H</b>, with the motor as the middle bar. Close top-left and bottom-right: current flows left → right. Close the other diagonal: right → left. The L293D has four "half-bridges" (1Y, 2Y, 3Y, 4Y): each output is switched either to + or to ground, copying its input. Two outputs make one H-bridge. Because each output is either + or −, never both, you can't make the deadly short circuit of closing both switches on one side.</p>
+  <p><b>Water analogy:</b> a water wheel in a pipe between two tanks. Raise the left tank and lower the right: it turns one way. Swap them: it turns the other way. Same level on both sides: it stops. The L293D is the one lifting the tanks.</p>
+  <div class="controls"><button id="hbF">▶ Forward (1A=1, 2A=0)</button><button id="hbR">◀ Reverse (1A=0, 2A=1)</button><button id="hbB">■ Brake (1A=2A)</button><button id="hbC">○ Coast (EN=0)</button><x-slider id="hbS" min="0" max="100" step="1" value="100" grow="1">Speed (PWM on EN)</x-slider></div>
+  <canvas id="c293" width="800" height="300"></canvas>
+  <table>
+    <tr><td>EN</td><td>1A</td><td>2A</td><td>Motor</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>Turns one way (forward)</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>Turns the other way (reverse)</td></tr>
+    <tr><td>1</td><td>same</td><td>same</td><td><b>Brake</b>: both ends at the same voltage, the motor is short-circuited through the chip and stops quickly</td></tr>
+    <tr><td>0</td><td>×</td><td>×</td><td><b>Coast</b>: outputs off, the motor spins down freely</td></tr>
+    <tr><td>PWM</td><td>1</td><td>0</td><td>Forward at reduced speed (on/off very fast, like the <a class="navlink" href="#p23">PWM of project 23</a>)</td></tr>
+  </table>
+  <p class="hint">Good to know: the L293D uses bipolar transistors, which lose about <b>1.5–3 V</b> in total, so from a 9 V battery the motor gets about 6–7 V, and the chip gets warm (the 4 middle ground pins are its heat sink). Modern MOSFET drivers (TB6612, DRV8833) lose much less. Used in <a class="navlink" href="#p24">project 24: motor forward / reverse</a>. How the motor itself works: <a data-page="motion" class="navlink">Sound &amp; motion</a>.</p>
+  <x-chip-widgets chip="293" name="L293D"/>
+</section>

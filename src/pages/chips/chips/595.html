@@ -1,0 +1,15 @@
+<section id="s595" data-menu="74HC595 shift reg." data-icon="→">
+  <h2><span class="num">#</span>74HC595 shift register: 8 outputs from 3 wires</h2>
+  <p><b>What it does:</b> a microcontroller often doesn't have enough pins. The 595 lets you control <b>8 outputs with just 3 wires</b>. Chain several and you get 16, 24 or more, still with 3 wires.</p>
+  <p><b>How it works inside (3 steps):</b></p>
+  <ol>
+    <li>Put a bit (1 or 0) on the <b>DATA</b> wire.</li>
+    <li>Pulse the <b>CLOCK</b> wire. Every bit inside shifts one place along, and the new bit enters at the start. Repeat 8 times.</li>
+    <li>Pulse the <b>LATCH</b> wire. All 8 bits are copied to the outputs <b>at the same moment</b>, so the LEDs don't flicker while bits are moving.</li>
+  </ol>
+  <p><b>Water analogy:</b> a bucket brigade. Cups of water (1) or empty cups (0) are passed down a line of 8 people, one step per clock. When the line is full, everyone pours into their own tank at the same time (the latch).</p>
+  <p class="hint">Click the LEDs at the bottom to choose a pattern, then press <b>Send</b>.</p>
+  <div class="controls"><button id="srSend">▶ Send pattern</button><button id="srRand">🎲 Random</button><x-slider id="srSp" min="0.5" max="6" step="0.1" value="2">Speed</x-slider></div>
+  <canvas id="c595" width="800" height="300"></canvas>
+  <x-chip-widgets chip="595" name="74HC595"/>
+</section>

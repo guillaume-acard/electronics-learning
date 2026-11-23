@@ -1,0 +1,10 @@
+<section id="s4056" data-menu="TP4056 charger" data-icon="🔋">
+  <h2><span class="num">#</span>TP4056 Li-ion charger: filling a battery safely</h2>
+  <p><b>What it does:</b> it charges a single <b>Li-ion / Li-po cell</b> (like an 18650) from 5 V USB, the safe way: first with a <b>constant current</b> (up to 1 A), then with a <b>constant voltage</b> of exactly <b>4.2 V</b> while the current fades, then it stops. Two pins drive a red "charging" and a green "done" LED. It's the chip on the charger module of <a class="navlink" href="#rl1">real-life build A</a>, a tiny 8-pin SOP soldered on the board.</p>
+  <p><b>How it works inside:</b> a power transistor between VCC and BAT acts as an adjustable valve. A control loop watches the battery: below 4.2 V it regulates the <b>current</b> (set by the PROG resistor: I = 1200 ÷ R); at 4.2 V it switches to holding the <b>voltage</b>. When the current falls to a tenth of the setting, the cell is full: CHRG turns off, STDBY turns on. A thermal loop lowers the current if the chip gets too hot.</p>
+  <p><b>Water analogy:</b> filling a bottle from a tap: full flow at first, then you slow down as you approach the brim, and stop exactly at the line. Over-filling a Li-ion cell (above ~4.25 V) is dangerous, hence the precise chip.</p>
+  <div class="controls"><button id="tpGo" class="active">▶ Charge (sped up)</button><x-slider id="tpR" min="0" max="3" step="1" value="3" grow="1">PROG resistor</x-slider><span id="tpRl" class="hint"></span></div>
+  <canvas id="c4056" width="800" height="280"></canvas>
+  <p class="hint">The TP4056 does <b>not</b> protect against over-discharge or short circuits: that's the job of the separate protection chip (DW01A + dual MOSFET) on the BMS module, or on "protected" TP4056 boards (6 pins: IN+, IN−, B+, B−, OUT+, OUT−).</p>
+  <x-chip-widgets chip="4056" name="TP4056"/>
+</section>

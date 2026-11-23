@@ -1,0 +1,15 @@
+<section id="s358" data-menu="LM358 op-amp" data-icon="▷">
+  <h2><span class="num">#</span>LM358 op-amp: the comparer and amplifier</h2>
+  <p><b>What it does:</b> an <b>op-amp</b> (operational amplifier) has two inputs, <b>+</b> and <b>−</b>, and one output. It looks at the <b>difference</b> between the inputs and multiplies it by a huge number (about 100,000). The LM358 has <b>two</b> op-amps in one chip.</p>
+  <p><b>Two ways to use it:</b></p>
+  <ul>
+    <li><b>Comparator (no feedback):</b> the huge gain means the output simply slams to <b>high</b> if + is above −, or <b>low</b> if + is below −. It makes a yes/no decision: "is it dark?", "is it too hot?"</li>
+    <li><b>Amplifier (with feedback):</b> two resistors feed part of the output back to the − input. The op-amp adjusts its output until both inputs are equal, which gives an exact, stable gain = <b>1 + Rf ÷ Rg</b>.</li>
+  </ul>
+  <p><b>Water analogy:</b> a super-sensitive see-saw (the two inputs) connected to a powerful pump (the output). The slightest tilt drives the pump fully one way. With feedback, the pump's own pressure pushes the see-saw back level, so it settles at an exact amount.</p>
+  <div class="controls"><span id="oaChoices"></span></div>
+  <div class="controls" id="oaCmp"><x-slider id="oaP" min="0" max="5" step="0.01" value="2.2" grow="1">+ input (sensor)</x-slider><x-slider id="oaN" min="0" max="5" step="0.01" value="2.5" grow="1">− input (threshold knob)</x-slider></div>
+  <div class="controls" id="oaAmp" style="display:none"><x-slider id="oaG" min="0" max="20" step="0.5" value="4" grow="1">Rf ÷ Rg (feedback ratio)</x-slider></div>
+  <canvas id="c358" width="800" height="270"></canvas>
+  <x-chip-widgets chip="358" name="LM358"/>
+</section>

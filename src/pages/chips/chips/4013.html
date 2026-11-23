@@ -1,0 +1,11 @@
+<section id="s4013" data-menu="CD4013 flip-flop" data-icon="D">
+  <h2><span class="num">#</span>CD4013 dual D flip-flop: a 1-bit memory with a camera shutter</h2>
+  <p><b>What it does:</b> two <b>D flip-flops</b>. Each one remembers <b>one bit</b>. At the exact moment its <b>clock</b> rises (low → high), it copies its <b>D</b> input to its <b>Q</b> output, and keeps it there until the next rising edge, whatever D does in between. <b>Q̅</b> is always the opposite of Q. Two extra pins force it: <b>S</b> (set, Q = 1) and <b>R</b> (reset, Q = 0); keep them low for normal use.</p>
+  <p><b>The divide-by-2 trick:</b> wire Q̅ back to D. Now D always asks for "the opposite of what Q is now", so every clock edge <b>flips</b> Q: 0, 1, 0, 1… Q changes once per clock pulse, so it makes one full cycle every <b>two</b> clock pulses: half the frequency. That's how <a class="navlink" href="#p26">project 26</a> turns the CD4060's 2 Hz into exactly <b>1 Hz</b>. The <a class="navlink" href="#s4060">CD4060</a> and <a class="navlink" href="#s4518">CD4518</a> are built from exactly these flip-flops.</p>
+  <p><b>Water analogy:</b> a camera pointed at a tap. D is the tap (open or closed); the clock is the shutter button. The photo (Q) shows the tap as it was at the click, and stays on the screen until the next click. In toggle mode it is a <b>ballpoint pen</b>: each click swaps in ↔ out.</p>
+  <p class="hint">Change D, then send clock pulses: Q only changes on the rising edge. Tick "toggle" to wire Q̅ → D and watch Q run at half the clock speed.</p>
+  <div class="controls"><button id="d13clk">👆 Clock pulse</button><button id="d13d">D = 0</button><button id="d13run">▶ Auto clock</button><label class="slider"><input type="checkbox" id="d13tog"> Toggle (Q̅ → D)</label><button id="d13r">R (reset)</button></div>
+  <canvas id="c4013" width="800" height="280"></canvas>
+  <p class="hint">Other uses: a <b>push-on / push-off</b> switch (one button press = one clock; you need a debounced button, because a raw button bounces and gives several clocks), storing a sensor state at a precise moment, or a 2-bit counter with both halves chained.</p>
+  <x-chip-widgets chip="4013" name="CD4013"/>
+</section>

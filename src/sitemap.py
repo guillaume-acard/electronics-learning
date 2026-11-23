@@ -191,7 +191,7 @@ PAGES = [
            'title': 'Common Microchips',
            'tag': "Fifteen classic chips: what's inside, what they're for, and how to use them.",
            'facts': ['NE555 · 7805 · LM358 · LM339 · LM386 · LM3914', 'CD4017 · CD4511 · CD4518 · CD4013 · CD4060', '74HC595 · L293D · TP4056 · ATmega328P']},
-  'js': ['@helpers', '@helpers2', 'chips.js', 'chipx.js', 'chipmin.js', 'chipmore.js'],
+  'js': ['@helpers', '@helpers2', 'lib.js', 'chips/*.js', 'widgets.js'],   # registry, one file per chip, then the widgets
   'card': {'svg': '<svg viewBox="0 0 120 60"><rect x="35" y="5" width="50" height="50" fill="#1f2937" stroke="#e2e8f0" stroke-width="2"/><path d="M53 5a7 7 0 0 '
                   '0 14 0" fill="#0b1220" stroke="#e2e8f0" stroke-width="2"/><path d="M25 14H35M25 26H35M25 38H35M25 50H35M85 14H95M85 26H95M85 38H95M85 50H95" '
                   'stroke="#e2e8f0" stroke-width="3"/></svg>',

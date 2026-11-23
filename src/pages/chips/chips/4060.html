@@ -1,0 +1,24 @@
+<section id="s4060" data-menu="CD4060 + quartz" data-icon="◷">
+  <h2><span class="num">#</span>CD4060 oscillator + 14-stage divider: quartz time</h2>
+  <p><b>What it does:</b> two things in one chip. An <b>oscillator</b> (pins 9–11) that makes a fast clock with a quartz crystal, or with a resistor and a capacitor. And a chain of <b>14 flip-flops</b>, each one halving the frequency of the one before (like the <a class="navlink" href="#s4013">CD4013</a> in toggle mode). Ten of those stages come out on pins: Q4 to Q10 and Q12 to Q14.</p>
+  <p><b>How it works inside:</b> the oscillator is an <b>inverter</b> (a NOT gate): its output is always the opposite of its input. Put a quartz from output to input and it keeps "correcting" itself back and forth, at the one frequency the quartz accepts. Every output Qn gives the oscillator frequency divided by 2ⁿ. With a <b>32.768 kHz</b> watch quartz: Q4 = 2,048 Hz (a tone), Q10 = 32 Hz, Q14 = <b>exactly 2 Hz</b>. Add one more ÷2 (a CD4013) and you have <b>1 Hz: a clock's second</b>.</p>
+  <p><b>Water analogy:</b> a pendulum clock. The quartz is the pendulum, the inverter is the little kick that keeps it swinging, and the 14 stages are the gears that turn its fast ticks into seconds.</p>
+  <p class="hint">Fourteen stages, each half as fast as the one before. The first ones are far too fast for your eyes (they look half lit); watch the last ones blink. The grey stages exist inside but have no pin.</p>
+  <div class="controls"><button id="d60run" class="active">⏸ Pause</button><button id="d60rst">↺ RESET (pin 12)</button></div>
+  <canvas id="c4060" width="800" height="300"></canvas>
+
+  <h3>🔷 What is a quartz crystal, and why is it so precise?</h3>
+  <p>A <b>quartz</b> is a thin slice of quartz crystal (the mineral, silicon dioxide) with a metal film on each side. Quartz is <b>piezoelectric</b>: squeeze it and it makes a small voltage; put a voltage on it and it bends a tiny bit. The same effect makes a piezo buzzer click (see <a data-page="motion" class="navlink">Sound &amp; motion</a>).</p>
+  <p>The slice is cut so that it rings, mechanically, at one very exact frequency, like a <b>tuning fork</b>. A watch quartz is literally a tiny tuning fork inside the little metal cylinder. Electrically, it lets through almost nothing except that one frequency. So the inverter around it can only oscillate there: the quartz <b>decides the rhythm</b>, the chip just keeps it going.</p>
+  <ul>
+    <li><b>Why 32,768 Hz?</b> It's 2¹⁵: divide by 2 fifteen times and you get exactly 1 Hz. It's also slow enough for a tiny, very low-power watch circuit.</li>
+    <li><b>Precision:</b> about ±20 ppm (parts per million): less than 2 seconds a day. A 555 with a resistor and a capacitor is off by 5–10 % and drifts with temperature and battery voltage: minutes a day.</li>
+    <li><b>The parts around it:</b> the <b>10 MΩ</b> biases the inverter to its middle point so it amplifies (it can't start otherwise). The two <b>22 pF</b> capacitors are the "load" the quartz is tuned for. The <b>100 kΩ</b> limits how hard the inverter shakes the tiny crystal: too much drive can damage a watch quartz.</li>
+    <li><b>Elsewhere:</b> the Arduino's 16 MHz crystal (<a class="navlink" href="#s328">ATmega328P</a>), every computer, phone, radio and watch. Faster crystals are thicker slices, not forks.</li>
+  </ul>
+  <p class="hint">Push the quartz at different frequencies. Away from its own frequency, even by a few hertz, it barely moves. That razor-sharp response is why it's so precise.</p>
+  <div class="controls"><x-slider id="xtF" min="32740" max="32796" step="0.25" value="32760" grow="1">Push frequency</x-slider><b id="xtFt" style="min-width:110px"></b></div>
+  <canvas id="cXtal" width="800" height="260"></canvas>
+  <p class="hint">Used in <a class="navlink" href="#p26">project 26: quartz stopwatch</a>. Keep the quartz legs short and don't touch it while it runs: your finger adds capacitance and can stop it.</p>
+  <x-chip-widgets chip="4060" name="CD4060"/>
+</section>

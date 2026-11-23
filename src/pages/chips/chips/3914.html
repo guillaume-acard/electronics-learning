@@ -1,0 +1,10 @@
+<section id="s3914" data-menu="LM3914 bar-graph" data-icon="▮▮">
+  <h2><span class="num">#</span>LM3914 bar-graph driver: a voltage becomes a bar</h2>
+  <p><b>What it does:</b> it lights <b>1 to 10 LEDs</b> depending on a voltage: a little voltage lights the first LED, the full-scale voltage lights all ten. It's a ready-made "level meter": battery gauges, VU-meters, thermometers (<a class="navlink" href="#p21">project 21</a> builds the same thing by hand with 3 × LM339, and lists the LM3914 as a variant), no microcontroller needed. It also <b>regulates the LED current itself</b>, so no resistor per LED.</p>
+  <p><b>How it works inside:</b> a ladder of <b>10 equal resistors</b> between RLO and RHI makes 10 evenly spaced voltages. <b>10 comparators</b> (op-amps, see the <a class="navlink" href="#s358">LM358</a>) each compare the input with one rung: if the input is higher, that comparator turns its LED on. A built-in <b>1.25 V reference</b> lets you set the scale with a trimmer, and the current it supplies (× 10) sets the LED brightness. MODE chooses a <b>bar</b> (all LEDs up to the level) or a single moving <b>dot</b>.</p>
+  <p><b>Water analogy:</b> a tall tank with 10 overflow holes at equal heights, each feeding a little light. The higher the water, the more holes spill.</p>
+  <div class="controls"><x-slider id="lm39In" min="0" max="1.3" step="0.005" value="0.3" grow="1">Input (SIG)</x-slider><x-slider id="lm39Hi" min="0.2" max="1.25" step="0.01" value="0.5" grow="1">RHI (top of scale)</x-slider><label class="slider"><input type="checkbox" id="lm39Dot"> dot mode</label></div>
+  <canvas id="c3914" width="800" height="280"></canvas>
+  <p class="hint">Cousins: the <b>LM3915</b> (logarithmic steps of 3 dB, for audio) and <b>LM3916</b> (VU-meter scale). Chain two LM3914s for 20 LEDs. Gotronic: LM3914N, code 21122.</p>
+  <x-chip-widgets chip="3914" name="LM3914"/>
+</section>

@@ -1,0 +1,13 @@
+<section id="s386" data-menu="LM386 audio amp" data-icon="🔊">
+  <h2><span class="num">#</span>LM386 audio amplifier: drives a speaker</h2>
+  <p><b>What it does:</b> it takes a small audio signal and gives it enough <b>power</b> (up to ~0.5–1 W) to move a speaker cone. It's the heart of countless mini amps, <b>including your Ruby amp</b>.</p>
+  <p><b>How it works inside:</b> an input stage, a gain stage, then a <b>push-pull output</b>: two transistors, one that <b>pushes</b> the speaker out (from +9 V) and one that <b>pulls</b> it in (to ground). The gain is <b>20×</b> by default, and up to <b>200×</b> if you connect a capacitor between <b>pins 1 and 8</b>. In the Ruby, the 1 kΩ <b>gain knob</b> sits there, so you choose anywhere in between.</p>
+  <p><b>Water analogy:</b> two pumps facing a flexible membrane (the speaker cone). One pushes, the other pulls, in time with the music.</p>
+  <div class="controls">
+    <x-slider id="laIn" min="0" max="1" step="0.01" value="0.4" grow="1">🎸 Guitar signal</x-slider>
+    <x-slider id="laG" min="0" max="1" step="0.01" value="0.2" grow="1">Gain knob (pins 1–8)</x-slider>
+  </div>
+  <canvas id="c386" width="800" height="270"></canvas>
+  <p class="hint">The output sits at half the supply (4.5 V) and swings up and down around it. That's why there's a big <b>220 µF capacitor</b> before the speaker: it blocks the 4.5 V DC and passes the music, exactly the coupling trick from the <a data-page="capacitor" class="navlink">capacitor page</a>. Push the gain too far and the swing hits 0 V / 9 V and clips, which is the Ruby's overdrive.</p>
+  <x-chip-widgets chip="386" name="LM386"/>
+</section>

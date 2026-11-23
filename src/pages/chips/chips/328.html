@@ -1,0 +1,10 @@
+<section id="s328" data-menu="ATmega328P (Arduino)" data-icon="µC">
+  <h2><span class="num">#</span>ATmega328P: the brain of the Arduino</h2>
+  <p><b>What it does:</b> it's a complete little <b>computer on one chip</b>: a processor, 32 KB of memory for your program, 2 KB of working memory, and 23 input/output pins that your code can switch, read, time and measure. The Arduino Uno (and the ONE-C, with its cousin the ATmega328P<b>B</b>) is just this chip plus USB, a 16 MHz crystal and a 5 V regulator. It runs the dice (<a class="navlink" href="#p12">project 12</a>) and the thermometer (<a class="navlink" href="#p20">project 20</a>).</p>
+  <p><b>How it works inside:</b> a <b>CPU</b> reads your program from <b>Flash</b> memory and executes ~16 million simple instructions per second, ticking with the crystal. It talks to the outside through <b>ports</b> (B, C, D): each pin is a tiny switch to 5 V or 0 V (digitalWrite), or an input (digitalRead). Some pins have extras: an <b>ADC</b> (analogRead, 6 pins A0–A5, 10 bits = 0–1023), <b>timers</b> for PWM (analogWrite on 6 pins), serial (TX/RX to the PC).</p>
+  <p><b>Water analogy:</b> a control room with 23 valves and gauges, and an operator (the CPU) who follows a written procedure (your program) 16 million steps per second.</p>
+  <div class="controls"><x-slider id="avA0" min="0" max="5" step="0.01" value="2.5" grow="1">Potentiometer on A0</x-slider></div>
+  <canvas id="c328" width="800" height="280"></canvas>
+  <p class="hint">The demo runs a tiny program: <code>value = analogRead(A0); analogWrite(9, value / 4); digitalWrite(13, millis() / 500 % 2);</code>. Arduino pin names (D0–D13, A0–A5) are not the chip's pin numbers: D13 is chip pin 19, A0 is pin 23.</p>
+  <x-chip-widgets chip="328" name="ATmega328P"/>
+</section>

@@ -68,7 +68,9 @@ def palette_js():
 
 
 def page_js(p):
-    files = [JS_SHARED.get(f, f'pages/{p["dir"]}/{f}') for f in p['js']]
+    files = []
+    for f in p['js']:            # '@name' = shared/js file; other entries are relative to the page folder (globs allowed)
+        files += [JS_SHARED[f]] if f in JS_SHARED else sorted(glob.glob(f'pages/{p["dir"]}/{f}')) or [f'pages/{p["dir"]}/{f}']
     if not files:
         return None
     js = palette_js() + rd('shared/js/core.js') + '\n' + '\n'.join(rd(f) for f in files)
@@ -89,7 +91,7 @@ def build_site(site):
     pages, links = site.PAGES, getattr(site, 'LINKS', {})
     pages_html, files = '', {}
     for i, p in enumerate(pages):
-        ctx = {'page': p['id'], 'site': pages, 'links': links}
+        ctx = {'page': p['id'], 'dir': p['dir'], 'site': pages, 'links': links}
         main = components.expand(rd(f'pages/{p["dir"]}/page.html'), ctx)
         if p.get('group'):
             k = main.rfind('<section')

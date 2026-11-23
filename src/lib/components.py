@@ -51,6 +51,14 @@ def _slider(a, inner, ctx):
     return f'<label class="slider{" grow" if a.get("grow") else ""}">{inner}<input{attrs}></label>'
 
 
+# ---------------------------------------------------------------- files
+
+@tag('include')
+def _include(a, inner, ctx):
+    """<x-include src="chips/555.html"/>: insert another HTML file (path relative to the page's folder)."""
+    return open(f'pages/{ctx["dir"]}/{a["src"]}', encoding='utf-8').read()
+
+
 # ---------------------------------------------------------------- microchips
 
 @tag('chip-widgets')

@@ -1,0 +1,13 @@
+<section id="s4017" data-menu="CD4017 counter" data-icon="10">
+  <h2><span class="num">#</span>CD4017 decade counter: the LED chaser</h2>
+  <p><b>What it does:</b> it has <b>10 outputs</b>. Only one is on at a time. Each pulse on the <b>clock</b> pin moves the "on" to the next output: 0, 1, 2 … 9, then back to 0.</p>
+  <p><b>How it works inside:</b> a chain of <b>flip-flops</b> (tiny 1-bit memories made of transistors) counts the pulses, and a <b>decoder</b> turns the count into "light output number N". Connect an output to the <b>reset</b> pin and it starts over early, so it counts to any number from 2 to 10.</p>
+  <p><b>Water analogy:</b> a rotating distributor valve that sends water to the next of 10 pipes each time you push its lever. The classic pairing: a <b>555 provides the clock pulses</b> and the 4017 counts them.</p>
+  <div class="controls">
+    <x-slider id="ctF" min="0" max="12" step="0.1" value="3" grow="1">Clock speed (from a 555)</x-slider>
+    <button id="ctStep">👆 One pulse</button>
+    <x-slider id="d18sp" min="0.5" max="12" step="0.5" value="2">Count to <select class="fsel" id="ctN"></select></label>
+  </div>
+  <canvas id="c4017" width="800" height="250"></canvas>
+  <x-chip-widgets chip="4017" name="CD4017"/>
+</section>

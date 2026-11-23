@@ -1,0 +1,14 @@
+<section id="s555" data-menu="NE555 timer" data-icon="⏱" data-group="The chips">
+  <h2><span class="num">#</span>NE555 timer: the blinker</h2>
+  <p><b>What it does:</b> it turns on and off by itself at a rate you choose with two resistors and a capacitor. Made in 1972, it's still produced by the <b>billions</b>.</p>
+  <p><b>How it works inside:</b> a capacitor fills through R1 + R2. Two <b>comparators</b> (voltage watchers) watch it: when it reaches <b>⅔</b> of the supply, the chip flips its output <b>off</b> and opens a <b>discharge</b> transistor that drains the capacitor through R2. When it falls to <b>⅓</b>, the output flips back <b>on</b> and filling starts again.</p>
+  <p><b>Water analogy:</b> a tank with a float. When the water reaches the high mark, the float opens a drain. When it drops to the low mark, the drain closes and the tank refills. The light is on while the tank is filling.</p>
+  <div class="controls">
+    <x-slider id="tR1" min="0" max="2" step="0.01" value="1">R1</x-slider>
+    <x-slider id="tR2" min="0" max="2" step="0.01" value="1.7">R2</x-slider>
+    <span id="tCch"></span><button id="tSnd">🔊 Listen</button>
+  </div>
+  <canvas id="c555" width="800" height="300"></canvas>
+  <p class="hint">Frequency = 1.44 ÷ ((R1 + 2×R2) × C). Pick 10 nF and the blinking becomes an audible <b>tone</b>: that's how cheap buzzers, sirens and the classic "Atari Punk Console" synth work.</p>
+  <x-chip-widgets chip="555" name="NE555"/>
+</section>

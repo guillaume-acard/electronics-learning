@@ -1,0 +1,14 @@
+<section id="s7805" data-menu="7805 regulator" data-icon="5V">
+  <h2><span class="num">#</span>7805 voltage regulator: the steady 5 V</h2>
+  <p><b>What it does:</b> you feed it anything from about 7 V to 20 V, and it always gives exactly <b>5 V</b> out, even as the battery drains or the load changes. (Its cousins: 7809 → 9 V, 7812 → 12 V, and the LM317, which is adjustable.)</p>
+  <p><b>How it works inside:</b> a big transistor acts as a valve between input and output. A <b>reference</b> (a precise Zener-like voltage) and a comparator constantly check the output: too high, close the valve a bit; too low, open it. The extra voltage is burned off as <b>heat</b>: power = (Vin − 5 V) × current.</p>
+  <p><b>Water analogy:</b> a pressure-reducing valve on a house's water supply. Whatever the street pressure, the taps get the same gentle pressure, and the valve gets warm doing it.</p>
+  <div class="controls">
+    <x-slider id="rgV" min="0" max="20" step="0.1" value="9" grow="1">Input voltage</x-slider>
+    <x-slider id="rgI" min="0" max="1" step="0.01" value="0.2" grow="1">Current drawn by the circuit</x-slider>
+    <span id="rgChoices"></span>
+  </div>
+  <canvas id="c7805" width="800" height="260"></canvas>
+  <p class="hint">Note the <b>dropout</b>: the input must be at least ~2 V above 5 V (so 7 V or more). Big voltage drop × big current = lots of heat, so add a <b>heatsink</b>. Without one, it protects itself by shutting down when too hot.</p>
+  <x-chip-widgets chip="7805" name="7805"/>
+</section>

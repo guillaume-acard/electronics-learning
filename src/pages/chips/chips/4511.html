@@ -1,0 +1,11 @@
+<section id="s4511" data-menu="CD4511 decoder" data-icon="8">
+  <h2><span class="num">#</span>CD4511 decoder: number → digit</h2>
+  <p><b>What it does:</b> it reads a number from 0 to 9 written in <b>binary</b> on 4 wires (A = 1, B = 2, C = 4, D = 8: that's called <b>BCD</b>, binary-coded decimal), and lights the right segments of a <b>7-segment display</b>. Give it 0110 (4 + 2 = 6) and it lights a, f, g, e, d, c: a "6". It also drives the segments itself, with up to ~25 mA each.</p>
+  <p><b>How it works inside:</b> a small <b>latch</b> (a 4-bit memory) holds the number, then a <b>decoder</b> made of logic gates works out which of the 7 segments each number needs (a hard-wired lookup table, like the 27-diode matrix of <a class="navlink" href="#p14">dice project 14</a>), and 7 <b>output transistors</b> push current into the segments. Three control pins: <b>LT</b> (lamp test: all on), <b>BI</b> (blank: all off) and <b>LE</b> (latch: freeze the digit).</p>
+  <p><b>Water analogy:</b> a fountain with 7 nozzles shaped like a digit. You set 4 levers (on/off), and a mechanism behind the wall opens exactly the nozzles that spray the shape of that number.</p>
+  <p class="hint">Click the 4 input bits (or the controls) to see what the display shows. Numbers above 9 (1010–1111) are not valid BCD: the 4511 shows nothing.</p>
+  <div class="controls"><button id="d11up">➕ Count up</button><button id="d11LT">LT (lamp test)</button><button id="d11BI">BI (blank)</button><button id="d11LE">LE (latch) </button></div>
+  <canvas id="c4511" width="800" height="270"></canvas>
+  <p class="hint">Only for <b>common-cathode</b> displays like your SC39-11SURKWA (COM to ground). Each segment still needs its own resistor (470 Ω–1 kΩ at 5–9 V). Used in <a class="navlink" href="#p15">project 15</a>, <a class="navlink" href="#p19">project 19</a> and <a class="navlink" href="#parts">Using real parts</a>.</p>
+  <x-chip-widgets chip="4511" name="CD4511"/>
+</section>

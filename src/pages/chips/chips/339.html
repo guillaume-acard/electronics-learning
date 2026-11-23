@@ -1,0 +1,18 @@
+<section id="s339" data-menu="LM339 comparators" data-icon="≶">
+  <h2><span class="num">#</span>LM339 quad comparator: four yes/no questions</h2>
+  <p><b>What it does:</b> four <b>comparators</b> in one chip. Each one compares two voltages and answers one question: <i>"is the − input higher than the + input?"</i> If <b>yes</b>, its output <b>connects to ground</b>. If <b>no</b>, its output is simply <b>disconnected</b> (it "floats"). It runs from one supply, 2 to 36 V, and its inputs work right down to 0 V.</p>
+  <p><b>How it works inside:</b> each comparator is a high-gain amplifier (like an op-amp) with no feedback: the tiniest difference between the inputs, a few millivolts, swings it fully one way or the other. Its output stage is a single transistor to ground, called an <b>open collector</b>. That is why every output needs a <b>pull-up resistor</b> to + (to give a clean "high" when the transistor is off), or an LED + resistor coming from + into the pin (it lights when the transistor switches on).</p>
+  <p><b>Water analogy:</b> four lock-keepers, each watching two water levels. When the level on his − side gets higher than on his + side, he opens a drain to the ground. He never pumps water in, he can only drain it.</p>
+  <p class="hint">Move the signal (on −) past the threshold (on +). Then switch the pull-up off: without it, a "no" answer leaves the output floating and nothing defines the voltage.</p>
+  <div class="controls"><x-slider id="c9sig" min="0" max="5" step="0.01" value="1.8" grow="1">Signal on IN−</x-slider><x-slider id="c9thr" min="0" max="5" step="0.01" value="2.5" grow="1">Threshold on IN+</x-slider><label class="slider"><input type="checkbox" id="c9pu" checked> Pull-up 10 kΩ</label></div>
+  <canvas id="c339" width="800" height="280"></canvas>
+  <table>
+    <tr><td></td><td><b>LM339</b> (comparator)</td><td><b>LM358</b> (op-amp)</td></tr>
+    <tr><td>Made for</td><td>Comparing only: yes / no</td><td>Amplifying (with feedback), comparing in a pinch</td></tr>
+    <tr><td>Output</td><td>Open collector: pulls to ground, needs a pull-up</td><td>Push-pull: drives high and low by itself</td></tr>
+    <tr><td>Switching</td><td>Fast, clean edges (~1 µs)</td><td>Slow edges as a comparator</td></tr>
+    <tr><td>Bonus</td><td>Outputs can be joined (any "yes" pulls the line low), and the pull-up can go to a different voltage (5 V logic from a 12 V circuit)</td><td>2 in a package, can also make filters and preamps</td></tr>
+  </table>
+  <p class="hint">Three LM339 = 12 comparators: <a class="navlink" href="#p21">project 21</a> uses 10 of them on a resistor ladder to build a bar thermometer by hand, which is exactly what the <a class="navlink" href="#s3914">LM3914</a> has inside. To stop the output flickering when the signal sits right on the threshold, add <b>hysteresis</b>: a 1 MΩ from the output back to the + input.</p>
+  <x-chip-widgets chip="339" name="LM339"/>
+</section>
