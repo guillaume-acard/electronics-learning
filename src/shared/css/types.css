@@ -1,0 +1,6 @@
+  .tcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .tcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#101827}
+  .tcard .tart{background:#0b1220;border-radius:8px;padding:6px;margin-bottom:8px}.tcard .tart svg{width:100%;height:84px;display:block}
+  .tcard h3{margin:4px 0 4px;font-size:1.02rem}.tcard .tlook{color:var(--muted);font-size:.9rem;margin:0 0 6px}
+  .tpc{list-style:none;padding:0;margin:0 0 6px;font-size:.9rem}.tpc .p{color:#86efac}.tpc .c{color:#fca5a5}
+  .tcard .tuse{font-size:.9rem;margin:0}

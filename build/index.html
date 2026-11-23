@@ -21,8 +21,6 @@
   <circle cx="240" cy="62" r="46" fill="url(#hg)"/><path d="M224 104v-44a16 16 0 0 1 32 0v44z" fill="#ef4444"/><rect x="230" y="104" width="3" height="50" fill="#cbd5e1"/><rect x="246" y="104" width="3" height="38" fill="#cbd5e1"/>
   <rect x="30" y="138" width="74" height="40" rx="4" fill="#1f2937"/><path d="M30 152a6 6 0 0 1 0 12z" fill="#0b1220"/><rect x="38" y="130" width="6" height="8" fill="#cbd5e1"/><rect x="38" y="178" width="6" height="8" fill="#cbd5e1"/><rect x="54" y="130" width="6" height="8" fill="#cbd5e1"/><rect x="54" y="178" width="6" height="8" fill="#cbd5e1"/><rect x="70" y="130" width="6" height="8" fill="#cbd5e1"/><rect x="70" y="178" width="6" height="8" fill="#cbd5e1"/><rect x="86" y="130" width="6" height="8" fill="#cbd5e1"/><rect x="86" y="178" width="6" height="8" fill="#cbd5e1"/></svg></div></div></div>
 <main>
-
-
 <section>
   <h2>Start here: the water analogy</h2>
   <p>Every page uses the same idea: <b>electricity behaves like water flowing in pipes</b>. Keep this table in mind and the rest gets much easier.</p>
@@ -40,63 +38,7 @@
 
 <section>
   <h2>Components</h2>
-  <div class="comp-grid">
-    <a class="comp" data-page="resistor">
-      <svg viewBox="0 0 120 50"><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><rect x="35" y="14" width="50" height="22" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg>
-      <div><h3>Resistor</h3>
-      <p>Limits how much current flows. Protects LEDs, divides voltages, sets defaults and timing.</p>
-      <p class="analogy">💧 A narrow pipe</p>
-      <span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="capacitor">
-      <svg viewBox="0 0 120 50"><path d="M5 25H54M66 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M54 8V42M66 8V42" stroke="#e2e8f0" stroke-width="4"/></svg>
-      <div><h3>Capacitor</h3>
-      <p>Stores charge for a moment. Smooths power, blocks DC while passing signals, and sets timing.</p>
-      <p class="analogy">💧 A stretchy rubber sheet in a pipe</p>
-      <span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="diode">
-      <svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/></svg>
-      <div><h3>Diode</h3>
-      <p>Lets current flow one way only. AC → DC, reverse protection, spike protection, guitar distortion.</p>
-      <p class="analogy">💧 A one-way valve</p>
-      <span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="led">
-      <svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/><path d="M62 6L74 -6M72 10L84 -2" stroke="#fbbf24" stroke-width="2"/></svg>
-      <div><h3>LED</h3>
-      <p>A diode that glows. Always needs a resistor. Includes a resistor calculator, PWM dimming and RGB colour mixing.</p>
-      <p class="analogy">💧 A one-way valve with a glowing paddle wheel</p>
-      <span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="transistor">
-      <svg viewBox="0 0 120 50"><circle cx="64" cy="25" r="20" fill="none" stroke="#e2e8f0" stroke-width="2"/><path d="M5 25H56M56 12V38M56 19L74 8V-4M56 31L74 42V54" stroke="#e2e8f0" stroke-width="3" fill="none"/></svg>
-      <div><h3>Transistor</h3>
-      <p>A small current controls a big one. A switch for motors, an amplifier for guitars, and the logic behind computers.</p>
-      <p class="analogy">💧 A big valve opened by a small side flow</p>
-      <span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="inductor">
-      <svg viewBox="0 0 120 50"><path d="M5 25H25M95 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M25 25a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg>
-      <div><h3>Inductor</h3><p>A coil that resists changes in current. Boost converters, filters, transformers, the switch-off spike.</p><p class="analogy">💧 A heavy water wheel</p><span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="relay">
-      <svg viewBox="0 0 120 50"><rect x="35" y="8" width="50" height="34" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 34L75 16" stroke="#e2e8f0" stroke-width="2"/></svg>
-      <div><h3>Relay</h3><p>A switch moved by an electromagnet. Isolated control of lamps, motors and mains, plus self-latching memory.</p><p class="analogy">💧 A lever on a separate pipe</p><span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="motion">
-      <svg viewBox="0 0 120 50"><circle cx="22" cy="25" r="15" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M42 16a12 12 0 0 1 0 18" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><path d="M58 20h8l12 -12v34l-12 -12h-8z" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><circle cx="102" cy="25" r="14" fill="none" stroke="#e2e8f0" stroke-width="3"/><text x="102" y="30" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700" font-family="system-ui">M</text></svg>
-      <div><h3>Sound &amp; motion</h3><p>Active and passive buzzers, the 8 Ω speaker and the DC motor: how they work and how to drive them safely.</p><p class="analogy">💧 A membrane and a water wheel</p><span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="formulas" style="--accent:#38bdf8">
-      <svg viewBox="0 0 120 50"><path d="M60 4L96 46H24Z" fill="none" stroke="#38bdf8" stroke-width="3"/><path d="M38 30H82M60 30V46" stroke="#38bdf8" stroke-width="2"/><text x="60" y="26" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="800" font-family="system-ui">V</text></svg>
-      <div><h3>Basic formulas</h3><p>Ohm's law, power, series &amp; parallel, dividers, LED resistors, RC time, battery life, with calculators.</p><p class="analogy">💧 Pressure × flow</p><span class="open">Open →</span></div>
-    </a>
-    <a class="comp" data-page="sensors" style="--accent:#f59e0b">
-      <svg viewBox="0 0 120 50"><circle cx="40" cy="25" r="16" fill="#fb923c"/><path d="M30 18l5 14l5 -14l5 14" stroke="#7c2d12" stroke-width="2" fill="none"/><path d="M80 14a10 10 0 0 1 20 0v14h-20z" fill="#e2e8f0"/><path d="M84 28v16M90 28v16M96 28v16" stroke="#e2e8f0" stroke-width="2"/></svg>
-      <div><h3>Sensors</h3><p>LDR, LM35, touch pads, push buttons, guitar pickups and infrared sensors: how the real world becomes a voltage.</p><p class="analogy">💧 Gauges and taps</p><span class="open">Open →</span></div>
-    </a>
-  </div>
+  <div class="comp-grid"><a class="comp" data-page="resistor"><svg viewBox="0 0 120 50"><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><rect x="35" y="14" width="50" height="22" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg><div><h3>Resistor</h3><p>Limits how much current flows. Protects LEDs, divides voltages, sets defaults and timing.</p><p class="analogy">💧 A narrow pipe</p><span class="open">Open →</span></div></a><a class="comp" data-page="capacitor"><svg viewBox="0 0 120 50"><path d="M5 25H54M66 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M54 8V42M66 8V42" stroke="#e2e8f0" stroke-width="4"/></svg><div><h3>Capacitor</h3><p>Stores charge for a moment. Smooths power, blocks DC while passing signals, and sets timing.</p><p class="analogy">💧 A stretchy rubber sheet in a pipe</p><span class="open">Open →</span></div></a><a class="comp" data-page="diode"><svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/></svg><div><h3>Diode</h3><p>Lets current flow one way only. AC → DC, reverse protection, spike protection, guitar distortion.</p><p class="analogy">💧 A one-way valve</p><span class="open">Open →</span></div></a><a class="comp" data-page="led"><svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/><path d="M62 6L74 -6M72 10L84 -2" stroke="#fbbf24" stroke-width="2"/></svg><div><h3>LED</h3><p>A diode that glows. Always needs a resistor. Includes a resistor calculator, PWM dimming and RGB colour mixing.</p><p class="analogy">💧 A one-way valve with a glowing paddle wheel</p><span class="open">Open →</span></div></a><a class="comp" data-page="transistor"><svg viewBox="0 0 120 50"><circle cx="64" cy="25" r="20" fill="none" stroke="#e2e8f0" stroke-width="2"/><path d="M5 25H56M56 12V38M56 19L74 8V-4M56 31L74 42V54" stroke="#e2e8f0" stroke-width="3" fill="none"/></svg><div><h3>Transistor</h3><p>A small current controls a big one. A switch for motors, an amplifier for guitars, and the logic behind computers.</p><p class="analogy">💧 A big valve opened by a small side flow</p><span class="open">Open →</span></div></a><a class="comp" data-page="inductor"><svg viewBox="0 0 120 50"><path d="M5 25H25M95 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M25 25a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg><div><h3>Inductor</h3><p>A coil that resists changes in current. Boost converters, filters, transformers, the switch-off spike.</p><p class="analogy">💧 A heavy water wheel</p><span class="open">Open →</span></div></a><a class="comp" data-page="relay"><svg viewBox="0 0 120 50"><rect x="35" y="8" width="50" height="34" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 34L75 16" stroke="#e2e8f0" stroke-width="2"/></svg><div><h3>Relay</h3><p>A switch moved by an electromagnet. Isolated control of lamps, motors and mains, plus self-latching memory.</p><p class="analogy">💧 A lever on a separate pipe</p><span class="open">Open →</span></div></a><a class="comp" data-page="motion"><svg viewBox="0 0 120 50"><circle cx="22" cy="25" r="15" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M42 16a12 12 0 0 1 0 18" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><path d="M58 20h8l12 -12v34l-12 -12h-8z" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><circle cx="102" cy="25" r="14" fill="none" stroke="#e2e8f0" stroke-width="3"/><text x="102" y="30" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700" font-family="system-ui">M</text></svg><div><h3>Sound &amp; motion</h3><p>Active and passive buzzers, the 8 Ω speaker and the DC motor: how they work and how to drive them safely.</p><p class="analogy">💧 A membrane and a water wheel</p><span class="open">Open →</span></div></a><a class="comp" data-page="formulas" style="--accent:#38bdf8"><svg viewBox="0 0 120 50"><path d="M60 4L96 46H24Z" fill="none" stroke="#38bdf8" stroke-width="3"/><path d="M38 30H82M60 30V46" stroke="#38bdf8" stroke-width="2"/><text x="60" y="26" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="800" font-family="system-ui">V</text></svg><div><h3>Basic formulas</h3><p>Ohm's law, power, series &amp; parallel, dividers, LED resistors, RC time, battery life, with calculators.</p><p class="analogy">💧 Pressure × flow</p><span class="open">Open →</span></div></a><a class="comp" data-page="sensors" style="--accent:#f59e0b"><svg viewBox="0 0 120 50"><circle cx="40" cy="25" r="16" fill="#fb923c"/><path d="M30 18l5 14l5 -14l5 14" stroke="#7c2d12" stroke-width="2" fill="none"/><path d="M80 14a10 10 0 0 1 20 0v14h-20z" fill="#e2e8f0"/><path d="M84 28v16M90 28v16M96 28v16" stroke="#e2e8f0" stroke-width="2"/></svg><div><h3>Sensors</h3><p>LDR, LM35, touch pads, push buttons, guitar pickups and infrared sensors: how the real world becomes a voltage.</p><p class="analogy">💧 Gauges and taps</p><span class="open">Open →</span></div></a></div>
 
   <h3 style="margin-top:26px">Coming next (just ask!)</h3>
   <div class="comp-grid soon">
@@ -109,39 +51,27 @@
 <section>
   <h2>Microchips</h2>
   <p>Once you know the components, chips are easy: each one is a ready-made circuit full of transistors, resistors and diodes.</p>
-  <div class="comp-grid">
-    <a class="comp" data-page="chips">
-      <svg viewBox="0 0 120 60"><rect x="35" y="5" width="50" height="50" fill="#1f2937" stroke="#e2e8f0" stroke-width="2"/><path d="M53 5a7 7 0 0 0 14 0" fill="#0b1220" stroke="#e2e8f0" stroke-width="2"/><path d="M25 14H35M25 26H35M25 38H35M25 50H35M85 14H95M85 26H95M85 38H95M85 50H95" stroke="#e2e8f0" stroke-width="3"/></svg>
-      <div><h3>Common microchips</h3>
-      <p>NE555 timer · 7805 regulator · LM358 op-amp · LM386 audio amp · CD4017 &amp; CD4518 counters · CD4511 display decoder · LM3914 bar-graph driver · 74HC595 shift register · TP4056 charger · ATmega328P (Arduino): what's inside, what they're for, and live demos.</p>
-      <p class="analogy">💧 Tanks with floats, pressure valves, see-saws and bucket brigades</p>
-      <span class="open">Open →</span></div>
-    </a>
-  </div>
+  <div class="comp-grid"><a class="comp" data-page="chips"><svg viewBox="0 0 120 60"><rect x="35" y="5" width="50" height="50" fill="#1f2937" stroke="#e2e8f0" stroke-width="2"/><path d="M53 5a7 7 0 0 0 14 0" fill="#0b1220" stroke="#e2e8f0" stroke-width="2"/><path d="M25 14H35M25 26H35M25 38H35M25 50H35M85 14H95M85 26H95M85 38H95M85 50H95" stroke="#e2e8f0" stroke-width="3"/></svg><div><h3>Common microchips</h3><p>NE555 timer · 7805 regulator · LM358 op-amp · LM339 comparators · LM386 audio amp · LM3914 bar-graph driver · CD4017, CD4518 counters · CD4511 display decoder · CD4013 flip-flop · CD4060 + quartz · 74HC595 shift register · L293D motor driver · TP4056 charger · ATmega328P (Arduino): what's inside, what they're for, and live demos.</p><p class="analogy">💧 Tanks with floats, pressure valves, see-saws and bucket brigades</p><span class="open">Open →</span></div></a></div>
 </section>
 
 <section>
   <h2>🔧 Build it yourself</h2>
-  <div class="comp-grid"><a class="comp" data-page="circuits"><svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg>
-  <div><h3>Circuits to build</h3><p>26 breadboard projects grouped by theme (electronic dice, police siren, fuzz pedal, 00–99 counter, thermometers, infrared alarm, motors and more) with parts lists and variants to try, plus real-life builds: a <b>Li-ion battery charger</b> and a <b>light detector that switches a lamp</b>.</p><span class="open">Open →</span></div></a></div>
+  <div class="comp-grid"><a class="comp" data-page="circuits"><svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg><div><h3>Circuits to build</h3><p>26 breadboard projects grouped by theme (electronic dice, police siren, fuzz pedal, 00–99 counter, thermometers, infrared alarm, motors and more) with parts lists and variants to try, plus real-life builds: a <b>Li-ion battery charger</b> and a <b>light detector that switches a lamp</b>.</p><span class="open">Open →</span></div></a></div>
 </section>
 
 <section>
   <h2>🛍️ Shopping list</h2>
-  <div class="comp-grid"><a class="comp" href="shopping.html"><svg viewBox="0 0 120 60"><path d="M20 12h12l10 30h50l8-22H38" stroke="#22c55e" stroke-width="4" fill="none"/><circle cx="48" cy="50" r="5" fill="#22c55e"/><circle cx="86" cy="50" r="5" fill="#22c55e"/></svg>
-  <div><h3>Gotronic shopping list</h3><p>Every part for the "Circuits to build" projects and the real-life builds, with Gotronic codes, quantities, tick boxes and a live total.</p><span class="open">Open →</span></div></a></div>
+  <div class="comp-grid"><a class="comp" href="shopping.html"><svg viewBox="0 0 120 60"><path d="M20 12h12l10 30h50l8-22H38" stroke="#22c55e" stroke-width="4" fill="none"/><circle cx="48" cy="50" r="5" fill="#22c55e"/><circle cx="86" cy="50" r="5" fill="#22c55e"/></svg><div><h3>Gotronic shopping list</h3><p>Every part for the "Circuits to build" projects and the real-life builds, with Gotronic codes, quantities, tick boxes and a live total.</p><span class="open">Open →</span></div></a></div>
 </section>
 
 <section>
   <h2>🛒 Using real parts</h2>
-  <div class="comp-grid"><a class="comp" href="#parts"><svg viewBox="0 0 120 60"><rect x="38" y="4" width="44" height="52" rx="3" fill="#111"/><path d="M50 10h20M72 12v14M72 32v14M50 50h20M48 32v14M48 12v14M50 30h20" stroke="#ef4444" stroke-width="4"/></svg>
-  <div><h3>From a shop page to a working circuit</h3><p>How to read a product page and datasheet, find the pinout, test the part, pick resistors and drive it. Worked example: the Kingbright SC39-11SURKWA 7-segment display.</p><span class="open">Open →</span></div></a></div>
+  <div class="comp-grid"><a class="comp" data-page="parts"><svg viewBox="0 0 120 60"><rect x="38" y="4" width="44" height="52" rx="3" fill="#111"/><path d="M50 10h20M72 12v14M72 32v14M50 50h20M48 32v14M48 12v14M50 30h20" stroke="#ef4444" stroke-width="4"/></svg><div><h3>From a shop page to a working circuit</h3><p>How to read a product page and datasheet, find the pinout, test the part, pick resistors and drive it. Worked examples: the Kingbright SC39-11SURKWA 7-segment display and the DC10G 10-LED bar graph.</p><span class="open">Open →</span></div></a></div>
 </section>
 
 <section>
   <h2>🏁 Test yourself</h2>
-  <div class="comp-grid"><a class="comp" href="#quiz" style="--accent:#facc15"><svg viewBox="0 0 120 60"><circle cx="60" cy="30" r="24" fill="#facc15"/><text x="60" y="42" text-anchor="middle" font-size="32" font-weight="800" fill="#0b1120">?</text></svg>
-  <div><h3>The Quiz</h3><p>31 interactive circuit challenges: pick the missing part, choose resistor and capacitor values, predict what happens, and build working circuits.</p><span class="open">Start the quiz →</span></div></a></div>
+  <div class="comp-grid"><a class="comp" data-page="quiz" style="--accent:#facc15"><svg viewBox="0 0 120 60"><circle cx="60" cy="30" r="24" fill="#facc15"/><text x="60" y="42" text-anchor="middle" font-size="32" font-weight="800" fill="#0b1120">?</text></svg><div><h3>The Quiz</h3><p>31 interactive circuit challenges: pick the missing part, choose resistor and capacitor values, predict what happens, and build working circuits.</p><span class="open">Start the quiz →</span></div></a></div>
 </section>
 
 <section>

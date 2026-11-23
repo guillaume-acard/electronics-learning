@@ -1,0 +1,10 @@
+# The "types of ... you'll meet" cards: (title, picture, how to recognise it, pros, cons, use for)
+from svg import *
+TYPES = [
+ ('5 mm standard',led('#ef4444'),'The classic: long leg = +, flat edge on the − side.',['Cheap, bright, every colour','Breadboard-friendly'],['Needs a resistor','~20 mA max'],'Indicators and all the beginner projects.'),
+ ('3 mm',led('#22c55e',size=0.75),'Smaller version, same rules.',['Fits tight panels'],['A bit less bright'],'Status lights on small boxes.'),
+ ('RGB (4 legs)',led('#a855f7',legs=4,extra='<circle cx="62" cy="34" r="3" fill="#ef4444"/><circle cx="70" cy="30" r="3" fill="#22c55e"/><circle cx="78" cy="34" r="3" fill="#3b82f6"/>'),'Three LEDs in one, with a common leg (the longest).',['Any colour by mixing'],['3 resistors and 3 pins to drive','Common anode or cathode: check!'],'Mood lights, colour indicators with an Arduino (PWM).'),
+ ('Flashing LED',led('#f59e0b',extra='<rect x="66" y="30" width="8" height="6" fill="#111"/>'),'Looks normal but has a tiny chip inside (a black speck).',['Blinks by itself, no 555 needed'],['Fixed rate','Doesn\'t like being dimmed'],'Fake alarm lights, toys.'),
+ ('High-power (1 W star)',S('<path d="M70 8l10 14h17l-8 15l8 15H80L70 66L60 52H43l8-15l-8-15h17z" fill="#94a3b8"/><circle cx="70" cy="37" r="12" fill="#fef9c3"/><circle cx="70" cy="37" r="6" fill="#fde047"/>'),'A small yellow dome on an aluminium star.',['Very bright (100+ lumens)'],['Needs a heatsink','Needs a constant-current driver, not just a resistor'],'Torches, lamps.'),
+ ('Addressable (WS2812)',S('<rect x="40" y="15" width="60" height="40" rx="3" fill="#f8fafc"/><circle cx="70" cy="35" r="13" fill="#fef3c7"/><rect x="65" y="30" width="10" height="10" fill="#111"/><text x="70" y="64" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="system-ui">DIN · 5V · GND</text>'),'A white square with a chip inside, usually on strips or rings.',['Hundreds of RGB LEDs on ONE data wire'],['Needs a microcontroller','5 V and up to 60 mA each at full white'],'LED strips, matrices and rings with an Arduino.')
+]

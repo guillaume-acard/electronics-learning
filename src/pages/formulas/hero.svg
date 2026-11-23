@@ -1,0 +1,6 @@
+<svg viewBox="0 0 320 200" aria-hidden="true">
+  <path d="M160 20 L270 180 L50 180 Z" fill="#0c4a6e" stroke="#38bdf8" stroke-width="4"/><path d="M92 120 H228 M160 120 V180" stroke="#38bdf8" stroke-width="4"/>
+  <text x="160" y="100" text-anchor="middle" fill="#fbbf24" font-size="40" font-weight="800" font-family="system-ui">V</text>
+  <text x="112" y="165" text-anchor="middle" fill="#e2e8f0" font-size="32" font-weight="800" font-family="system-ui">R</text>
+  <text x="208" y="165" text-anchor="middle" fill="#e2e8f0" font-size="32" font-weight="800" font-family="system-ui">I</text>
+  <text x="290" y="60" text-anchor="middle" fill="#f472b6" font-size="18" font-weight="800" font-family="system-ui">P=V×I</text></svg>

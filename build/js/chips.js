@@ -22,7 +22,6 @@ if(typeof gndSym==='function')gndSym=__wrap(gndSym,(ctx,x,y)=>__PR(ctx,{t:'gnd',
 if(typeof resBox==='function')resBox=__wrap(resBox,(ctx,x,y,w,h,t)=>{const hz=w>h;__PR(ctx,{t:'part',k:'res',a:hz?[x,y+h/2]:[x+w/2,y],b:hz?[x+w,y+h/2]:[x+w/2,y+h],o:{label:t}});});
 
 const requestAnimationFrame=cb=>window.requestAnimationFrame(function tick(t){if(PG.hidden)window.requestAnimationFrame(tick);else cb(t);});
-
 const $ = id => document.getElementById(id);
 function loopPath(ctx, x1, y1, x2, y2){ctx.beginPath(); ctx.moveTo(x1,(y1+y2)/2); ctx.lineTo(x1,y1); ctx.lineTo(x2,y1); ctx.lineTo(x2,y2); ctx.lineTo(x1,y2); ctx.closePath();}
 function arrowText(ctx, txt, x, y, color='#94a3b8', size=14, align='center'){ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);}
@@ -53,6 +52,7 @@ function prune(h,t,span){while(h.length&&h[0].t<t-span)h.shift();}
 
 function wrapText(ctx,txt,x,y,maxW,lh,color='#e2e8f0',size=13){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.fillStyle=color;ctx.textAlign='left';
   let line='';txt.split(' ').forEach(w=>{const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,x,y);y+=lh;line=w;}else line=t;});if(line)ctx.fillText(line,x,y);}
+
 
 // ===== DIP helper =====
 function dip(ctx,x,y,labels,title,hl=[],sp=20){const n=labels.length,h=n/2,w=70,H=h*sp+10;
@@ -230,6 +230,7 @@ function draw595(dt){stepSR(dt);const c=$('c595'),ctx=c.getContext('2d');ctx.cle
 let lastC=performance.now();
 function frameC(now){const dt=Math.min(0.05,(now-lastC)/1000);lastC=now;draw555(dt);draw7805(dt);draw358(dt);draw386(dt);draw4017(dt);draw595(dt);requestAnimationFrame(frameC);}
 requestAnimationFrame(frameC);
+
 
 // ===== Pinout + inside-the-chip schematics =====
 (function(){
@@ -749,6 +750,7 @@ let lastX=performance.now();(function fX(now){const dt=Math.min(0.05,(now-lastX)
  Object.keys(PN).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.onclick=()=>show(k);box.appendChild(b);});show('NE555P');})();
 })();
 
+
 // ===== Minimal circuits: every leg connected =====
 (function(){
 // row: [pin, branches, why]; branch = [chain, dest]; chain items 'R:1 kΩ','C:10 µF+','C:100 nF','LED:r','POT:10 kΩ','LDR','SPK','XTAL:16 MHz','BTN','D'
@@ -959,6 +961,7 @@ function build(el){const k=el.dataset.chip,M=MIN[k];if(!M)return;const rows=M.ro
   el.querySelectorAll('[data-pin]').forEach(e=>{e.addEventListener('mouseenter',()=>sel(+e.dataset.pin));e.addEventListener('click',()=>sel(+e.dataset.pin));});}
 document.querySelectorAll('.chmin').forEach(build);
 })();
+
 // ===== Demos for LM339, CD4013, CD4060 (+ quartz), L293D =====
 (function(){
 const g=id=>document.getElementById(id);
@@ -1108,6 +1111,5 @@ let last=performance.now();
 (function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;const t=now/1000;
   draw339(t);draw4013(dt);draw4060(dt);drawXtal();draw293(dt);requestAnimationFrame(loop);})(performance.now());
 })();
-
 
 })();

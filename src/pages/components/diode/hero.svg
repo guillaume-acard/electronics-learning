@@ -1,0 +1,9 @@
+<svg viewBox="0 0 320 200" aria-hidden="true">
+  <defs><linearGradient id="db" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5563"/><stop offset=".5" stop-color="#1f2937"/><stop offset="1" stop-color="#030712"/></linearGradient>
+  <linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fecaca" stop-opacity=".9"/><stop offset="1" stop-color="#f97316" stop-opacity=".6"/></linearGradient></defs>
+  <rect x="10" y="76" width="300" height="7" rx="3" fill="#cbd5e1"/>
+  <rect x="100" y="52" width="120" height="56" rx="12" fill="url(#db)"/><rect x="188" y="52" width="16" height="56" fill="#e5e7eb"/>
+  <text x="146" y="85" text-anchor="middle" fill="#9ca3af" font-size="12" font-family="system-ui">1N4007</text>
+  <rect x="40" y="146" width="240" height="4" rx="2" fill="#cbd5e1"/>
+  <rect x="128" y="134" width="64" height="28" rx="12" fill="url(#gl)"/><rect x="174" y="134" width="7" height="28" fill="#111"/>
+  <path d="M120 186h36M156 176v20M156 186l-18-10v20z" stroke="#fbbf24" stroke-width="2.5" fill="none"/><text x="200" y="191" fill="#fbbf24" font-size="13" font-family="system-ui">stripe = −</text></svg>

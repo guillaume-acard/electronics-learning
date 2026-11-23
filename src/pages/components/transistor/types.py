@@ -1,0 +1,11 @@
+# The "types of ... you'll meet" cards: (title, picture, how to recognise it, pros, cons, use for)
+from svg import *
+TYPES = [
+ ('NPN small-signal (BC547)',to92('BC547'),'Black half-round (TO-92). Flat face towards you: C B E (for the BC5xx).',['Cheap, easy switch or amplifier','Turns on with a small + base current'],['~100 mA max','0.2 V lost when switched on'],'LEDs, relays, the dice displays, the touch switch, the fuzz pedal.'),
+ ('NPN medium-power (SS8050)',to92('SS8050'),'Same TO-92 half-round as the BC547, but the legs are <b>E B C</b> (flat face towards you). Swap it blindly for a BC547 and it won\'t work.',['Up to 1.5 A in a tiny package','Same easy drive: 1 kΩ from a pin'],['Gets warm above ~0.5 A','Leg order differs from the BC547'],'Small DC motors (project 23), buzzers, LED strips: loads too big for a BC547.'),
+ ('PNP (BC557)',to92('BC557'),'Same package, the mirror image: turns on when the base is pulled <b>below</b> the emitter.',['Switches the + side of a load'],['Logic is "upside down": low = on'],'High-side switching, push-pull pairs.'),
+ ('Darlington (TIP120)',to220('TIP120'),'TO-220 with a metal tab: two transistors in one.',['Huge gain (~1000)','Up to 5 A'],['~1.5 V lost: heats up','Slower'],'Motors, solenoids, lamp strips from an Arduino.'),
+ ('MOSFET N (IRLZ44N)',to220('IRLZ44N'),'Same TO-220 look, but pins are Gate, Drain, Source.',['Almost no loss when on (milliohms)','Controlled by voltage: no base current'],['Sensitive to static','Pick a "logic-level" one (IRL…) for 5 V'],'Big loads with little heat: motors, LED strips, heaters.'),
+ ('JFET (J310)',to92('J310'),'TO-92 again, pins Drain, Source, Gate.',['Very high input impedance','Low noise'],['Values vary from part to part','Only small signals'],'The Ruby amp\'s input buffer, guitar preamps, high-impedance inputs.'),
+ ('Phototransistor',S('<path d="M62 48V68M78 48V68" stroke="#cbd5e1" stroke-width="2.5"/><path d="M52 48V24a18 18 0 0 1 36 0V48z" fill="#1e293b" opacity=".9"/><path d="M20 10l18 12M26 4l18 12" stroke="#fbbf24" stroke-width="2"/>'),'Looks like a dark LED (2 legs): light is its base current.',['Light controls the current'],['Slower than a photodiode'],'IR obstacle sensors (TCRT5000), light barriers.')
+]

@@ -1,0 +1,9 @@
+# The "types of ... you'll meet" cards: (title, picture, how to recognise it, pros, cons, use for)
+from svg import *
+TYPES = [
+ ('Axial (resistor-like)',axial('#16a34a',['#7c3f12','#111','#111']),'Looks like a fat green resistor with colour bands (value in µH).',['Small, cheap'],['Low currents only'],'Filters in radios and small circuits.'),
+ ('Radial drum',S('<path d="M62 50V68M78 50V68" stroke="#cbd5e1" stroke-width="2.5"/><rect x="45" y="12" width="50" height="38" rx="6" fill="#334155"/><path d="M50 18h40M50 26h40M50 34h40M50 42h40" stroke="#b45309" stroke-width="3"/>'),'A small bobbin of copper wire on a ferrite core.',['Higher current (0.5–3 A)'],['Magnetic field leaks around it'],'Buck/boost converters, power filters.'),
+ ('Toroid',S('<circle cx="70" cy="35" r="26" fill="none" stroke="#475569" stroke-width="14"/>'+''.join(f'<path d="M{70+20*__import__("math").cos(a)} {35+20*__import__("math").sin(a)}L{70+33*__import__("math").cos(a)} {35+33*__import__("math").sin(a)}" stroke="#b45309" stroke-width="2.5"/>' for a in [i*0.39 for i in range(16)])),'A ring (doughnut) wrapped with wire.',['Field stays inside the ring: little interference','Efficient'],['Harder to wind'],'Power supplies, audio, mains filters.'),
+ ('Ferrite bead',S('<path d="M4 35H136" stroke="#cbd5e1" stroke-width="2.5"/><rect x="50" y="22" width="40" height="26" rx="6" fill="#4b5563"/>'),'A grey bead on a wire or a cable (the lump on USB cables).',['Kills high-frequency noise'],['Does nothing to audio or DC'],'Stopping interference on power and data cables.'),
+ ('Transformer',S('<rect x="30" y="10" width="80" height="50" rx="3" fill="#475569"/><rect x="45" y="16" width="20" height="38" fill="#b45309"/><rect x="75" y="16" width="20" height="38" fill="#c2410c"/>'),'Two coils on one iron core.',['Changes AC voltage up or down','Isolates two circuits'],['Heavy, AC only'],'Mains adapters, guitar amp output stages, audio isolation.')
+]

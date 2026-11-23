@@ -38,4 +38,27 @@
   };
   window.snapPages = () => [...document.querySelectorAll('.page')].map((p) => p.id.slice(5));
   window.snapAll = async function () { const r = {}; for (const p of snapPages()) r[p] = await snapPage(p); return r; };
+  // Run in the background and keep the result in localStorage (same origin for every build served by the dev server).
+  window.snapRun = function (key) {
+    localStorage.removeItem('snap:' + key);
+    (async () => { await snapInstall(); localStorage.setItem('snap:' + key, JSON.stringify(await snapAll())); })();
+    return 'started ' + key;
+  };
+  window.snapGet = (key) => JSON.parse(localStorage.getItem('snap:' + key) || 'null');
+  // Differences between two stored runs. ignore: list of "page/section#i" to skip.
+  window.snapDiff = function (ka, kb, ignore = []) {
+    const a = snapGet(ka), b = snapGet(kb), out = [];
+    if (!a || !b) return 'missing run: ' + (!a ? ka : kb);
+    for (const p of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      const A = a[p] || {}, B = b[p] || {};
+      for (const s of new Set([...Object.keys(A), ...Object.keys(B)])) {
+        const x = A[s], y = B[s];
+        if (!x || !y) { out.push(`${p}/${s}: section ${x ? 'removed' : 'added'}`); continue; }
+        if (x.t !== y.t) out.push(`${p}/${s}: text (${x.n} -> ${y.n} chars)`);
+        if (x.c.length !== y.c.length) { out.push(`${p}/${s}: canvases ${x.c.length} -> ${y.c.length}`); continue; }
+        x.c.forEach((h, i) => { if (h !== y.c[i] && !ignore.includes(`${p}/${s}#${i}`)) out.push(`${p}/${s}#${i}`); });
+      }
+    }
+    return out;
+  };
 })();
