@@ -1,37 +1,33 @@
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))) if os.path.basename(os.path.dirname(os.path.abspath(__file__))) in ('generators','legacy') else os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 from paths import SRC, PAGES, SITE
 import re
 from illus import ILLUS, HERO
 from illus_extra import EXTRA, HEXTRA
 ILLUS.update(EXTRA);HERO.update(HEXTRA)
-O=PAGES
 COMP=['resistor','capacitor','diode','led','transistor','inductor','relay','motion']
 COMP_ICONS=[('resistor','Ω'),('capacitor','C'),('diode','D'),('led','💡'),('transistor','T'),('inductor','L'),('relay','K'),('motion','🔊')]
 ORDER=['home','resistor','capacitor','diode','led','transistor','inductor','relay','motion','formulas','sensors','chips','parts','circuits','quiz']
 NAMES={'home':'Home','resistor':'Resistor','capacitor':'Capacitor','diode':'Diode','led':'LED','transistor':'Transistor','inductor':'Inductor','relay':'Relay','motion':'Sound & motion','formulas':'Formulas','sensors':'Sensors','chips':'Microchips','parts':'Real parts','circuits':'Circuits','quiz':'Quiz'}
-FILES={'home':'index','resistor':'resistor','capacitor':'capacitor','diode':'diode','led':'led','transistor':'transistor','chips':'chips'}
 
+LOC={'home':'home','formulas':'formulas','sensors':'sensors','chips':'chips','parts':'parts','circuits':'circuits','quiz':'quiz'}
+LOC.update({c:'components/'+c for c in COMP})
+JS='shared/js/'
+def rd(p): return open(p).read()
 def parts(name):
-    if name=='quiz':
-        return open('quiz_body.html').read(),[open('helpers.js').read(),open('helpers2.js').read(),open('quiz.js').read()]
-    if name=='chips':  # built from its sources (pages/chips.html is no longer used)
-        main=open('chips_body.html').read()
+    d='pages/'+LOC[name]+'/'
+    main=rd(d+'page.html')
+    if name=='chips':
         main=main[main.index('<main>')+6:main.index('</main>')]
         main=re.sub(r'<nav style="margin:4px 0 0">.*?</nav>\n?','',main,flags=re.S)
-        js='\n'+'\n'.join(open(f).read().rstrip('\n') for f in ('helpers.js','chips.js','chipx.js','chipmin.js','chipmore.js') if os.path.exists(f))+'\n\n'
+        js='\n'+'\n'.join(rd(f).rstrip('\n') for f in (JS+'helpers.js',d+'chips.js',d+'chipx.js',d+'chipmin.js',d+'chipmore.js'))+'\n\n'
         return main,[js]
-    if name in ('inductor','relay','motion','circuits','parts','sensors','formulas'):
-        return open(name+'_body.html').read(),[open('helpers.js').read(),open('helpers2.js').read(),open(name+'.js').read()]+([open('more.js').read()] if name=='circuits' else [])
-    s=open(O+FILES[name]+'.html').read()
-    main=s[s.index('<main>')+6:s.index('</main>')]
-    main=re.sub(r'<nav style="margin:4px 0 0">.*?</nav>\n?','',main,flags=re.S)
-    scripts=re.findall(r'<script>(.*?)</script>',s,flags=re.S)
-    scripts=[x for x in scripts if 'const LINKS=' not in x]
-    return main,scripts
+    if name=='home': return main,[]
+    if name=='capacitor': return main,[rd(d+'page.js')]
+    if name in ('resistor','diode','led','transistor'): return main,['\n'+rd(JS+'helpers.js')+rd(d+'page.js')]
+    return main,[rd(JS+'helpers.js'),rd(JS+'helpers2.js'),rd(d+'page.js')]+([rd(d+'demos.js')] if name=='circuits' else [])
 
-css=open('style2.css.html').read()
-css=css[css.index('<style>')+7:css.index('</style>')]
+css=open('shared/css/base.css').read()
 css+='''
   .comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
   .comp{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:16px;background:#101827;color:var(--ink);text-decoration:none;transition:.15s}
@@ -205,7 +201,7 @@ for n in ORDER:
     pages_html+=f'\n<div class="page" id="page-{n}" style="--accent:{acc}" hidden>\n{hero(n)}\n<main>\n{main}\n{pager(n)}\n</main>\n</div>\n'
     if scripts:
         js='\n'.join(scripts)
-        PRE=open('probe_prelude.js').read() if True else ''
+        PRE=open(JS+'probe_prelude.js').read() if True else ''
         files[n]=f'''
 // ================= {n} =================
 (function(){{
@@ -242,7 +238,7 @@ open(D+'js/app.js','w').write(router)
 import comptypes as _ct
 open(D+'css/style.css','w').write(css+_ct.CSS)
 tags=''.join(f'<script src="js/{n}.js"></script>\n' for n in files)+'<script src="js/app.js"></script>'+'\n<script src="js/probe.js"></script>'
-open(D+'js/probe.js','w').write(open('probe.js').read())
+open(D+'js/probe.js','w').write(open(JS+'probe.js').read())
 html=f'''<!DOCTYPE html>
 <html lang="en">
 <head>

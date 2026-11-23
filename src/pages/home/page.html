@@ -1,72 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="color-scheme" content="dark">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Electronics Learning: Components</title>
-<style>
-  :root{
-    --bg:#0b1120; --card:#151e30; --ink:#e2e8f0; --muted:#94a3b8; --line:#2a3650;
-    --water:#3b82f6; --water-light:#bcd6fb; --accent:#f59e0b; --good:#10b981; --bad:#ef4444;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-  header{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:40px 20px 34px;text-align:center}
-  header h1{margin:0 0 6px;font-size:2.2rem}
-  header p{margin:0;opacity:.9;font-size:1.1rem}
-  main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-  h2{margin-top:0;font-size:1.4rem}
-  h2 .num{display:inline-block;background:var(--water);color:#fff;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;font-size:1rem;margin-right:8px}
-  .tldr{font-size:1.15rem;background:#1b2e4f;border-left:5px solid var(--water);padding:14px 18px;border-radius:8px}
-  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1220;border:1px solid var(--line)}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 8px}
-  button{font:inherit;font-weight:600;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;background:#2a3650;color:var(--ink);transition:.15s}
-  button:hover{filter:brightness(.95)}
-  button.active{background:var(--water);color:#fff}
-  button.active.dis{background:var(--accent)}
-  button.active.hold{background:#64748b}
-  label.slider{display:flex;align-items:center;gap:8px;font-size:.95rem;color:var(--muted)}
-  input[type=range]{width:140px}
-  .readout{display:flex;gap:18px;flex-wrap:wrap;font-size:.95rem;margin:6px 0 10px}
-  .readout b{font-variant-numeric:tabular-nums}
-  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;font-weight:600}
-  .hint{color:var(--muted);font-size:.95rem}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
-  .map{display:grid;grid-template-columns:1fr auto 1fr;gap:8px 12px;align-items:center}
-  .map div{padding:8px 12px;border-radius:8px}
-  .map .w{background:#1b2e4f}.map .e{background:#3a2c12}.map .arrow{text-align:center;color:var(--muted)}
-  .map .h{font-weight:700;background:none}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-  .card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#101827}
-  .card .ico{font-size:1.8rem}
-  .card h3{margin:6px 0 4px;font-size:1.05rem}
-  .card p{margin:0;font-size:.93rem;color:var(--muted)}
-  table{width:100%;border-collapse:collapse}
-  td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-  td:first-child{font-weight:600;width:34%}
-  .warn{background:#3a1a1d;border-left:5px solid var(--bad);padding:12px 16px;border-radius:8px}
-  #fPress{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-  code{background:#2a3650;padding:1px 6px;border-radius:5px}
-  .navlink{color:#93c5fd;text-decoration:none;font-weight:600;cursor:pointer}
-  .navlink:hover{text-decoration:underline}
-  .comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-  .comp{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:16px;background:#101827;color:var(--ink);text-decoration:none;transition:.15s}
-  a.comp:hover{border-color:#3b82f6;transform:translateY(-2px)}
-  .comp svg{width:96px;flex-shrink:0;margin-top:8px;overflow:visible}
-  .comp h3{margin:0 0 4px}.comp p{margin:0 0 6px;color:var(--muted);font-size:.95rem}
-  .comp .analogy{color:#93c5fd}.comp .open{font-weight:700;color:#60a5fa}
-  .soon .comp{opacity:.6}
-</style>
-</head>
-<body>
-<header>
-  <h1>⚡ Electronics, one component at a time</h1>
-  <p>Simple explanations, water analogies and interactive animations</p>
-</header>
-<main>
+
 
 <section>
   <h2>Start here: the water analogy</h2>
@@ -179,12 +111,3 @@
     <li>Got a question? Ask, and the explanation gets added to the page.</li>
   </ul>
 </section>
-</main>
-
-
-<script>
-const LINKS={"hub": {"web": "https://claude.ai/artifact/PMq2YkU4BVFW8M5MXWXPG6", "file": "index.html"}, "capacitor": {"web": "https://claude.ai/artifact/1o6HM5cbubAaBdgnwipgfP", "file": "capacitor.html"}, "resistor": {"web": "https://claude.ai/artifact/WAXu6C27xupiicC5hkDcEa", "file": "resistor.html"}, "diode": {"web": "https://claude.ai/artifact/Ny8bfjVrvdDofDt6kC4DSb", "file": "diode.html"}, "led": {"web": "https://claude.ai/artifact/7Cbu5cYi8sZcNzqe86DvWm", "file": "led.html"}, "transistor": {"web": "https://claude.ai/artifact/VEvxPsqDqPm9pZ74THwNsa", "file": "transistor.html"}, "chips": {"web": "https://claude.ai/artifact/LrYTBReH3ve9cRPbtd5wyJ", "file": "chips.html"}, "inductor": {"web": "#", "file": "inductor.html"}, "relay": {"web": "#", "file": "relay.html"}, "circuits": {"web": "#", "file": "circuits.html"}, "quiz": {"web": "#", "file": "quiz.html"}};
-document.querySelectorAll('a[data-page]').forEach(a=>{const l=LINKS[a.dataset.page];if(!l)return;const local=location.protocol==='file:';a.href=local?l.file:l.web;if(!local)a.target='_blank';});
-</script>
-</body>
-</html>

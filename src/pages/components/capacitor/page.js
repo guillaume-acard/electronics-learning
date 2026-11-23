@@ -1,379 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="color-scheme" content="dark">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How a Capacitor Works</title>
-<style>
-  :root{
-    --bg:#0b1120; --card:#151e30; --ink:#e2e8f0; --muted:#94a3b8; --line:#2a3650;
-    --water:#3b82f6; --water-light:#bcd6fb; --accent:#f59e0b; --good:#10b981; --bad:#ef4444;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
-  header{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:40px 20px 34px;text-align:center}
-  header h1{margin:0 0 6px;font-size:2.2rem}
-  header p{margin:0;opacity:.9;font-size:1.1rem}
-  main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-  h2{margin-top:0;font-size:1.4rem}
-  h2 .num{display:inline-block;background:var(--water);color:#fff;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;font-size:1rem;margin-right:8px}
-  .tldr{font-size:1.15rem;background:#1b2e4f;border-left:5px solid var(--water);padding:14px 18px;border-radius:8px}
-  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1220;border:1px solid var(--line)}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 8px}
-  button{font:inherit;font-weight:600;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;background:#2a3650;color:var(--ink);transition:.15s}
-  button:hover{filter:brightness(.95)}
-  button.active{background:var(--water);color:#fff}
-  button.active.dis{background:var(--accent)}
-  button.active.hold{background:#64748b}
-  label.slider{display:flex;align-items:center;gap:8px;font-size:.95rem;color:var(--muted)}
-  input[type=range]{width:140px}
-  .readout{display:flex;gap:18px;flex-wrap:wrap;font-size:.95rem;margin:6px 0 10px}
-  .readout b{font-variant-numeric:tabular-nums}
-  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;font-weight:600}
-  .hint{color:var(--muted);font-size:.95rem}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
-  .map{display:grid;grid-template-columns:1fr auto 1fr;gap:8px 12px;align-items:center}
-  .map div{padding:8px 12px;border-radius:8px}
-  .map .w{background:#1b2e4f}.map .e{background:#3a2c12}.map .arrow{text-align:center;color:var(--muted)}
-  .map .h{font-weight:700;background:none}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-  .card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#101827}
-  .card .ico{font-size:1.8rem}
-  .card h3{margin:6px 0 4px;font-size:1.05rem}
-  .card p{margin:0;font-size:.93rem;color:var(--muted)}
-  table{width:100%;border-collapse:collapse}
-  td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-  td:first-child{font-weight:600;width:34%}
-  .warn{background:#3a1a1d;border-left:5px solid var(--bad);padding:12px 16px;border-radius:8px}
-  #fPress{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-  code{background:#2a3650;padding:1px 6px;border-radius:5px}
-  .navlink{color:#93c5fd;text-decoration:none;font-weight:600;cursor:pointer}
-  .navlink:hover{text-decoration:underline}
-</style>
-</head>
-<body>
-<header>
-  <h1>The Capacitor</h1>
-  <p>A tiny, very fast rechargeable store of electric charge</p>
-</header>
-<main>
-<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
 
-<section>
-  <h2><span class="num">1</span>The short version</h2>
-  <p class="tldr">A capacitor is <b>two metal plates separated by an insulator</b>.
-  Electricity can't pass through the gap, but charge can <b>pile up</b> on the plates. It fills up quickly, holds the charge,
-  and can release it all at once.</p>
-  <p>Think of it as a very small battery that charges and empties in a fraction of a second.
-  A battery stores energy using chemistry. A capacitor stores it as charge sitting on the plates.</p>
-</section>
-
-<section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
-  <p>Batteries and power supplies are great at giving <b>steady</b> energy, but they are slow to react, and the electricity they deliver is never perfectly clean.
-  Capacitors fix those problems. They do <b>five main jobs</b>:</p>
-  <div class="cards">
-    <div class="card"><div class="ico">⚡</div><h3>1. Quick energy reserve</h3><p><b>Why:</b> some parts need a big burst instantly, such as a camera flash or a chip switching on. A battery can't deliver that fast enough, but a capacitor can empty in a split second.<br><i>Water:</i> a bucket ready to dump, instead of waiting for a slow tap.</p></div>
-    <div class="card"><div class="ico">〰️</div><h3>2. Smoothing</h3><p><b>Why:</b> power from a wall adapter comes in bumps. The capacitor fills during the peaks and gives back during the dips, so the voltage stays steady and devices don't glitch.<br><i>Water:</i> a water tower that keeps pressure even when the pump pulses.</p></div>
-    <div class="card"><div class="ico">🚧</div><h3>3. Blocking DC, passing signals</h3><p><b>Why:</b> in audio, you want the <b>music</b> to go from one stage to the next, but not the steady DC voltage, which would cause distortion or damage. A capacitor lets only the changing part through.<br><i>Water:</i> the rubber sheet (see section 5).</p></div>
-    <div class="card"><div class="ico">🔇</div><h3>4. Filtering noise and tone</h3><p><b>Why:</b> capacitors let fast wiggles through more easily than slow ones. Used cleverly, they dump hiss and buzz to ground, or cut treble (your guitar's tone knob).<br><i>Water:</i> a side drain that only swallows quick ripples.</p></div>
-    <div class="card"><div class="ico">⏱️</div><h3>5. Timing</h3><p><b>Why:</b> filling through a resistor always takes the same time, so circuits use it as a clock: blinking LEDs, delays, and the "hold" before lights turn off.<br><i>Water:</i> an hourglass that always takes the same time to fill.</p></div>
-  </div>
-  <p style="margin-top:14px"><b>In one sentence:</b> capacitors are used wherever a circuit needs to <b>store a little energy for a moment</b>,
-  <b>steady</b> a voltage, <b>separate</b> signals from DC, or <b>measure time</b>. That's why almost every electronic device contains dozens of them.</p>
-</section>
-
-<section>
-  <h2><span class="num">3</span>The water analogy: a rubber sheet in a pipe</h2>
-  <p>Picture a water pipe with a <b>stretchy rubber sheet</b> sealed across the middle. Water <i>cannot</i> pass through the sheet.</p>
-  <ul>
-    <li>Turn on the <b>pump</b> (the battery). Water rushes in on one side and stretches the sheet. The same amount of water is pushed out of the other side, so water flows around the whole loop.</li>
-    <li>As the sheet stretches, it <b>pushes back</b> harder and harder. The flow slows down, and when the sheet's push equals the pump's push, the flow <b>stops</b>. The capacitor is now <b>full</b>.</li>
-    <li>Remove the pump and the stretched sheet springs back, pushing the water the <b>other way</b>. That's <b>discharging</b>.</li>
-  </ul>
-  <p class="hint">Try it: press <b>Charge</b>, wait, then <b>Hold</b>, then <b>Discharge</b>. The moving dashes show the flow.</p>
-
-  <div class="controls">
-    <button id="bCharge">▶ Charge</button>
-    <button id="bHold">⏸ Hold (close valve)</button>
-    <button id="bDis">↩ Discharge</button>
-    <button id="bReset">Reset</button>
-    <label class="slider">Pump pressure (voltage)<input id="sV" type="range" min="0.3" max="1" step="0.05" value="0.9"></label>
-    <label class="slider">Capacitor size<input id="sC" type="range" min="0.5" max="4" step="0.1" value="1.5"></label>
-  </div>
-  <div class="readout">
-    <span>Mode: <span id="rMode" class="pill" style="background:#e5e9f2">idle</span></span>
-    <span>Charge stored: <b id="rQ">0%</b></span>
-    <span>Flow right now: <b id="rI">0%</b></span>
-  </div>
-  <canvas id="cWater" width="800" height="300"></canvas>
-
-  <h3 style="margin-bottom:4px">The same thing as a real circuit</h3>
-  <p class="hint" style="margin-top:0">The yellow dots are electrons. The <b>+</b> and <b>−</b> signs are charge piling up on the plates. Not a single electron crosses the gap.</p>
-  <canvas id="cCirc" width="800" height="300"></canvas>
-
-  <h3 style="margin-bottom:4px">What it looks like over time</h3>
-  <canvas id="cGraph" width="800" height="210"></canvas>
-  <p class="hint">Notice the shape. The flow (orange) is <b>strongest at the start</b> and fades away. The stored charge (blue) rises fast at first, then levels off.
-  A <b>bigger</b> capacitor takes longer to fill, like a bigger, softer rubber sheet. Try the size slider.</p>
-</section>
-
-<section>
-  <h2><span class="num">4</span>Translating water ↔ electricity</h2>
-  <div class="map">
-    <div class="h">Water</div><div></div><div class="h">Electricity</div>
-    <div class="w">Pump</div><div class="arrow">→</div><div class="e">Battery / power supply</div>
-    <div class="w">Water pressure</div><div class="arrow">→</div><div class="e">Voltage (V)</div>
-    <div class="w">Flow of water</div><div class="arrow">→</div><div class="e">Current (A)</div>
-    <div class="w">Narrow pipe</div><div class="arrow">→</div><div class="e">Resistor (Ω)</div>
-    <div class="w">Rubber sheet</div><div class="arrow">→</div><div class="e">Insulator between the plates</div>
-    <div class="w">How much the sheet is stretched</div><div class="arrow">→</div><div class="e">Charge stored (Q)</div>
-    <div class="w">Size / softness of the sheet</div><div class="arrow">→</div><div class="e">Capacitance (F, farads)</div>
-  </div>
-  <p style="margin-top:14px">The key formula is <code>Q = C × V</code>: <b>charge stored = capacitance × voltage</b>.
-  In water terms, a bigger, softer sheet (more C) holds more water at the same pressure (V).</p>
-</section>
-
-<section>
-  <h2><span class="num">5</span>Its superpower: blocks steady flow, lets wiggles through</h2>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 14px;background:#101827">
-  <h4 style="margin:0 0 6px;font-size:1.05rem">📖 First: what are DC and AC?</h4>
-  <table>
-    <tr><td>DC: <b>Direct Current</b></td><td>Flows in <b>one direction</b> and stays <b>steady</b>. Like a <b>river</b>. Examples: batteries, USB (5 V), a phone charger's output.</td></tr>
-    <tr><td>AC: <b>Alternating Current</b></td><td>Keeps <b>changing direction</b>, back and forth. Like <b>waves sloshing</b> in a bathtub. Examples: the wall socket (230 V, 50 times a second in France), a guitar or music signal.</td></tr>
-  </table>
-  <p style="margin:10px 0 0">People also say <b>"DC"</b> for the <b>steady part of a signal</b>, and <b>"AC"</b> for the part that <b>wiggles</b>. A signal can be both at once: a wiggle riding on a steady level, as in example C below.</p>
-  </div>
-  <p>Because of the rubber sheet, a <b>steady push</b> (DC, like a battery) only moves water briefly, until the sheet is stretched. After that, nothing flows.
-  A <b>back-and-forth push</b> (AC, like an audio signal) makes the sheet flex one way and then the other, <i>forever</i>. Water keeps sloshing, so the waterwheel keeps moving.</p>
-  <div class="controls">
-    <button id="bDC">Steady push (DC / battery)</button>
-    <button id="bAC">Back-and-forth push (AC / music signal)</button>
-    <button id="bOff">Off</button>
-  </div>
-  <canvas id="cACDC" width="800" height="250"></canvas>
-  <p class="hint">This is why guitar amps and audio gear put capacitors between stages. The <b>music</b> (a fast wiggle) passes through,
-  while unwanted <b>steady DC voltage</b> is blocked. This job is called a <b>coupling capacitor</b>.</p>
-</section>
-
-<section>
-  <h2><span class="num">6</span>Where you'll find capacitors</h2>
-  <div class="cards">
-    <div class="card"><div class="ico">📸</div><h3>Camera flash</h3><p>A capacitor charges slowly (that whine you hear), then dumps everything in one bright burst.</p></div>
-    <div class="card"><div class="ico">🔌</div><h3>Power supplies</h3><p>They smooth out bumpy voltage. Like a water tower, they top up the dips and absorb the peaks.</p></div>
-    <div class="card"><div class="ico">🎸</div><h3>Audio and guitar amps</h3><p>They pass the music signal between stages while blocking DC. They also shape tone, for example in a guitar's tone knob.</p></div>
-    <div class="card"><div class="ico">⏱️</div><h3>Timers and blinkers</h3><p>A capacitor filling through a resistor takes a predictable time. That sets the blink rate of an LED.</p></div>
-    <div class="card"><div class="ico">💻</div><h3>Next to every chip</h3><p>Small "decoupling" caps sit by each chip as a local reserve, giving instant energy when the chip needs a burst.</p></div>
-    <div class="card"><div class="ico">📱</div><h3>Touchscreens</h3><p>Your finger changes the capacitance of the screen, so the phone knows where you touched.</p></div>
-  </div>
-</section>
-
-<section>
-  <h2><span class="num">7</span>Different sizes ("strengths") and what each is used for</h2>
-  <p>Capacitors come in a huge range of sizes, from tiny to enormous. The "strength" of a capacitor means two different things:</p>
-  <ul>
-    <li><b>Capacitance (size)</b>, in farads: <i>how much</i> charge it holds. In water terms, how big and stretchy the rubber sheet is.</li>
-    <li><b>Voltage rating</b>, in volts: <i>how much pressure</i> it can take before it fails. In water terms, how thick and tough the sheet is.</li>
-  </ul>
-
-  <h3>Capacitance: from thimble to swimming pool</h3>
-  <p class="tldr" style="font-size:1rem"><b>Rule of thumb:</b> <b>small</b> capacitors fill and empty in a flash, so they deal with <b>fast</b> things like high frequencies and noise.
-  <b>Big</b> capacitors hold more energy and react slowly, so they deal with <b>slow</b> things like power, smoothing and long delays.</p>
-  <p class="hint">Drag the slider to see how size changes the job. The fill time assumes the capacitor fills through the same 1 kΩ resistor every time.</p>
-  <div class="controls"><label class="slider" style="flex:1">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7" style="flex:1;width:auto"></label></div>
-  <canvas id="cSize" width="800" height="230"></canvas>
-
-  <table style="margin-top:14px">
-    <tr><td>🥄 <b>pF</b> (picofarads)<br><span class="hint">a thimble</span></td><td>Radio tuning, high-frequency filters, and the two little 22 pF caps beside a microcontroller's crystal.</td></tr>
-    <tr><td>☕ <b>nF</b> (nanofarads)<br><span class="hint">a cup</span></td><td>The famous <b>100 nF</b> "decoupling" cap next to every chip, guitar tone controls (22–47 nF), and noise filters.</td></tr>
-    <tr><td>🪣 <b>1–100 µF</b><br><span class="hint">a bucket</span></td><td>Passing audio between stages (coupling), timing and blinking circuits, and LED fade-outs.</td></tr>
-    <tr><td>🛁 <b>100–10,000 µF</b><br><span class="hint">a bathtub</span></td><td>Power supply smoothing, and energy reserves for amplifiers and motors.</td></tr>
-    <tr><td>🏊 <b>Farads</b> (supercapacitors)<br><span class="hint">a swimming pool</span></td><td>Keeping a clock or memory alive during power cuts, torches that charge in seconds, and buses that recover braking energy.</td></tr>
-  </table>
-
-  <h3>Voltage rating: how tough the rubber sheet is</h3>
-  <p>Every capacitor has a maximum voltage printed on it, such as <code>16V</code>, <code>25V</code> or <code>400V</code>.
-  Exceed it and the insulator breaks down, like a rubber sheet bursting under too much pressure. The part fails, and electrolytics can bulge or pop.</p>
-  <ul>
-    <li><b>Rule of thumb:</b> choose a rating around <b>1.5–2× the voltage</b> in your circuit. For a 9 V circuit, use 16 V or 25 V caps.</li>
-    <li>A higher rating never hurts the circuit. It just means a physically bigger and pricier part. A thicker sheet needs more room.</li>
-    <li>That's why a 1000 µF 16 V capacitor is fingertip-sized, but a 1000 µF 400 V one is the size of a drinks can.</li>
-  </ul>
-  <h3>Try it: push past the limit</h3>
-  <p>This capacitor is <b>1000 µF, rated 16 V</b>. Move the battery voltage slider and watch the rubber sheet.</p>
-  <ul>
-    <li><b>Below 16 V:</b> the sheet stretches, the flow stops, and it's fully charged. A higher voltage just means more stretch and more charge.</li>
-    <li><b>Near 16 V:</b> the sheet is under strain. A tiny leak appears, and in real life the capacitor wears out faster.</li>
-    <li><b>Above 16 V:</b> the sheet is overstretched. After a moment it <b>tears</b>, and water then flows straight through the hole <i>non-stop</i>. That isn't charging, it's a broken capacitor acting like a short circuit.</li>
-  </ul>
-  <div class="controls">
-    <label class="slider" style="flex:1">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9" style="flex:1;width:auto"></label>
-    <b id="bVlab" style="min-width:52px">9 V</b>
-    <button id="bNew">🔧 Replace capacitor</button>
-  </div>
-  <div class="readout">
-    <span>Capacitor voltage: <b id="bVc">0 V</b></span>
-    <span>Charge stored: <b id="bQ">0 mC</b></span>
-    <span>Status: <b id="bStat">charging</b></span>
-  </div>
-  <canvas id="cBurst" width="800" height="320"></canvas>
-  <p class="hint">Try 9 V, then 12 V: both stop flowing, but 12 V stores more. Then try 20 V or 25 V. The higher you go over the rating, the faster it fails.</p>
-
-</section>
-
-<section>
-  <h2><span class="num">8</span>Simple example circuits</h2>
-  <p>Here are four small circuits you'll meet again and again. In each one you can <b>swap the capacitor size</b> and see what changes.</p>
-
-  <h3>A. LED that fades out slowly (energy reserve)</h3>
-  <p>A battery, a push button, and an LED with its resistor. A capacitor sits beside the LED. Pressing the button lights the LED and fills the capacitor.
-  When you let go, the capacitor <b>keeps feeding the LED</b> for a while, so it fades instead of snapping off.
-  <b>Why:</b> this is the "dim slowly" effect in car interior lights and the glow that lingers on a charger after you unplug it.</p>
-  <div class="controls"><button id="fPress" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="fChoices"></span></div>
-  <canvas id="cFade" width="800" height="260"></canvas>
-  <p class="hint">Bigger capacitor = bigger reserve = longer fade. 10 µF is gone almost instantly, while 1000 µF glows for seconds.</p>
-
-  <h3>B. Power supply smoothing (the water tower)</h3>
-  <p>Electricity from the wall is <b>AC</b>: it swings back and forth 50 times a second. A <b>diode</b>, a one-way valve, lets only the forward pushes through,
-  which leaves a stream of <b>bumps</b>. A big capacitor fills at each bump and <b>tops up the gaps</b> in between, so the output is almost flat.
-  <b>Why:</b> every phone charger, guitar amp and computer needs steady DC, and this is how they get it.</p>
-  <div class="controls"><span id="pChoices"></span></div>
-  <canvas id="cSmooth" width="800" height="260"></canvas>
-  <p class="hint">Slowed down so you can see it. With no capacitor the lamp flickers. Bigger capacitors give smaller dips ("ripple"), which is why power supplies use the bathtub-sized ones.</p>
-
-  <h3>C. Coupling capacitor in audio (pass the music, block the DC)</h3>
-  <p>Inside an amp, the guitar signal often <b>rides on top of a steady DC voltage</b>, which the circuit needs to work. Sending that DC into the next stage would upset it.
-  A capacitor in series passes the <b>wiggles</b> (the music) and blocks the DC. The output is the same sound, now centred on zero.
-  <b>Why:</b> it's used between almost every stage of an amplifier, and on the input of a guitar amp or pedal.</p>
-  <div class="controls"><span id="kChoices"></span></div>
-  <canvas id="cCouple" width="800" height="270"></canvas>
-  <p class="hint">Size matters here too. A capacitor that is <b>too small</b> only lets fast wiggles (treble) through, so the bass disappears and the sound gets thin. That's also how a <b>tone control</b> works on purpose.</p>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
-  <h4 style="margin:0 0 8px;font-size:1.1rem">🔍 Why does the output end up centred on 0?</h4>
-  <p style="margin-top:0">The signal is made of <b>two parts</b>: a <b>steady 4.5 V</b> (DC) plus a <b>wiggle of ±0.5 V</b> (the music), so it moves between 4 V and 5 V.</p>
-  <ol>
-    <li><b>The steady 4.5 V stretches the rubber sheet once and it stays stretched.</b> The capacitor is now charged to 4.5 V. A steady push causes no more flow, so the sheet <i>absorbs</i> it.</li>
-    <li><b>The wiggle makes the sheet flex</b> a bit more, then a bit less. Each flex pushes water back and forth on the other side, so the wiggle gets through.</li>
-    <li>The capacitor keeps holding 4.5 V, so the output is always <b>input − 4.5 V</b>:</li>
-  </ol>
-  <table style="max-width:520px;margin:6px 0 12px">
-    <tr><td>Input</td><td>− capacitor holds</td><td>= Output</td></tr>
-    <tr><td>5.0 V (top)</td><td>− 4.5 V</td><td><b>+0.5 V</b></td></tr>
-    <tr><td>4.5 V (middle)</td><td>− 4.5 V</td><td><b>0 V</b></td></tr>
-    <tr><td>4.0 V (bottom)</td><td>− 4.5 V</td><td><b>−0.5 V</b></td></tr>
-  </table>
-  <p><b>Why exactly the average?</b> The next stage has a resistor to ground (0 V). If the output sat above 0 on average, current would flow through that resistor and charge the capacitor a bit more, pulling the output down. If it sat below 0, the opposite would happen. It only stops adjusting when the output averages exactly <b>0</b>.</p>
-  <p><b>Try it:</b> press <b>Plug in</b> to start with an <i>empty</i> capacitor. At first the output is the same as the input, still sitting up at 4.5 V. Then watch the capacitor fill up to the average, which slides the output down until it is centred on 0. Notice the output <b>already wiggles</b> while it slides: the music passes from the very first moment.
-  Both graphs use the <b>same scale</b>, so you can see the shift.</p>
-  <div class="controls"><button id="zPlug">🔌 Plug in (empty capacitor)</button><button id="zSettled">Skip to settled</button></div>
-  <canvas id="cCenter" width="800" height="360"></canvas>
-  <p class="hint" style="margin-bottom:0">🚤 <b>Boat analogy:</b> you hold a rope tied to a boat on a lake. You feel the <b>waves</b> tugging back and forth, but never the <b>height</b> of the lake. The capacitor is the rope: it passes the movement on and ignores the level.</p>
-  </div>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
-  <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 But I thought a full capacitor blocks current?</h4>
-  <p style="margin-top:0">"Full" doesn't mean closed for good. It means <b>in balance</b>: the capacitor pushes back exactly as hard as the input pushes, so nothing flows.</p>
-  <ul>
-    <li><b>Steady push (DC):</b> the push never changes, so once balanced it <b>stays</b> balanced, and the current stops for good. That's how DC gets blocked.</li>
-    <li><b>Changing push (music):</b> the balance keeps breaking. When the input rises above what the capacitor holds, a little charge flows <b>in</b>. When it drops below, a little flows <b>back out</b>. Current keeps sloshing back and forth.</li>
-    <li><b>No charge ever crosses the gap.</b> Charge arriving on one plate pushes the same amount <i>off</i> the other plate. From outside it looks like current passed through, just as pushing the rubber sheet moves the water on the other side.</li>
-  </ul>
-  <p><b>The wobble doesn't wait for the capacitor to fill.</b> The capacitor does two jobs at the same time: it <b>slowly absorbs</b> the steady part and <b>immediately passes</b> the changes. (Don't confuse the capacitor's voltage, which is what it currently holds, with its <i>voltage rating</i>, which is its burst limit.)</p>
-  <div class="controls"><span id="eChoices"></span></div>
-  <canvas id="cElec" width="800" height="270"></canvas>
-  <p class="hint" style="margin-bottom:0">Watch the two bars. When they're equal, nothing moves. With the steady push they become equal and stay that way. With music they never stay equal for long, so the charges keep moving on <b>both</b> sides of the gap.</p>
-  </div>
-
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
-  <h4 style="margin:0 0 8px;font-size:1.1rem">📏 Why does the size (pF, nF, 100 nF) change the sound?</h4>
-  <p style="margin-top:0"><b>Rule: a capacitor blocks any change slow enough for it to catch up with.</b>
-  The capacitor always tries to <b>match</b> the input. When it matches, nothing gets through. So the question is: <i>can it catch up before the wiggle turns around?</i></p>
-  <ul>
-    <li><b>Small capacitor</b> (a thimble): fills almost instantly. It keeps up with slow wiggles (bass) and cancels them. Only fast wiggles (treble) escape. Result: a <b>thin, tinny</b> sound.</li>
-    <li><b>Big capacitor</b> (a bathtub): fills slowly and can't keep up with bass or treble. Everything passes. Result: a <b>full</b> sound.</li>
-    <li><b>DC</b> is the slowest change there is, a push that never changes. Every capacitor eventually catches up with it, so DC is <b>always</b> blocked.</li>
-  </ul>
-  <div class="controls"><span id="sChoices"></span></div>
-  <canvas id="cRace" width="800" height="300"></canvas>
-  <p class="hint">Orange is the input. Blue is the capacitor trying to keep up. The <b>green gap</b> between them is what gets through to the output.</p>
-  <p>With real numbers (the next stage has a 1 MΩ resistor), the catch-up time is <b>resistance × capacitance</b>:</p>
-  <table>
-    <tr><td>Capacitor</td><td>Catch-up time</td><td>Bass (100 Hz, flips every 5 ms)</td><td>Treble (5 kHz, flips every 0.1 ms)</td><td>Sound</td></tr>
-    <tr><td>100 pF</td><td>0.1 ms</td><td>caught: <b>blocked</b></td><td>about as fast: partly blocked</td><td>very tinny</td></tr>
-    <tr><td>1 nF</td><td>1 ms</td><td>partly caught: <b>reduced</b></td><td>too fast: <b>passes</b></td><td>thin</td></tr>
-    <tr><td>100 nF</td><td>100 ms</td><td>too fast: <b>passes</b></td><td><b>passes</b></td><td>full</td></tr>
-  </table>
-  <p class="hint" style="margin-bottom:0">🚪 <b>Door analogy:</b> you push and pull a door, and someone on the other side tries to match you. If they're <b>quick</b> (small capacitor), they cancel your slow pushes and only your fast jabs get through. If they're <b>slow</b> (big capacitor), every push gets through. A guitar's <b>tone knob</b> uses this on purpose to separate bass from treble.</p>
-  </div>
-
-
-
-  <h3>D. Decoupling capacitor next to a chip (a local reserve)</h3>
-  <p>Chips such as microcontrollers and op-amps draw power in <b>sudden little gulps</b>. The power has to travel down a long wire, so it can't arrive fast enough, and the voltage at the chip briefly sags.
-  If it sags too far, the chip glitches or resets. A small <b>100 nF</b> capacitor placed <b>right beside</b> the chip supplies each gulp instantly.
-  <b>Why:</b> it's a cheap fix for random crashes, so every chip's datasheet asks for one.</p>
-  <div class="controls"><button id="dToggle">Add the 100 nF capacitor</button></div>
-  <canvas id="cDecouple" width="800" height="260"></canvas>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
-  <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 Why does a long wire make the voltage sag?</h4>
-  <p style="margin-top:0">It's not mainly because the wire is "far". It's because <b>the current in a wire has inertia</b>, like the water in a long pipe.</p>
-  <ul>
-    <li><b>Small reason: resistance.</b> Every wire loses a little voltage (current × resistance). On a circuit board that's only a few millivolts, so it's not the real problem.</li>
-    <li><b>Big reason: inertia (called <i>inductance</i>).</b> Picture a long pipe full of still water with a tap at the end. When the tap suddenly opens, the whole column of water has to <b>speed up</b> first. During that moment the <b>pressure at the tap drops</b>: it wants water now, but the pipe can't deliver it yet. It's like your shower going weak when someone opens another tap. A wire resists sudden changes in current in the same way, and the longer the wire, the more "water" there is to get moving.</li>
-  </ul>
-  <p><b>Why chips care:</b> chips switch in a few <b>nanoseconds</b> (billionths of a second), and at that speed even a few centimetres of wire counts as long. Rough numbers: a 10 cm wire has about 100 nH of inductance. If the chip suddenly wants 0.1 A more within 10 ns, the sag ≈ 100 nH × (0.1 A ÷ 10 ns) ≈ <b>1 V</b>. On a 3.3 V or 5 V chip that's huge, enough to cause a glitch or reset. The power supply also needs time to react, so it can't fix the dip fast enough either.</p>
-  <p><b>The fix:</b> a small <b>tank right next to the tap</b>. When the tap opens suddenly, the tank supplies the water instantly while the long pipe catches up, then the pipe refills it calmly. That's why the 100 nF capacitor must sit <b>right beside</b> the chip's power pin. If it's far away, there's still a stretch of pipe between the tank and the tap, and the problem is only partly fixed.</p>
-  <div class="controls"><span id="lChoices"></span></div>
-  <canvas id="cPipe" width="800" height="350"></canvas>
-  <p class="hint" style="margin-bottom:0">Watch the dashes in the long pipe. They speed up <b>slowly</b> after each gulp, which is the inertia. Compare the dip on the pressure gauge and the graph with no tank, with a tank far away, and with a tank right beside the chip.</p>
-  </div>
-
-</section>
-
-<section>
-  <h2><span class="num">9</span>Key facts</h2>
-  <div class="grid2">
-    <div>
-      <canvas id="cSym" width="380" height="170"></canvas>
-      <p class="hint" style="text-align:center">Left: normal (ceramic/film). Right: polarized (electrolytic). The curved or marked plate is −.</p>
-    </div>
-    <table>
-      <tr><td>Unit</td><td>Farad (F). 1 F is huge, so you'll usually see <b>µF</b> (micro, millionth), <b>nF</b> (nano), <b>pF</b> (pico).</td></tr>
-      <tr><td>Code "104"</td><td>Means 10 followed by 4 zeros, in pF: 100,000 pF = <b>100 nF</b> = 0.1 µF.</td></tr>
-      <tr><td>Voltage rating</td><td>The max voltage it can safely handle. Pick one comfortably above your circuit's voltage.</td></tr>
-      <tr><td>Fill time</td><td>R × C = one "time constant" (τ). After 1τ it's about 63% full. After 5τ it's basically full.</td></tr>
-    </table>
-  </div>
-  <h3>Common types</h3>
-  <table>
-    <tr><td>Ceramic (small, beige/blue disc)</td><td>Small values (pF–µF), no polarity. Used for decoupling and high frequencies.</td></tr>
-    <tr><td>Electrolytic (cylinder can)</td><td>Big values (µF–mF). <b>Polarized</b>: the − leg is marked with a stripe and is usually the shorter leg.</td></tr>
-    <tr><td>Film (boxy, often coloured)</td><td>Stable and low-noise. Popular in audio signal paths.</td></tr>
-  </table>
-  <p class="warn" style="margin-top:16px"><b>⚠️ Safety:</b> capacitors can <b>stay charged after the power is off</b>. Big ones in amps, TVs and power supplies
-  can give a nasty shock. Also, an electrolytic installed <b>backwards</b> can bulge or pop. Always check the stripe.</p>
-</section>
-
-<section>
-  <h2><span class="num">10</span>Recap</h2>
-  <ul>
-    <li>Two plates and a gap: charge <b>piles up</b> but never crosses.</li>
-    <li>Charging: big flow at first, then it slows to zero as it fills.</li>
-    <li>It can <b>hold</b> charge and <b>release</b> it quickly.</li>
-    <li><b>DC</b> = steady, one direction (a river). <b>AC</b> = back and forth (waves).</li>
-    <li>It <b>blocks steady DC</b> but <b>lets changing signals (AC) through</b>.</li>
-    <li>"Full" means <b>balanced</b>, not closed. A steady push stays balanced, while a changing push keeps breaking the balance, so current sloshes in and out. No charge ever crosses the gap.</li>
-    <li>A capacitor blocks any change <b>slow enough for it to catch up with</b>. Small caps block bass, big caps pass everything except DC.</li>
-    <li><code>Q = C × V</code>. A bigger C holds more charge at the same voltage.</li>
-    <li><b>Small caps (pF–nF)</b> handle fast things like noise and high frequencies. <b>Big caps (µF–F)</b> handle energy, smoothing and long delays.</li>
-    <li>Always pick a <b>voltage rating</b> above your circuit voltage.</li>
-  </ul>
-</section>
-</main>
-
-<script>
 // ---------- Shared helpers ----------
 const $ = id => document.getElementById(id);
 function loopPath(ctx, x1, y1, x2, y2){
@@ -621,8 +246,8 @@ function frame(now){
 }
 setMode('idle');
 requestAnimationFrame(frame);
-</script>
-<script>
+
+
 // ===== Helpers for schematics and plots =====
 function W(ctx,pts,col='#cbd5e1',lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
 function dot(ctx,x,y){ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
@@ -766,9 +391,8 @@ function frame2(now){const dt=Math.min(0.05,(now-last2)/1000);last2=now;
   stepFade(dt);stepSmooth(dt);stepCouple(dt);stepDecouple(dt);
   drawFade();drawSmooth();drawCouple();drawDecouple();requestAnimationFrame(frame2);}
 requestAnimationFrame(frame2);
-</script>
 
-<script>
+
 // ===== Burst demo =====
 const BU={V:9,vc:0,stress:0,broken:false,heat:0,off:0,flow:0,t:0,smoke:[],popT:0};
 const RATING=16, VMAX=30;
@@ -861,9 +485,8 @@ function drawBurst(){
 let lastB=performance.now();
 function frameB(now){const dt=Math.min(0.05,(now-lastB)/1000);lastB=now;stepBurst(dt);drawBurst();requestAnimationFrame(frameB);}
 requestAnimationFrame(frameB);
-</script>
 
-<script>
+
 // ===== Coupling: why centred on 0 =====
 const Z={t:0,vc:4.5,h:[]}, zTau=1.2;
 $('zPlug').onclick=()=>{Z.vc=0;};
@@ -913,9 +536,8 @@ function drawZ(){
 let lastZ=performance.now();
 function frameZ(now){const dt=Math.min(0.05,(now-lastZ)/1000);lastZ=now;stepZ(dt);drawZ();requestAnimationFrame(frameZ);}
 requestAnimationFrame(frameZ);
-</script>
 
-<script>
+
 // ===== Balance / electrons demo =====
 const E={mode:1,t:0,vc:0.6,off:0,vin:0.6,I:0};
 choices('eChoices',['Steady push (DC)','Music (changing push)'],1,i=>{E.mode=i;});
@@ -969,9 +591,8 @@ function drawR(){const c=$('cRace'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.w
 let lastE=performance.now();
 function frameE(now){const dt=Math.min(0.05,(now-lastE)/1000);lastE=now;stepE(dt);stepR(dt);drawE();drawR();requestAnimationFrame(frameE);}
 requestAnimationFrame(frameE);
-</script>
 
-<script>
+
 // ===== Long pipe inertia demo =====
 const LP={mode:0,t:0,q:0.15,q2:0.15,S:1,d:0.15,P:1,off1:0,off2:0,h:[],glitch:0};
 choices('lChoices',['No tank','Tank far away','Tank right beside the chip'],0,i=>{LP.mode=i;LP.S=1;LP.q=LP.q2=LP.d;});
@@ -1018,11 +639,3 @@ function drawLP(){const c=$('cPipe'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.
 let lastLP=performance.now();
 function frameLP(now){const dt=Math.min(0.05,(now-lastLP)/1000);lastLP=now;stepLP(dt);drawLP();requestAnimationFrame(frameLP);}
 requestAnimationFrame(frameLP);
-</script>
-
-<script>
-const LINKS={"hub": {"web": "https://claude.ai/artifact/PMq2YkU4BVFW8M5MXWXPG6", "file": "index.html"}, "capacitor": {"web": "https://claude.ai/artifact/1o6HM5cbubAaBdgnwipgfP", "file": "capacitor.html"}, "resistor": {"web": "https://claude.ai/artifact/WAXu6C27xupiicC5hkDcEa", "file": "resistor.html"}, "diode": {"web": "https://claude.ai/artifact/Ny8bfjVrvdDofDt6kC4DSb", "file": "diode.html"}, "led": {"web": "https://claude.ai/artifact/7Cbu5cYi8sZcNzqe86DvWm", "file": "led.html"}, "transistor": {"web": "https://claude.ai/artifact/VEvxPsqDqPm9pZ74THwNsa", "file": "transistor.html"}, "chips": {"web": "https://claude.ai/artifact/LrYTBReH3ve9cRPbtd5wyJ", "file": "chips.html"}, "inductor": {"web": "#", "file": "inductor.html"}, "relay": {"web": "#", "file": "relay.html"}, "circuits": {"web": "#", "file": "circuits.html"}, "quiz": {"web": "#", "file": "quiz.html"}};
-document.querySelectorAll('a[data-page]').forEach(a=>{const l=LINKS[a.dataset.page];if(!l)return;const local=location.protocol==='file:';a.href=local?l.file:l.web;if(!local)a.target='_blank';});
-</script>
-</body>
-</html>
