@@ -3,7 +3,7 @@ import glob, importlib.util, json, os, re
 from paths import SITE
 import components
 
-JS_SHARED = {'@helpers': 'shared/js/helpers.js', '@helpers2': 'shared/js/helpers2.js'}
+JS_SHARED = {'@helpers': 'shared/js/helpers.js', '@helpers2': 'shared/js/helpers2.js', '@breadboard': 'shared/js/breadboard.js'}
 CSS_FILES = ['shared/css/tokens.css', 'shared/css/base.css', 'shared/css/layout.css', 'shared/css/components.css', 'shared/css/probe.css']
 # + every pages/**/page.css (CSS used by one page only)
 
