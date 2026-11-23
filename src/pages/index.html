@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electronics Learning: Components</title>
+<style>
+  :root{
+    --bg:#0b1120; --card:#151e30; --ink:#e2e8f0; --muted:#94a3b8; --line:#2a3650;
+    --water:#3b82f6; --water-light:#bcd6fb; --accent:#f59e0b; --good:#10b981; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:40px 20px 34px;text-align:center}
+  header h1{margin:0 0 6px;font-size:2.2rem}
+  header p{margin:0;opacity:.9;font-size:1.1rem}
+  main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  h2{margin-top:0;font-size:1.4rem}
+  h2 .num{display:inline-block;background:var(--water);color:#fff;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;font-size:1rem;margin-right:8px}
+  .tldr{font-size:1.15rem;background:#1b2e4f;border-left:5px solid var(--water);padding:14px 18px;border-radius:8px}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1220;border:1px solid var(--line)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 8px}
+  button{font:inherit;font-weight:600;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;background:#2a3650;color:var(--ink);transition:.15s}
+  button:hover{filter:brightness(.95)}
+  button.active{background:var(--water);color:#fff}
+  button.active.dis{background:var(--accent)}
+  button.active.hold{background:#64748b}
+  label.slider{display:flex;align-items:center;gap:8px;font-size:.95rem;color:var(--muted)}
+  input[type=range]{width:140px}
+  .readout{display:flex;gap:18px;flex-wrap:wrap;font-size:.95rem;margin:6px 0 10px}
+  .readout b{font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;font-weight:600}
+  .hint{color:var(--muted);font-size:.95rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .map{display:grid;grid-template-columns:1fr auto 1fr;gap:8px 12px;align-items:center}
+  .map div{padding:8px 12px;border-radius:8px}
+  .map .w{background:#1b2e4f}.map .e{background:#3a2c12}.map .arrow{text-align:center;color:var(--muted)}
+  .map .h{font-weight:700;background:none}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#101827}
+  .card .ico{font-size:1.8rem}
+  .card h3{margin:6px 0 4px;font-size:1.05rem}
+  .card p{margin:0;font-size:.93rem;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  td:first-child{font-weight:600;width:34%}
+  .warn{background:#3a1a1d;border-left:5px solid var(--bad);padding:12px 16px;border-radius:8px}
+  #fPress{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  code{background:#2a3650;padding:1px 6px;border-radius:5px}
+  .navlink{color:#93c5fd;text-decoration:none;font-weight:600;cursor:pointer}
+  .navlink:hover{text-decoration:underline}
+  .comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .comp{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:16px;background:#101827;color:var(--ink);text-decoration:none;transition:.15s}
+  a.comp:hover{border-color:#3b82f6;transform:translateY(-2px)}
+  .comp svg{width:96px;flex-shrink:0;margin-top:8px;overflow:visible}
+  .comp h3{margin:0 0 4px}.comp p{margin:0 0 6px;color:var(--muted);font-size:.95rem}
+  .comp .analogy{color:#93c5fd}.comp .open{font-weight:700;color:#60a5fa}
+  .soon .comp{opacity:.6}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Electronics, one component at a time</h1>
+  <p>Simple explanations, water analogies and interactive animations</p>
+</header>
+<main>
+
+<section>
+  <h2>Start here: the water analogy</h2>
+  <p>Every page uses the same idea: <b>electricity behaves like water flowing in pipes</b>. Keep this table in mind and the rest gets much easier.</p>
+  <div class="map">
+    <div class="h">Water</div><div></div><div class="h">Electricity</div>
+    <div class="w">Pump</div><div class="arrow">→</div><div class="e">Battery / power supply</div>
+    <div class="w">Pressure</div><div class="arrow">→</div><div class="e"><b>Voltage</b>, in volts (V)</div>
+    <div class="w">Flow of water</div><div class="arrow">→</div><div class="e"><b>Current</b>, in amps (A)</div>
+    <div class="w">Narrow pipe</div><div class="arrow">→</div><div class="e"><b>Resistance</b>, in ohms (Ω)</div>
+    <div class="w">River (one direction, steady)</div><div class="arrow">→</div><div class="e"><b>DC</b>: Direct Current</div>
+    <div class="w">Waves sloshing back and forth</div><div class="arrow">→</div><div class="e"><b>AC</b>: Alternating Current</div>
+  </div>
+  <p style="margin-top:14px">And the one formula that ties them together: <code>V = I × R</code>, which in water terms is <b>pressure = flow × narrowness</b>.</p>
+</section>
+
+<section>
+  <h2>Components</h2>
+  <div class="comp-grid">
+    <a class="comp" data-page="resistor">
+      <svg viewBox="0 0 120 50"><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><rect x="35" y="14" width="50" height="22" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg>
+      <div><h3>Resistor</h3>
+      <p>Limits how much current flows. Protects LEDs, divides voltages, sets defaults and timing.</p>
+      <p class="analogy">💧 A narrow pipe</p>
+      <span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="capacitor">
+      <svg viewBox="0 0 120 50"><path d="M5 25H54M66 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M54 8V42M66 8V42" stroke="#e2e8f0" stroke-width="4"/></svg>
+      <div><h3>Capacitor</h3>
+      <p>Stores charge for a moment. Smooths power, blocks DC while passing signals, and sets timing.</p>
+      <p class="analogy">💧 A stretchy rubber sheet in a pipe</p>
+      <span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="diode">
+      <svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/></svg>
+      <div><h3>Diode</h3>
+      <p>Lets current flow one way only. AC → DC, reverse protection, spike protection, guitar distortion.</p>
+      <p class="analogy">💧 A one-way valve</p>
+      <span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="led">
+      <svg viewBox="0 0 120 50"><path d="M5 25H45M75 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 10L75 25L45 40Z" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M75 10V40" stroke="#e2e8f0" stroke-width="3"/><path d="M62 6L74 -6M72 10L84 -2" stroke="#fbbf24" stroke-width="2"/></svg>
+      <div><h3>LED</h3>
+      <p>A diode that glows. Always needs a resistor. Includes a resistor calculator, PWM dimming and RGB colour mixing.</p>
+      <p class="analogy">💧 A one-way valve with a glowing paddle wheel</p>
+      <span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="transistor">
+      <svg viewBox="0 0 120 50"><circle cx="64" cy="25" r="20" fill="none" stroke="#e2e8f0" stroke-width="2"/><path d="M5 25H56M56 12V38M56 19L74 8V-4M56 31L74 42V54" stroke="#e2e8f0" stroke-width="3" fill="none"/></svg>
+      <div><h3>Transistor</h3>
+      <p>A small current controls a big one. A switch for motors, an amplifier for guitars, and the logic behind computers.</p>
+      <p class="analogy">💧 A big valve opened by a small side flow</p>
+      <span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="inductor">
+      <svg viewBox="0 0 120 50"><path d="M5 25H25M95 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M25 25a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0a8.75 8.75 0 0 1 17.5 0" fill="none" stroke="#e2e8f0" stroke-width="3"/></svg>
+      <div><h3>Inductor</h3><p>A coil that resists changes in current. Boost converters, filters, transformers, the switch-off spike.</p><p class="analogy">💧 A heavy water wheel</p><span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="relay">
+      <svg viewBox="0 0 120 50"><rect x="35" y="8" width="50" height="34" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M5 25H35M85 25H115" stroke="#e2e8f0" stroke-width="3"/><path d="M45 34L75 16" stroke="#e2e8f0" stroke-width="2"/></svg>
+      <div><h3>Relay</h3><p>A switch moved by an electromagnet. Isolated control of lamps, motors and mains, plus self-latching memory.</p><p class="analogy">💧 A lever on a separate pipe</p><span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="motion">
+      <svg viewBox="0 0 120 50"><circle cx="22" cy="25" r="15" fill="none" stroke="#e2e8f0" stroke-width="3"/><path d="M42 16a12 12 0 0 1 0 18" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><path d="M58 20h8l12 -12v34l-12 -12h-8z" fill="none" stroke="#e2e8f0" stroke-width="2.5"/><circle cx="102" cy="25" r="14" fill="none" stroke="#e2e8f0" stroke-width="3"/><text x="102" y="30" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700" font-family="system-ui">M</text></svg>
+      <div><h3>Sound &amp; motion</h3><p>Active and passive buzzers, the 8 Ω speaker and the DC motor: how they work and how to drive them safely.</p><p class="analogy">💧 A membrane and a water wheel</p><span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="formulas" style="--accent:#38bdf8">
+      <svg viewBox="0 0 120 50"><path d="M60 4L96 46H24Z" fill="none" stroke="#38bdf8" stroke-width="3"/><path d="M38 30H82M60 30V46" stroke="#38bdf8" stroke-width="2"/><text x="60" y="26" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="800" font-family="system-ui">V</text></svg>
+      <div><h3>Basic formulas</h3><p>Ohm's law, power, series &amp; parallel, dividers, LED resistors, RC time, battery life, with calculators.</p><p class="analogy">💧 Pressure × flow</p><span class="open">Open →</span></div>
+    </a>
+    <a class="comp" data-page="sensors" style="--accent:#f59e0b">
+      <svg viewBox="0 0 120 50"><circle cx="40" cy="25" r="16" fill="#fb923c"/><path d="M30 18l5 14l5 -14l5 14" stroke="#7c2d12" stroke-width="2" fill="none"/><path d="M80 14a10 10 0 0 1 20 0v14h-20z" fill="#e2e8f0"/><path d="M84 28v16M90 28v16M96 28v16" stroke="#e2e8f0" stroke-width="2"/></svg>
+      <div><h3>Sensors</h3><p>LDR, LM35, touch pads, push buttons, guitar pickups and infrared sensors: how the real world becomes a voltage.</p><p class="analogy">💧 Gauges and taps</p><span class="open">Open →</span></div>
+    </a>
+  </div>
+
+  <h3 style="margin-top:26px">Coming next (just ask!)</h3>
+  <div class="comp-grid soon">
+    <div class="comp"><svg viewBox="0 0 120 50"><path d="M35 5L85 25L35 45Z" fill="none" stroke="#94a3b8" stroke-width="3"/><path d="M5 15H35M5 35H35M85 25H115" stroke="#94a3b8" stroke-width="3"/></svg><div><h3>Op-amp (deep dive)</h3><p class="analogy">💧 A smart pump that copies a pressure, but bigger</p></div></div>
+    
+  </div>
+  <p class="hint">Suggested order: resistor → capacitor → diode → LED → transistor → inductor → relay → sound &amp; motion → formulas → sensors → microchips → build the circuits → take the quiz.</p>
+</section>
+
+<section>
+  <h2>Microchips</h2>
+  <p>Once you know the components, chips are easy: each one is a ready-made circuit full of transistors, resistors and diodes.</p>
+  <div class="comp-grid">
+    <a class="comp" data-page="chips">
+      <svg viewBox="0 0 120 60"><rect x="35" y="5" width="50" height="50" fill="#1f2937" stroke="#e2e8f0" stroke-width="2"/><path d="M53 5a7 7 0 0 0 14 0" fill="#0b1220" stroke="#e2e8f0" stroke-width="2"/><path d="M25 14H35M25 26H35M25 38H35M25 50H35M85 14H95M85 26H95M85 38H95M85 50H95" stroke="#e2e8f0" stroke-width="3"/></svg>
+      <div><h3>Common microchips</h3>
+      <p>NE555 timer · 7805 regulator · LM358 op-amp · LM386 audio amp · CD4017 &amp; CD4518 counters · CD4511 display decoder · LM3914 bar-graph driver · 74HC595 shift register · TP4056 charger · ATmega328P (Arduino): what's inside, what they're for, and live demos.</p>
+      <p class="analogy">💧 Tanks with floats, pressure valves, see-saws and bucket brigades</p>
+      <span class="open">Open →</span></div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>🔧 Build it yourself</h2>
+  <div class="comp-grid"><a class="comp" data-page="circuits"><svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg>
+  <div><h3>Circuits to build</h3><p>26 breadboard projects grouped by theme (electronic dice, police siren, fuzz pedal, 00–99 counter, thermometers, infrared alarm, motors and more) with parts lists and variants to try, plus real-life builds: a <b>Li-ion battery charger</b> and a <b>light detector that switches a lamp</b>.</p><span class="open">Open →</span></div></a></div>
+</section>
+
+<section>
+  <h2>How to use these pages</h2>
+  <ul>
+    <li>Every page has the same structure: <b>short version → what it's for → water analogy → interactive demos → example circuits → key facts → recap</b>.</li>
+    <li>Play with every slider and button. Breaking things (bursting capacitors, burning LEDs) is part of learning, and nothing here costs money!</li>
+    <li>Got a question? Ask, and the explanation gets added to the page.</li>
+  </ul>
+</section>
+</main>
+
+
+<script>
+const LINKS={"hub": {"web": "https://claude.ai/artifact/PMq2YkU4BVFW8M5MXWXPG6", "file": "index.html"}, "capacitor": {"web": "https://claude.ai/artifact/1o6HM5cbubAaBdgnwipgfP", "file": "capacitor.html"}, "resistor": {"web": "https://claude.ai/artifact/WAXu6C27xupiicC5hkDcEa", "file": "resistor.html"}, "diode": {"web": "https://claude.ai/artifact/Ny8bfjVrvdDofDt6kC4DSb", "file": "diode.html"}, "led": {"web": "https://claude.ai/artifact/7Cbu5cYi8sZcNzqe86DvWm", "file": "led.html"}, "transistor": {"web": "https://claude.ai/artifact/VEvxPsqDqPm9pZ74THwNsa", "file": "transistor.html"}, "chips": {"web": "https://claude.ai/artifact/LrYTBReH3ve9cRPbtd5wyJ", "file": "chips.html"}, "inductor": {"web": "#", "file": "inductor.html"}, "relay": {"web": "#", "file": "relay.html"}, "circuits": {"web": "#", "file": "circuits.html"}, "quiz": {"web": "#", "file": "quiz.html"}};
+document.querySelectorAll('a[data-page]').forEach(a=>{const l=LINKS[a.dataset.page];if(!l)return;const local=location.protocol==='file:';a.href=local?l.file:l.web;if(!local)a.target='_blank';});
+</script>
+</body>
+</html>

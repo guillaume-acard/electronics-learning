@@ -1,0 +1,160 @@
+<header>
+  <h1>The Resistor</h1>
+  <p>The simplest component: it makes it harder for electricity to flow</p>
+</header>
+<main>
+<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
+
+<section>
+  <h2><span class="num">1</span>The short version</h2>
+  <p class="tldr">A resistor <b>resists</b> the flow of electricity. It's a deliberately <b>narrow pipe</b> in the circuit. The narrower the pipe (the bigger the resistance), the <b>less current</b> flows for the same push.</p>
+  <p>Its strength is measured in <b>ohms (Ω)</b>. A resistor doesn't store anything (that's the capacitor's job). It simply slows the flow down and turns the "lost" energy into a little <b>heat</b>.</p>
+</section>
+
+<section>
+  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <p>A battery pushes as hard as it can. Many parts would take far too much current and burn, or would get the wrong voltage. Resistors are how we <b>control</b> the flow. They do six main jobs:</p>
+  <div class="cards">
+    <div class="card"><div class="ico">🛡️</div><h3>1. Limit current</h3><p><b>Why:</b> an LED connected straight to a battery takes too much current and burns in a second. A resistor in series keeps the current safe.<br><i>Water:</i> a narrow section so the flow can't rush.</p></div>
+    <div class="card"><div class="ico">➗</div><h3>2. Divide a voltage</h3><p><b>Why:</b> two resistors in a row split a voltage into a smaller one, for example 9 V → 4.5 V. A <b>volume knob</b> is an adjustable divider.<br><i>Water:</i> measuring the pressure halfway down a narrowing pipe.</p></div>
+    <div class="card"><div class="ico">📌</div><h3>3. Set a default (pull-up)</h3><p><b>Why:</b> a chip's input left unconnected "floats" and reads random values. A resistor gently holds it at a known level until a button overrides it.<br><i>Water:</i> a gentle spring holding a valve in place.</p></div>
+    <div class="card"><div class="ico">⏱️</div><h3>4. Timing (with a capacitor)</h3><p><b>Why:</b> a resistor controls how fast a capacitor fills. Fill time = R × C, which is how blink rates and delays are set.<br><i>Water:</i> a thin hose filling a tank slowly.</p></div>
+    <div class="card"><div class="ico">🔥</div><h3>5. Make heat on purpose</h3><p><b>Why:</b> toasters, kettles, heaters and hair dryers are just big resistors. All the energy they slow down becomes heat.<br><i>Water:</i> friction in a narrow pipe.</p></div>
+    <div class="card"><div class="ico">🌡️</div><h3>6. Sense things</h3><p><b>Why:</b> some resistors change with light (LDR), temperature (thermistor) or pressure. The circuit measures the change to "see" or "feel".<br><i>Water:</i> a pipe that narrows when it's cold.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">3</span>The water analogy: a narrow pipe</h2>
+  <p>The <b>pump</b> (battery) creates <b>pressure</b> (voltage). The water <b>flow</b> is the current. The <b>narrow section</b> is the resistor.</p>
+  <ul>
+    <li>Stronger pump → <b>more flow</b>.</li>
+    <li>Narrower pipe (more ohms) → <b>less flow</b>.</li>
+    <li>All the pressure is "used up" squeezing through the narrow part: high pressure before it, low pressure after it. That's called the <b>voltage drop</b> across the resistor.</li>
+    <li>The squeezing creates friction, which becomes <b>heat</b>.</li>
+  </ul>
+  <div class="controls">
+    <label class="slider">Pump pressure (voltage)<input id="fV" type="range" min="0" max="12" step="0.5" value="9"></label>
+    <label class="slider">Resistance (narrowness)<input id="fR" type="range" min="1" max="10" step="0.5" value="3"></label>
+  </div>
+  <div class="readout"><span>Voltage: <b id="fVt"></b></span><span>Resistance: <b id="fRt"></b></span><span>Current = V ÷ R = <b id="fIt"></b></span><span>Heat: <b id="fPt"></b></span></div>
+  <canvas id="cFlow" width="800" height="300"></canvas>
+  <p class="hint">Push harder and the flow speeds up. Narrow the pipe and it slows down. Both at once (high voltage and little resistance) gives lots of flow and lots of heat.</p>
+</section>
+
+<section>
+  <h2><span class="num">4</span>Ohm's law: the one formula to remember</h2>
+  <p class="tldr" style="text-align:center;font-size:1.6rem"><b>V = I × R</b></p>
+  <p style="text-align:center;margin-top:-6px" class="hint">Voltage (volts) = Current (amps) × Resistance (ohms)</p>
+  <p>In water terms: <b>pressure needed = flow × narrowness</b>. Cover the one you want to find, and the other two tell you how to compute it:</p>
+  <div class="controls" id="ohmBtns">
+    <button data-k="V" class="active">Find the voltage</button><button data-k="I">Find the current</button><button data-k="R">Find the resistance</button>
+  </div>
+  <div id="ohmOut" class="card" style="font-size:1.05rem"></div>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Combining resistors: in a row or side by side</h2>
+  <ul>
+    <li><b>Series (one after the other):</b> the water must squeeze through <b>both</b> narrow sections, so it's harder. The resistances <b>add up</b>: R = R1 + R2.</li>
+    <li><b>Parallel (side by side):</b> the water has <b>two paths</b> to choose from, so it's easier. The total is <b>smaller than either one</b>: 1/R = 1/R1 + 1/R2.</li>
+  </ul>
+  <div class="controls">
+    <span id="spChoices"></span>
+    <label class="slider">R1<input id="sR1" type="range" min="1" max="10" step="1" value="2"></label>
+    <label class="slider">R2<input id="sR2" type="range" min="1" max="10" step="1" value="4"></label>
+  </div>
+  <div class="readout"><span>Total resistance: <b id="spR"></b></span><span>Total current from 9 V: <b id="spI"></b></span></div>
+  <canvas id="cSP" width="800" height="270"></canvas>
+  <p class="hint">The yellow dots are the flow. In parallel, notice that more current goes through the <b>easier</b> path (the smaller resistor).</p>
+</section>
+
+<section>
+  <h2><span class="num">6</span>The other "strength": the power rating (how much heat it can take)</h2>
+  <p>Like the capacitor's voltage rating, a resistor has a limit, but this one is about <b>heat</b>. The heat produced is <b>P = V × I</b>, in watts. Most small resistors are rated <b>¼ W (0.25 W)</b>. Go above it and the resistor gets too hot: it discolours, smokes, and finally burns open, breaking the circuit.</p>
+  <p>Here is a <b>100 Ω, ¼ W</b> resistor. Increase the voltage across it:</p>
+  <div class="controls">
+    <label class="slider" style="flex:1">Voltage across it<input id="hV" type="range" min="0" max="12" step="0.5" value="3" style="flex:1;width:auto"></label>
+    <b id="hVt" style="min-width:50px"></b><button id="hNew">🔧 Replace resistor</button>
+  </div>
+  <div class="readout"><span>Current: <b id="hI"></b></span><span>Heat (power): <b id="hP"></b></span><span>Status: <b id="hS"></b></span></div>
+  <canvas id="cHeat" width="800" height="200"></canvas>
+  <p class="hint">At 5 V it's right at the ¼ W limit. Above that it's overheating: P = V²/R, so doubling the voltage makes <b>four times</b> the heat. Power resistors (1 W, 5 W, 10 W…) are physically bigger so they can shed more heat.</p>
+</section>
+
+<section>
+  <h2><span class="num">7</span>Simple example circuits</h2>
+
+  <h3>A. Protecting an LED (current limiting)</h3>
+  <p>An LED needs about <b>2 V</b> and at most <b>20 mA</b>. A 9 V battery would push far too much current through it. The resistor takes the extra 7 V and limits the current to: <code>I = (9 V − 2 V) ÷ R</code>.
+  <b>Why:</b> every LED in every device has a resistor like this.</p>
+  <div class="controls"><span id="ledChoices"></span><button id="ledNew">🔧 New LED</button></div>
+  <canvas id="cLed" width="800" height="250"></canvas>
+  <p class="hint">No resistor gives an instant burn. 100 Ω is too much current, so it burns after a few seconds. 470 Ω is the right value. 10 kΩ is safe but dim.</p>
+
+  <h3>B. Voltage divider and the volume knob (potentiometer)</h3>
+  <p>Two resistors in a row split the voltage: <code>Vout = Vin × R2 ÷ (R1 + R2)</code>. A <b>potentiometer</b> is one long resistor with a sliding contact, so turning it moves the split point.
+  <b>Why:</b> volume and tone knobs (including on a guitar), sensor readings, and setting reference levels.</p>
+  <div class="controls"><label class="slider" style="flex:1">Turn the knob<input id="pot" type="range" min="0" max="1" step="0.01" value="0.5" style="flex:1;width:auto"></label></div>
+  <canvas id="cDiv" width="800" height="260"></canvas>
+
+  <h3>C. Pull-up resistor (giving a chip a default value)</h3>
+  <p>A button connects a chip's input to ground (0 V) when pressed. But when it's <i>not</i> pressed, the input is connected to <b>nothing</b>. It "floats" and picks up electrical noise, so the chip reads random HIGH/LOW values.
+  A <b>10 kΩ pull-up</b> to +5 V gently holds the input HIGH. Pressing the button wins easily, because the button is a direct path while the resistor only pulls gently.
+  <b>Why:</b> it's on almost every button, switch and data line connected to a microcontroller.</p>
+  <div class="controls"><button id="pullBtn" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="pullChoices"></span></div>
+  <canvas id="cPull" width="800" height="260"></canvas>
+
+  <h3>D. Timing with a capacitor (the blinker)</h3>
+  <p>A resistor controls how fast a capacitor fills (see the <a data-page="capacitor" class="navlink">capacitor page</a>). Here a 100 µF capacitor fills through the resistor. When it reaches ⅔ full, the LED flashes and it empties back to ⅓.
+  The time scales with <b>R × C</b>, so a bigger resistor gives slower blinking. <b>Why:</b> blinkers, delays, oscillators and the classic 555 timer chip.</p>
+  <div class="controls"><label class="slider" style="flex:1">Resistor<input id="rcR" type="range" min="0" max="1.7" step="0.01" value="0.7" style="flex:1;width:auto"></label><b id="rcRt" style="min-width:150px"></b></div>
+  <canvas id="cRC" width="800" height="230"></canvas>
+</section>
+
+<section>
+  <h2><span class="num">8</span>Reading the colour code</h2>
+  <p>Small resistors are too tiny for printed numbers, so they use <b>coloured bands</b>. The first two bands are <b>digits</b>, the third is the <b>multiplier</b> (how many zeros), and the fourth is the <b>tolerance</b> (how accurate it is).</p>
+  <div class="controls" id="ccSel"></div>
+  <canvas id="cCC" width="800" height="150"></canvas>
+  <p class="hint">Memory trick for the digit colours 0–9: <b>B</b>lack <b>B</b>rown <b>R</b>ed <b>O</b>range <b>Y</b>ellow <b>G</b>reen <b>B</b>lue <b>V</b>iolet <b>G</b>rey <b>W</b>hite. Surface-mount resistors use a number code instead: <code>103</code> = 10 followed by 3 zeros = 10 kΩ.</p>
+</section>
+
+<section>
+  <h2><span class="num">9</span>Key facts</h2>
+  <div class="grid2">
+    <div>
+      <canvas id="cSymR" width="380" height="150"></canvas>
+      <p class="hint" style="text-align:center">Left: European/IEC symbol (used in France). Right: American symbol. They mean the same thing.</p>
+    </div>
+    <table>
+      <tr><td>Unit</td><td>Ohm (Ω). <b>kΩ</b> = thousand, <b>MΩ</b> = million. 4k7 means 4.7 kΩ.</td></tr>
+      <tr><td>Formula</td><td><b>V = I × R</b>. Heat: <b>P = V × I</b>.</td></tr>
+      <tr><td>Polarity</td><td>None. It works both ways round.</td></tr>
+      <tr><td>Power rating</td><td>Usually ¼ W for small ones. Check P = V × I stays well below it.</td></tr>
+      <tr><td>Tolerance</td><td>±5% (gold) or ±1% (brown). A 1 kΩ ±5% resistor is really between 950 and 1050 Ω.</td></tr>
+    </table>
+  </div>
+  <h3>Common types</h3>
+  <table>
+    <tr><td>Carbon / metal film (small, with coloured bands)</td><td>The everyday through-hole resistor. Metal film is more accurate and quieter, so it's good for audio.</td></tr>
+    <tr><td>Wirewound / ceramic (big, white block)</td><td>Handles lots of heat (5 W, 10 W+). Used in power supplies and amp power sections.</td></tr>
+    <tr><td>SMD (tiny black rectangle)</td><td>Soldered on the surface of modern boards, with a number code (103 = 10 kΩ).</td></tr>
+    <tr><td>Potentiometer (knob)</td><td>An adjustable resistor with three legs: volume, tone and gain knobs.</td></tr>
+    <tr><td>LDR / thermistor</td><td>Resistance changes with light or temperature. Used in night lights and thermostats.</td></tr>
+  </table>
+  <p class="warn" style="margin-top:16px"><b>⚠️ Safety:</b> resistors get <b>hot</b>, sometimes enough to burn your finger, especially power resistors. A burnt smell or discoloured resistor means it's been overloaded. Find out why before replacing it.</p>
+</section>
+
+<section>
+  <h2><span class="num">10</span>Recap</h2>
+  <ul>
+    <li>A resistor is a <b>narrow pipe</b>: it limits how much current flows.</li>
+    <li><b>V = I × R</b>: more voltage gives more current, and more resistance gives less current.</li>
+    <li>The voltage is "used up" across it (the voltage drop) and becomes <b>heat</b>.</li>
+    <li>Series: resistances add up (harder). Parallel: the total gets smaller (easier, more paths).</li>
+    <li>Respect the <b>power rating</b> (watts), or it overheats and burns.</li>
+    <li>Main jobs: protect LEDs, divide voltages (volume knobs), set defaults (pull-ups), and set timing with capacitors.</li>
+  </ul>
+</section>
+</main>

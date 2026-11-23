@@ -1,0 +1,68 @@
+
+<section id="p12">
+  <h2><span class="num">12</span>Digital dice with two 7-segment displays</h2>
+  <p><span class="qtopic">Real parts</span> Press a button: the two displays spin through random numbers, slow down and stop on two dice values, like rolling two real dice. It uses two <b>Kingbright SC39-11SURKWA</b> displays (see <a class="navlink" href="#parts">Using real parts</a>), an Arduino and the <b>multiplexing</b> trick: both displays share the same 8 segment wires, and two transistors switch them on one at a time, very fast.</p>
+  <div class="controls"><button id="dcRoll" class="active" style="font-size:1.05rem">🎲 Roll!</button><span class="hint">Mode:</span><span id="dcMode"></span><label class="slider"><input type="checkbox" id="dcSlow"> slow-motion multiplexing</label></div>
+  <canvas id="cdice" width="800" height="300"></canvas>
+  <p class="hint">Tick <b>slow-motion multiplexing</b> to see the secret: only <b>one</b> display is ever lit at a time. The Arduino swaps between them every 4 ms, which is far too fast for your eye.</p>
+  <h3>Schematic</h3>
+  <canvas id="cp12" width="800" height="360"></canvas>
+  <table>
+    <tr><td>Arduino pin</td><td>Goes to</td></tr>
+    <tr><td>D2 … D9</td><td>Through a <b>330 Ω</b> resistor each, to segments <b>a b c d e f g dp</b>, i.e. display pins <b>7 6 4 2 1 9 10 5</b>. Wire the same pin of <b>both</b> displays together.</td></tr>
+    <tr><td>D10, D11</td><td>Through <b>1 kΩ</b> to the base of BC547 #1 / #2. Each collector goes to the <b>COM</b> (pin 3 or 8) of display 1 / 2, and each emitter to <b>GND</b>.</td></tr>
+    <tr><td>D12</td><td>Push button to <b>GND</b> (the code turns on the internal pull-up, so no resistor is needed).</td></tr>
+    <tr><td>A0</td><td>Leave it <b>unconnected</b>: its random noise seeds the random-number generator.</td></tr>
+  </table>
+  <h3>Arduino code</h3>
+<pre style="background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.88rem;line-height:1.45"><code>// Digital dice: 2 × Kingbright SC39-11SURKWA (common cathode), multiplexed
+const byte SEG[8]   = {2, 3, 4, 5, 6, 7, 8, 9};  // a b c d e f g dp (each via 330 Ω)
+const byte DIGIT[2] = {10, 11};                  // → 1 kΩ → BC547 base, collector = display COM
+const byte BUTTON   = 12;                        // push button to GND
+const byte FONT[10] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F}; // bit0 = a … bit6 = g
+byte value[2] = {6, 6};
+
+void showDigit(byte d, byte n) {
+  for (byte s = 0; s < 8; s++) digitalWrite(SEG[s], bitRead(FONT[n], s));
+  digitalWrite(DIGIT[d], HIGH);    // transistor ON → this display lights
+  delay(4);
+  digitalWrite(DIGIT[d], LOW);     // OFF before changing the segments (no "ghosting")
+}
+
+void refresh(unsigned long ms) {   // keep both displays lit for ms milliseconds
+  unsigned long start = millis();
+  while (millis() - start < ms) { showDigit(0, value[0]); showDigit(1, value[1]); }
+}
+
+void setup() {
+  for (byte s = 0; s < 8; s++) pinMode(SEG[s], OUTPUT);
+  for (byte d = 0; d < 2; d++) pinMode(DIGIT[d], OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+  randomSeed(analogRead(A0));      // unconnected pin = random noise
+}
+
+void loop() {
+  if (digitalRead(BUTTON) == LOW) {                 // button pressed: roll!
+    for (int wait = 20; wait < 260; wait += 15) {   // spins fast, then slows down
+      value[0] = random(1, 7);                      // 1 … 6
+      value[1] = random(1, 7);
+      refresh(wait);
+    }
+  }
+  refresh(20);
+}</code></pre>
+  <div class="grid2" style="margin-top:12px">
+    <div><h3 style="margin-top:0">🧰 You need</h3><ul><li>2 × Kingbright SC39-11SURKWA (Gotronic 03099)</li><li>Arduino Uno or compatible (e.g. Joy-It ONE-C)</li><li>8 × 330 Ω (segments), 2 × 1 kΩ (bases)</li><li>2 × BC547B transistors</li><li>1 push button, breadboard + jumper wires</li></ul></div>
+    <div><h3 style="margin-top:0">🔧 Build</h3><ol><li>Place both displays across the breadboard gap, side by side.</li><li>Link the same pins of both displays together (7↔7, 6↔6, … 5↔5), <b>except COM</b>.</li><li>Each shared segment line → 330 Ω → Arduino D2–D9.</li><li>Each COM → its own BC547 collector. Emitters → GND, bases → 1 kΩ → D10 / D11.</li><li>Button between D12 and GND. Upload the code and press!</li></ol></div>
+  </div>
+  <h3>🧪 Variants to try</h3>
+  <table>
+    <tr><td>Change <code>delay(4)</code> to <code>delay(200)</code></td><td>You see the displays take turns: multiplexing in slow motion.</td></tr>
+    <tr><td>One die only: set <code>value[0]</code> to blank</td><td>Add a blank code to FONT (0x00) and show it on display 1.</td></tr>
+    <tr><td>A 2–12 roll: show <code>value[0] + value[1]</code> on both digits</td><td>Tens on the left, units on the right: a "two-dice total" display.</td></tr>
+    <tr><td>Light the decimal point while rolling</td><td>Set bit 7 (dp) in the FONT value during the animation.</td></tr>
+    <tr><td>220 Ω instead of 330 Ω</td><td>Brighter. Each digit is only on half the time, so short peaks of ~14 mA are fine (the datasheet allows 185 mA pulses).</td></tr>
+    <tr><td>Remove the transistors and drive COM straight from D10/D11</td><td>Dimmer and risky: one pin would sink up to 8 segments × 9 mA = 72 mA, way over the ~20–40 mA an Arduino pin can handle.</td></tr>
+    <tr><td>Going further, without Arduino</td><td>555 clock (fast while the button is held) → CD4510 counter → CD4511 decoder → display. A great challenge using the chips from the Microchips page.</td></tr>
+  </table>
+</section>

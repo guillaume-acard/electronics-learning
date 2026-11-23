@@ -1,0 +1,109 @@
+<header>
+  <h1>The Transistor</h1>
+  <p>A valve controlled by electricity: the building block of all modern electronics</p>
+</header>
+<main>
+<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
+
+<section>
+  <h2><span class="num">1</span>The short version</h2>
+  <p class="tldr">A transistor is a <b>valve that a small current can open</b>. A tiny current into one leg (the <b>base</b>) controls a much bigger current flowing between the other two legs (the <b>collector → emitter</b>).</p>
+  <p>That gives it two superpowers:</p>
+  <ul>
+    <li><b>Switch:</b> a weak signal, such as a chip's pin, turns a big load on and off (a motor, a lamp, a relay).</li>
+    <li><b>Amplifier:</b> the big current follows the small one, but about <b>100× bigger</b>. A faint guitar signal becomes a strong one.</li>
+  </ul>
+  <p>This page uses the classic <b>NPN bipolar transistor</b> (BJT). Its cousin the <b>MOSFET</b> works the same way, but it's opened by a <i>voltage</i> on its gate instead of a current.</p>
+</section>
+
+<section>
+  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <div class="cards">
+    <div class="card"><div class="ico">🔌</div><h3>Switching big loads</h3><p><b>Why:</b> a microcontroller pin can give about 20 mA, but a motor needs 500 mA. A transistor lets the weak pin control the strong current safely.</p></div>
+    <div class="card"><div class="ico">🔊</div><h3>Amplifying</h3><p><b>Why:</b> a guitar pickup or microphone gives a tiny signal. Transistors make it big enough to drive a speaker. Your Ruby amp's LM386 chip has a dozen inside!</p></div>
+    <div class="card"><div class="ico">🧠</div><h3>Computing</h3><p><b>Why:</b> on/off switches can build logic (AND, OR, NOT). A phone's processor has <b>billions</b> of tiny transistors.</p></div>
+    <div class="card"><div class="ico">🌗</div><h3>Reacting to sensors</h3><p><b>Why:</b> a sensor's weak signal (light, heat) can switch something on automatically, like a night light.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">3</span>The water analogy: a big valve opened by a small flow</h2>
+  <p>A <b>big pipe</b> (collector → emitter) has a heavy gate in it. A <b>small side pipe</b> (the base) pushes a piston that lifts the gate. A trickle in the small pipe lets a river through the big one.</p>
+  <ul>
+    <li><b>Off (cutoff):</b> no base flow, gate closed, nothing flows.</li>
+    <li><b>Amplifying (active):</b> the main flow = <b>gain × base flow</b>. With a gain of 100, 50 µA in gives 5 mA through. Double the base flow and you double the main flow.</li>
+    <li><b>Fully on (saturated):</b> the gate is wide open. More base flow can't help, because the rest of the circuit (the load) now limits the flow. This is the "switch on" state.</li>
+  </ul>
+  <div class="controls"><label class="slider" style="flex:1">Small base flow (base current)<input id="tIb" type="range" min="0" max="150" step="1" value="40" style="flex:1;width:auto"></label><b id="tIbt" style="min-width:70px"></b></div>
+  <canvas id="cTV" width="800" height="330"></canvas>
+  <p class="hint">One more detail: the base-emitter junction is a <b>diode</b> inside the transistor, so the base needs about <b>0.7 V</b> before any base current flows (see the <a data-page="diode" class="navlink">diode page</a>). That's also why you always put a <b>resistor in front of the base</b>: to limit that current, just like with an LED.</p>
+</section>
+
+<section>
+  <h2><span class="num">4</span>Simple example circuits</h2>
+
+  <h3>A. Switching a motor from a microcontroller</h3>
+  <p>A microcontroller pin (Arduino, ESP32…) can give about <b>20 mA</b>. A small motor needs <b>~500 mA</b>. Connected directly, the pin can't deliver, the motor barely twitches, and the chip overheats. With a transistor, the pin only supplies a few mA into the base, and the transistor switches the 500 mA from the battery.
+  The <b>flyback diode</b> across the motor protects the transistor (see the <a data-page="diode" class="navlink">diode page</a>).</p>
+  <p>The full circuit has <b>two power sources</b>: 5 V for the microcontroller and 9 V for the motor. The important detail is the <b>common ground</b>: both batteries' minus terminals, the chip's GND and the transistor's emitter all connect together. Without it, the base current from the pin has no way back to the chip, and the transistor never turns on. The big motor current loops through the 9 V battery, motor and transistor only. It <b>never passes through the chip</b>.</p>
+  <div class="controls"><button id="swPin">Pin: LOW (0 V)</button><span id="swChoices"></span></div>
+  <canvas id="cSw" width="800" height="330"></canvas>
+
+  <h3>B. Amplifying a signal</h3>
+  <p>A tiny wiggle on the base makes a big wiggle at the collector. The output is <b>upside down</b> (when the input goes up, the transistor opens more and pulls the output down), but it's the same shape, just bigger. Turn the gain up too far and the output hits the supply limits and gets <b>clipped</b>, which is another way to get distortion.</p>
+  <p>This is the classic <b>common-emitter amplifier</b>. Each part has a job:</p>
+  <ul>
+    <li><b>R1 and R2 (bias):</b> a voltage divider holding the base at about 1.5 V, so the transistor sits <b>half-open</b>. That way the signal can open it more <i>and</i> less. Without bias, the negative half of the wave would just switch it off.</li>
+    <li><b>C in and C out:</b> coupling capacitors. They let the music in and out while blocking the DC bias voltages (just like example C on the <a data-page="capacitor" class="navlink">capacitor page</a>).</li>
+    <li><b>Rc (collector resistor):</b> turns the transistor's changing <i>current</i> into a changing <i>voltage</i>. More current means a bigger voltage drop across Rc, so the collector goes <b>down</b>, which is why the output is upside down.</li>
+    <li><b>Re (emitter resistor):</b> sets the gain: <b>gain ≈ Rc ÷ Re</b>. The slider changes Re: a smaller Re gives more gain.</li>
+  </ul>
+  <div class="controls"><label class="slider" style="flex:1">Gain<input id="amG" type="range" min="1" max="40" step="1" value="12" style="flex:1;width:auto"></label><b id="amGt" style="min-width:60px"></b></div>
+  <canvas id="cAmp" width="800" height="525"></canvas>
+  <p class="hint">🎸 In your Ruby amp, the first part (the <b>J310 JFET</b>) is a transistor used as a <b>buffer</b>: it doesn't add much gain, but it lets the guitar's weak, fragile signal drive the rest of the circuit without being loaded down. Then the LM386 chip, made of transistors inside, provides gain of 20 to 200×.</p>
+
+  <h3>C. Automatic night light</h3>
+  <p>An <b>LDR</b> (light-dependent resistor) and a resistor form a voltage divider on the base. In daylight the LDR's resistance is low and pulls the base below 0.7 V, so the transistor is off. When it gets dark, the LDR's resistance shoots up, the base voltage rises above 0.7 V, and the transistor turns the LED on.</p>
+  <div class="controls"><label class="slider" style="flex:1">🌙 Dark ←→ Bright ☀️<input id="nlL" type="range" min="0" max="1" step="0.01" value="0.9" style="flex:1;width:auto"></label></div>
+  <canvas id="cNL" width="800" height="260"></canvas>
+
+  <h3>D. Logic gates: how computers think</h3>
+  <p>Use transistors as on/off switches and you can build decisions. Two in <b>series</b> (one after the other): both must be on for current to flow, which is <b>AND</b>. Two in <b>parallel</b> (side by side): either one is enough, which is <b>OR</b>. Combine millions of these and you get a computer.</p>
+  <div class="controls"><span id="lgChoices"></span><button id="lgA">A: off</button><button id="lgB">B: off</button></div>
+  <canvas id="cLG" width="800" height="260"></canvas>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Key facts</h2>
+  <div class="grid2">
+    <div><canvas id="cSymT" width="380" height="180"></canvas>
+    <p class="hint" style="text-align:center">NPN symbol: the arrow on the emitter points <b>out</b> (the direction current leaves). On PNP it points in.</p></div>
+    <table>
+      <tr><td>Legs</td><td><b>B</b>ase (control), <b>C</b>ollector (in), <b>E</b>mitter (out). The order differs between models: always check the datasheet!</td></tr>
+      <tr><td>Gain (hFE, β)</td><td>Typically 100–300: collector current ≈ gain × base current.</td></tr>
+      <tr><td>Base voltage</td><td>≈ 0.7 V to turn on (there's a diode inside).</td></tr>
+      <tr><td>Limits</td><td>Max collector current (BC547: 100 mA, 2N2222: 600 mA), max voltage and max power (heat).</td></tr>
+    </table>
+  </div>
+  <h3>Common types</h3>
+  <table>
+    <tr><td>NPN BJT (BC547, 2N2222)</td><td>The classic: switching small loads and simple amplifiers. Current-controlled.</td></tr>
+    <tr><td>PNP BJT (BC557, 2N2907)</td><td>The mirror image: switches the + side. Its base is pulled <i>low</i> to turn it on.</td></tr>
+    <tr><td>N-channel MOSFET (IRLZ44N)</td><td>Voltage-controlled, with almost no gate current. Great for big loads (motors, LED strips).</td></tr>
+    <tr><td>JFET (J310, MPF102)</td><td>Very high input resistance, quiet. Used as a guitar input buffer, as in your Ruby amp.</td></tr>
+    <tr><td>Darlington (TIP120)</td><td>Two transistors in one, so the gains multiply (~1000×). Easy to drive.</td></tr>
+    <tr><td>Inside chips</td><td>An LM386 has about a dozen. A phone processor has billions, each a few nanometres wide.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">6</span>Recap</h2>
+  <ul>
+    <li>A transistor is a <b>valve opened by a small current</b> (or a voltage, for a MOSFET).</li>
+    <li>Three states: <b>off</b>, <b>amplifying</b> (main flow = gain × base flow) and <b>fully on</b> (limited by the load).</li>
+    <li>As a <b>switch</b>, a weak signal controls a big load. As an <b>amplifier</b>, a small wiggle becomes a big one.</li>
+    <li>The base needs ~0.7 V and <b>always a base resistor</b>.</li>
+    <li>Combined as switches, they make <b>logic</b>: the basis of every computer.</li>
+  </ul>
+</section>
+</main>

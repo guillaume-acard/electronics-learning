@@ -1,0 +1,4 @@
+<script>
+const LINKS={hub:{web:'@HUB@',file:'index.html'},capacitor:{web:'https://claude.ai/artifact/1o6HM5cbubAaBdgnwipgfP',file:'capacitor.html'},resistor:{web:'@RES@',file:'resistor.html'}};
+document.querySelectorAll('a[data-page]').forEach(a=>{const l=LINKS[a.dataset.page];if(!l)return;const local=location.protocol==='file:';a.href=local?l.file:l.web;if(!local)a.target='_blank';});
+</script>

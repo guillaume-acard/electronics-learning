@@ -1,0 +1,68 @@
+<section>
+  <h2><span class="num">7</span>Different sizes ("strengths") and what each is used for</h2>
+  <p>Capacitors come in a huge range of sizes, from tiny to enormous. The "strength" of a capacitor means two different things:</p>
+  <ul>
+    <li><b>Capacitance (size)</b>, in farads: <i>how much</i> charge it holds. In water terms, how big and stretchy the rubber sheet is.</li>
+    <li><b>Voltage rating</b>, in volts: <i>how much pressure</i> it can take before it fails. In water terms, how thick and tough the sheet is.</li>
+  </ul>
+
+  <h3>Capacitance: from thimble to swimming pool</h3>
+  <p class="tldr" style="font-size:1rem"><b>Rule of thumb:</b> <b>small</b> capacitors fill and empty in a flash, so they deal with <b>fast</b> things like high frequencies and noise.
+  <b>Big</b> capacitors hold more energy and react slowly, so they deal with <b>slow</b> things like power, smoothing and long delays.</p>
+  <p class="hint">Drag the slider to see how size changes the job. The fill time assumes the capacitor fills through the same 1 kΩ resistor every time.</p>
+  <div class="controls"><label class="slider" style="flex:1">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7" style="flex:1;width:auto"></label></div>
+  <canvas id="cSize" width="800" height="230"></canvas>
+
+  <table style="margin-top:14px">
+    <tr><td>🥄 <b>pF</b> (picofarads)<br><span class="hint">a thimble</span></td><td>Radio tuning, high-frequency filters, and the two little 22 pF caps beside a microcontroller's crystal.</td></tr>
+    <tr><td>☕ <b>nF</b> (nanofarads)<br><span class="hint">a cup</span></td><td>The famous <b>100 nF</b> "decoupling" cap next to every chip, guitar tone controls (22–47 nF), and noise filters.</td></tr>
+    <tr><td>🪣 <b>1–100 µF</b><br><span class="hint">a bucket</span></td><td>Passing audio between stages (coupling), timing and blinking circuits, and LED fade-outs.</td></tr>
+    <tr><td>🛁 <b>100–10,000 µF</b><br><span class="hint">a bathtub</span></td><td>Power supply smoothing, and energy reserves for amplifiers and motors.</td></tr>
+    <tr><td>🏊 <b>Farads</b> (supercapacitors)<br><span class="hint">a swimming pool</span></td><td>Keeping a clock or memory alive during power cuts, torches that charge in seconds, and buses that recover braking energy.</td></tr>
+  </table>
+
+  <h3>Voltage rating: how tough the rubber sheet is</h3>
+  <p>Every capacitor has a maximum voltage printed on it, such as <code>16V</code>, <code>25V</code> or <code>400V</code>.
+  Exceed it and the insulator breaks down, like a rubber sheet bursting under too much pressure. The part fails, and electrolytics can bulge or pop.</p>
+  <ul>
+    <li><b>Rule of thumb:</b> choose a rating around <b>1.5–2× the voltage</b> in your circuit. For a 9 V circuit, use 16 V or 25 V caps.</li>
+    <li>A higher rating never hurts the circuit. It just means a physically bigger and pricier part. A thicker sheet needs more room.</li>
+    <li>That's why a 1000 µF 16 V capacitor is fingertip-sized, but a 1000 µF 400 V one is the size of a drinks can.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">8</span>Simple example circuits</h2>
+  <p>Here are four small circuits you'll meet again and again. In each one you can <b>swap the capacitor size</b> and see what changes.</p>
+
+  <h3>A. LED that fades out slowly (energy reserve)</h3>
+  <p>A battery, a push button, and an LED with its resistor. A capacitor sits beside the LED. Pressing the button lights the LED and fills the capacitor.
+  When you let go, the capacitor <b>keeps feeding the LED</b> for a while, so it fades instead of snapping off.
+  <b>Why:</b> this is the "dim slowly" effect in car interior lights and the glow that lingers on a charger after you unplug it.</p>
+  <div class="controls"><button id="fPress" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="fChoices"></span></div>
+  <canvas id="cFade" width="800" height="260"></canvas>
+  <p class="hint">Bigger capacitor = bigger reserve = longer fade. 10 µF is gone almost instantly, while 1000 µF glows for seconds.</p>
+
+  <h3>B. Power supply smoothing (the water tower)</h3>
+  <p>Electricity from the wall is <b>AC</b>: it swings back and forth 50 times a second. A <b>diode</b>, a one-way valve, lets only the forward pushes through,
+  which leaves a stream of <b>bumps</b>. A big capacitor fills at each bump and <b>tops up the gaps</b> in between, so the output is almost flat.
+  <b>Why:</b> every phone charger, guitar amp and computer needs steady DC, and this is how they get it.</p>
+  <div class="controls"><span id="pChoices"></span></div>
+  <canvas id="cSmooth" width="800" height="260"></canvas>
+  <p class="hint">Slowed down so you can see it. With no capacitor the lamp flickers. Bigger capacitors give smaller dips ("ripple"), which is why power supplies use the bathtub-sized ones.</p>
+
+  <h3>C. Coupling capacitor in audio (pass the music, block the DC)</h3>
+  <p>Inside an amp, the guitar signal often <b>rides on top of a steady DC voltage</b>, which the circuit needs to work. Sending that DC into the next stage would upset it.
+  A capacitor in series passes the <b>wiggles</b> (the music) and blocks the DC. The output is the same sound, now centred on zero.
+  <b>Why:</b> it's used between almost every stage of an amplifier, and on the input of a guitar amp or pedal.</p>
+  <div class="controls"><span id="kChoices"></span></div>
+  <canvas id="cCouple" width="800" height="270"></canvas>
+  <p class="hint">Size matters here too. A capacitor that is <b>too small</b> only lets fast wiggles (treble) through, so the bass disappears and the sound gets thin. That's also how a <b>tone control</b> works on purpose.</p>
+
+  <h3>D. Decoupling capacitor next to a chip (a local reserve)</h3>
+  <p>Chips such as microcontrollers and op-amps draw power in <b>sudden little gulps</b>. The power has to travel down a long wire, so it can't arrive fast enough, and the voltage at the chip briefly sags.
+  If it sags too far, the chip glitches or resets. A small <b>100 nF</b> capacitor placed <b>right beside</b> the chip supplies each gulp instantly.
+  <b>Why:</b> it's a cheap fix for random crashes, so every chip's datasheet asks for one.</p>
+  <div class="controls"><button id="dToggle">Add the 100 nF capacitor</button></div>
+  <canvas id="cDecouple" width="800" height="260"></canvas>
+</section>

@@ -1,0 +1,140 @@
+<div class="cl-layout">
+<aside class="cl-menu" id="seMenu"><h4>Start</h4>
+<a href="#sewhat" data-se="sewhat"><span class="n">?</span>What is a sensor?</a>
+<h4>The sensors</h4>
+<a href="#seldr" data-se="seldr"><span class="n">☀</span>LDR (light)</a>
+<a href="#selm35" data-se="selm35"><span class="n">°C</span>LM35 (temperature)</a>
+<a href="#setouch" data-se="setouch"><span class="n">☝</span>Touch pads (skin)</a>
+<a href="#sebtn" data-se="sebtn"><span class="n">⏺</span>Push button</a>
+<a href="#sepick" data-se="sepick"><span class="n">🎸</span>Guitar pickup</a>
+<a href="#seir" data-se="seir"><span class="n">IR</span>Infrared sensors</a>
+<h4>End</h4>
+<a href="#serecap" data-se="serecap"><span class="n">✓</span>Recap</a>
+</aside>
+<div class="cl-content">
+
+<section id="sewhat">
+  <h2><span class="num">1</span>What is a sensor?</h2>
+  <p class="tldr">A sensor turns something from the <b>real world</b> (light, heat, a touch, a press, a vibrating string) into something <b>electrical</b> that a circuit can use: a changing <b>resistance</b>, a <b>voltage</b>, or a switch that opens and closes.</p>
+  <p>Circuits can only "see" voltages and currents. A sensor is their eye, ear or fingertip. The circuit after it then decides what to do: light a lamp, sound an alarm, show a number.</p>
+  <h3>The three families</h3>
+  <div class="cards">
+    <div class="card"><div class="ico">🎚️</div><h3>Resistance changes</h3><p>The LDR (light) and your skin (touch). They are just resistors whose value moves. <b>Trick:</b> put them in a <b>voltage divider</b> with a fixed resistor to get a voltage.<br><i>Water:</i> a pipe that gets wider or narrower.</p></div>
+    <div class="card"><div class="ico">⚡</div><h3>Voltage out</h3><p>The LM35 (temperature) and the guitar pickup (vibration). They give a voltage directly: 10 mV per °C, or a few hundred mV of music.<br><i>Water:</i> a pump whose pressure follows the world.</p></div>
+    <div class="card"><div class="ico">🔘</div><h3>On / off</h3><p>The push button. Either connected or not. <b>Trick:</b> a pull-up or pull-down resistor so the "off" state is a clean 0 V or 5 V, never floating.<br><i>Water:</i> a tap, open or closed.</p></div>
+  </div>
+  <h3>The voltage divider: the sensor's best friend</h3>
+  <p>Two resistors in series between + and −: the middle point sits at a voltage set by their <b>ratio</b>. Replace one by a sensor and the middle voltage follows the sensor: Vout = Vin × R2 ÷ (R1 + R2). That's how the night-light, the touch switch and most simple sensor circuits work.</p>
+  <p class="hint">Each sensor page has: what it is, how it works inside, a live demo, how to connect it, and the projects on the <a class="navlink" href="#circuits">Circuits</a> page that use it.</p>
+</section>
+
+<section id="seldr">
+  <h2><span class="num">2</span>LDR: the light sensor</h2>
+  <p class="tldr">An <b>LDR</b> (light-dependent resistor, or photoresistor) is a resistor whose value <b>drops when light hits it</b>: about 1 MΩ in the dark, a few kΩ in a lit room, a few hundred Ω in sunlight.</p>
+  <p><b>What it's for:</b> night lights and street lamps that switch on at dusk, light meters, "is the box open?" alarms, robots that follow light. <b>Why use one:</b> it's cheap, needs no power of its own and works with any voltage.</p>
+  <p><b>How it works inside:</b> the squiggly track is <b>cadmium sulphide</b>, a material whose electrons are stuck in place in the dark. Each particle of light (photon) that hits it knocks electrons loose, and free electrons can carry current. More light → more free electrons → <b>lower resistance</b>. It reacts in a few tens of milliseconds: fine for daylight, too slow for fast signals.</p>
+  <p><b>Water analogy:</b> a pipe stuffed with ice. Sunlight melts the ice, so the brighter it is, the more water gets through.</p>
+  <div class="controls"><label class="slider" style="flex:1">Light level<input id="ldrL" type="range" min="0" max="1" step="0.005" value="0.45" style="flex:1;width:auto"></label></div>
+  <canvas id="cldr" width="800" height="290"></canvas>
+  <p class="hint">Left: light falling on the LDR. Middle: the voltage divider used in the night light (LDR on top, 10 kΩ to ground): more light → lower LDR resistance → higher voltage. Right: resistance against light (both scales logarithmic).</p>
+  <h3>How to connect it</h3>
+  <ul><li>Always in a <b>divider</b> with a fixed resistor about equal to the LDR's value at the light level you care about (10 kΩ for indoor light).</li><li>LDR to + and resistor to −: the voltage goes <b>up</b> with light. Swap them and it goes <b>down</b> with light.</li><li>Feed that voltage to a transistor, a comparator (LM358) or an Arduino analog pin.</li></ul>
+  <h3>Key facts</h3>
+  <ul><li>PGM1201 (Gotronic 03136): 4–10 kΩ at 10 lux, ~1 MΩ in the dark.</li><li>No polarity: either way round.</li><li>Slow (~20–50 ms) and not very precise: perfect for "dark or bright?", not for measuring lux accurately.</li></ul>
+  <p>🔧 <b>Used in:</b> <a class="navlink" href="#rl2">B. Light detector that turns on a lamp</a> (LDR + LM358 comparator + relay).</p>
+</section>
+
+<section id="selm35">
+  <h2><span class="num">3</span>LM35: the temperature sensor</h2>
+  <p class="tldr">The <b>LM35</b> is a small chip (3 legs, like a transistor) whose output voltage is the temperature: exactly <b>10 mV per °C</b>. At 23 °C it gives 0.23 V. No formula, no calibration.</p>
+  <p><b>What it's for:</b> thermometers, fan controllers, overheat alarms, fridge or aquarium monitors. <b>Why use one:</b> it's accurate (±0.5 °C at 25 °C), linear, and its output can go straight into an Arduino or a comparator.</p>
+  <p><b>How it works inside:</b> it uses a property of transistors: the voltage needed to turn one on (~0.6 V) <b>drops by about 2 mV for every degree</b>. The LM35 compares two transistors running at different currents: the difference between them grows exactly in proportion to the temperature. An internal op-amp amplifies and trims it to a neat 10 mV/°C, set at the factory.</p>
+  <p><b>Water analogy:</b> a thermometer that pushes a piston: every degree pushes the pressure up by exactly the same small step.</p>
+  <div class="controls"><label class="slider" style="flex:1">Temperature<input id="lmT" type="range" min="-10" max="100" step="0.5" value="23" style="flex:1;width:auto"></label></div>
+  <canvas id="clm35" width="800" height="290"></canvas>
+  <p class="hint">The output is a straight line: 0 V at 0 °C, 1 V at 100 °C. Below 0 °C the basic circuit just gives 0 V (it would need a negative supply to show negative temperatures).</p>
+  <h3>How to connect it</h3>
+  <ul><li>LM35DZ (TO-92), flat side facing you: <b>+Vs</b> (4–30 V), <b>Vout</b>, <b>GND</b>. The ST039 module has the same 3 pins labelled Vcc, S, Gnd.</li><li>Read Vout with an Arduino analog pin (use the 1.1 V reference for 0.1 °C steps) or an LM3914 bar-graph driver.</li><li>Long wires? Add a 1 kΩ + 1 µF filter at the receiving end: the LM35 dislikes driving long, capacitive cables.</li></ul>
+  <h3>Key facts</h3>
+  <ul><li>Range 0–100 °C (LM35DZ), 10 mV/°C, uses only 60 µA so it barely heats itself.</li><li>It measures <b>its own</b> temperature: pinch it, and it shows your finger's temperature after a few seconds.</li></ul>
+  <p>🔧 <b>Used in:</b> <a class="navlink" href="#p20">20. Digital thermometer</a> (Arduino + 7-segment) and <a class="navlink" href="#p21">21. Bar-graph thermometer</a> (3 × LM339 comparators, no Arduino).</p>
+</section>
+
+<section id="setouch">
+  <h2><span class="num">4</span>Touch pads: your skin as a sensor</h2>
+  <p class="tldr">Two bare wires and your finger. Your skin is a (very poor) conductor: touching both pads connects them through roughly <b>100 kΩ to 2 MΩ</b>. That's a tiny current, but enough if you amplify it with transistors.</p>
+  <p><b>What it's for:</b> touch lamps, buttons with no moving parts, "don't touch!" alarms, simple moisture detectors (water conducts too). <b>Why use one:</b> nothing to wear out, and it costs two wires.</p>
+  <p><b>How it works:</b> the current through your skin is only a few µA, far too little for an LED. So it goes into the base of a transistor, which multiplies it by ~200, then into a second one (a <b>Darlington pair</b>), which multiplies it again by ~200: <b>× 40,000</b> in total. A few µA become a few mA: the LED lights.</p>
+  <p><b>Water analogy:</b> a trickle that opens a small valve, whose flow opens a big valve.</p>
+  <div class="controls"><button id="tcTouch" style="font-size:1.05rem">☝️ Hold to touch</button><label class="slider" style="flex:1">Skin<input id="tcSkin" type="range" min="0" max="1" step="0.01" value="0.5" style="flex:1;width:auto"></label><span class="hint">dry ← → damp</span></div>
+  <canvas id="ctouch" width="800" height="290"></canvas>
+  <p class="hint">Hold the button: the tiny skin current (µA) is multiplied twice. Damp skin conducts better: try the slider. With only one transistor (× 200), dry skin wouldn't be enough.</p>
+  <h3>How to connect it</h3>
+  <ul><li>Pad A to + through a 1 kΩ (protection), pad B to the base of the first transistor.</li><li>First transistor's emitter → second transistor's base; both collectors to the load (LED + 470 Ω).</li><li>Keep the pads close (a few mm apart) so one fingertip bridges them.</li></ul>
+  <h3>Key facts</h3>
+  <ul><li>Safe: 9 V through 100 kΩ+ of skin is a few tens of µA, you don't feel anything.</li><li>The same circuit detects <b>water</b>: put the pads in a glass and pour.</li><li>Fancier touch sensors (phones) measure capacitance instead of resistance.</li></ul>
+  <p>🔧 <b>Used in:</b> <a class="navlink" href="#p5">5. Touch switch</a> (Darlington pair).</p>
+</section>
+
+<section id="sebtn">
+  <h2><span class="num">5</span>Push button: the simplest sensor</h2>
+  <p class="tldr">A push button senses <b>a finger press</b>: a spring keeps two contacts apart, and pressing pushes a metal dome or blade against them. Pressed = connected (≈ 0 Ω), released = open (infinite Ω).</p>
+  <p><b>What it's for:</b> every keypad, the reset and "roll" buttons of the dice, the counter reset, the relay START. <b>Why use one:</b> nothing is simpler or more reliable for "the user wants something".</p>
+  <p><b>Two catches:</b></p>
+  <ul><li><b>Floating input:</b> when released, a button connects the input to <i>nothing</i>. A chip input left floating picks up noise and reads random 0s and 1s. Fix: a <b>pull-down</b> resistor (10 kΩ to −, button to +) or a <b>pull-up</b> (10 kΩ to +, button to −). The Arduino has internal pull-ups (<code>INPUT_PULLUP</code>).</li><li><b>Bounce:</b> the metal contacts bounce for 1–10 ms, so one press can look like 5 presses to a fast counter. Fix: a 100 nF capacitor across the button, or a short delay in code.</li></ul>
+  <p><b>Water analogy:</b> a tap. A pull-down resistor is a small drain that keeps the pipe empty when the tap is closed, so it never "half-fills" by itself.</p>
+  <div class="controls"><button id="btPress" style="font-size:1.05rem">👆 Hold to press</button><span class="hint">Resistor:</span><button id="btPD" class="active">Pull-down</button><button id="btPU">Pull-up</button><button id="btNone">None (floating!)</button><label class="slider"><input type="checkbox" id="btDeb"> 100 nF debounce</label></div>
+  <canvas id="cbtn" width="800" height="290"></canvas>
+  <p class="hint">Right: what a fast counter sees (zoomed on the first milliseconds). Without debounce, the contact bounces and the counter adds several counts per press. With "None", watch the input wander when the button is released.</p>
+  <h3>Key facts</h3>
+  <ul><li>The 6 × 6 mm buttons have <b>4 legs</b> in 2 connected pairs: place them across the breadboard gap and the pressed side connects the two halves.</li><li>Pull-up → reads 1 when released, 0 when pressed. Pull-down → the opposite.</li></ul>
+  <p>🔧 <b>Used in:</b> <a class="navlink" href="#p2">2. LED fade</a>, <a class="navlink" href="#p4">4. Traffic light</a>, <a class="navlink" href="#p7">7. Relay clicker</a>, <a class="navlink" href="#p12">12. Dice</a>, <a class="navlink" href="#p13">13–15. Dice without Arduino</a> (reset pin with 10 kΩ pull-down), <a class="navlink" href="#p19">19. Counter</a> (reset).</p>
+</section>
+
+<section id="sepick">
+  <h2><span class="num">6</span>Guitar pickup: the vibration sensor</h2>
+  <p class="tldr">An electric guitar pickup is a <b>magnet</b> wrapped in thousands of turns of thin wire (a <a class="navlink" href="#inductor">coil</a>). The steel string, magnetised by the magnet, vibrates above it: the moving magnetism <b>induces a small AC voltage</b> in the coil. That voltage is the sound of the string.</p>
+  <p><b>What it's for:</b> turning string vibrations into a signal for an amp like your <b>Ruby</b>, a pedal like the <a class="navlink" href="#p18">fuzz</a>, or a tuner. <b>Why:</b> no battery, no microphone feedback, and it only hears the strings, not the room.</p>
+  <p><b>How it works inside:</b> a changing magnetic field through a coil makes a voltage (Faraday's law, the same physics as the <a class="navlink" href="#inductor">inductor</a> and the switch-off spike). The faster the field changes, the bigger the voltage: so the pickup gives ~100–300 mV, wiggling at the string's frequency (110 Hz for the A string). Single coils have ~5,000–8,000 turns, about <b>6 kΩ</b> of resistance and a few henries of inductance.</p>
+  <p><b>Water analogy:</b> a paddle wheel in a pipe, turned back and forth by a pendulum swinging next to it: the water sloshes in time with the swing.</p>
+  <div class="controls"><button id="pkPluck" style="font-size:1.05rem">🎸 Pluck</button><label class="slider" style="flex:1">String height<input id="pkH" type="range" min="0" max="1" step="0.01" value="0.4" style="flex:1;width:auto"></label><span class="hint">close ← → far</span></div>
+  <canvas id="cpick" width="800" height="290"></canvas>
+  <p class="hint">Pluck: the string swings over the magnet, the field through the coil changes, and the coil produces the voltage on the right. Raise the string (or lower the pickup) and the signal gets weaker: that's what adjusting pickup height on a real guitar does.</p>
+  <h3>How to connect it</h3>
+  <ul><li>Two wires: hot (tip of the jack) and ground (sleeve). Usually through the guitar's volume and tone pots.</li><li>It's a weak, high-impedance signal: it likes a <b>high-impedance input</b> (≥ 500 kΩ–1 MΩ), like the Ruby's JFET buffer. A low-impedance input "loads" it and kills the treble.</li></ul>
+  <h3>Key facts</h3>
+  <ul><li>Humbuckers = two coils wired in opposite directions: the string signal adds up, the 50 Hz mains hum cancels.</li><li>Pickups only work with steel strings (nylon strings aren't magnetic).</li></ul>
+  <p>🔧 <b>Used in:</b> <a class="navlink" href="#p18">18. Fuzz pedal</a> (guitar IN) and the <a class="navlink" href="#p10">10. Mini amp</a>.</p>
+</section>
+
+<section id="seir">
+  <h2><span class="num">7</span>Infrared (IR) sensors</h2>
+  <p class="tldr"><b>Infrared</b> is light just beyond red (850–950 nm): invisible to your eyes, but easy to make with an IR LED and to detect with a photodiode or phototransistor. Three very different IR sensors are worth knowing: <b>obstacle/reflection</b>, <b>remote-control receiver</b> and <b>PIR motion</b>.</p>
+  <p>💡 Tip: your phone's camera can often see IR. Point a TV remote at it and press a button: you'll see the LED flash.</p>
+  <div class="controls"><button class="irM active" data-m="0">🔦 Obstacle / reflection</button><button class="irM" data-m="1">📺 Remote receiver</button><button class="irM" data-m="2">🚶 PIR motion</button></div>
+  <div class="controls" id="irCtl"></div>
+  <canvas id="cir" width="800" height="290"></canvas>
+  <div class="cards" style="margin-top:12px">
+    <div class="card"><div class="ico">🔦</div><h3>Obstacle / reflection</h3><p>An <b>IR LED</b> shines, a <b>phototransistor</b> next to it looks. A nearby object (or a white surface) reflects the light back: the phototransistor conducts. A dark surface absorbs it.<br><b>Parts:</b> TCRT5000 (2–8 mm, line-following robots), obstacle modules with a 555 and two trimmers (2–40 cm, e.g. Gotronic GT1081).<br><b>Wiring:</b> IR LED + 220 Ω at 5 V; phototransistor collector to + through 10 kΩ, emitter to −: the collector voltage <b>drops</b> when something is close. Modules give a ready digital output (often LOW = obstacle).<br><i>Water:</i> a torch and a mirror: you only see light back when something is in front.</p></div>
+    <div class="card"><div class="ico">📺</div><h3>Remote-control receiver (TSOP38238)</h3><p>A remote doesn't just switch its IR LED on: it flashes it <b>38,000 times a second</b> in bursts. The receiver contains a photodiode, an amplifier, a <b>38 kHz filter</b> and a demodulator, so it ignores sunlight and lamps and outputs clean pulses (LOW during a burst). The pattern of long and short bursts is the button code (NEC, RC5…).<br><b>Parts:</b> TSOP38238 (Gotronic 03417, €0.95): pins OUT, GND, VS (check the datasheet: other TSOP series have another order!).<br><b>Wiring:</b> VS to 5 V, GND, OUT to an Arduino pin with the <i>IRremote</i> library. Quick test without code: an LED + 1 kΩ from +5 V into OUT flickers when you press any remote button.<br><i>Water:</i> a whistle at one exact pitch that only one dog in the park responds to.</p></div>
+    <div class="card"><div class="ico">🚶</div><h3>PIR motion detector</h3><p>"Passive infrared": it sends nothing. A <b>pyroelectric</b> crystal reacts to <b>changes</b> in the heat (IR) it sees. Behind the white <b>Fresnel lens</b> (the faceted dome), the view is split into zones: a warm body moving from zone to zone makes the signal swing, and the module's chip turns that into a clean HIGH output for a few seconds.<br><b>Parts:</b> HC-SR501-type modules (Gotronic SBC-PIR, 3–6 m, output HIGH for 3–5 s). Two trimmers: sensitivity (range) and hold time; a jumper chooses single or repeat trigger.<br><b>Wiring:</b> VCC 5 V, GND, OUT (3.3 V high) to an Arduino pin, or through 1 kΩ to a BC547 driving an LED, buzzer or relay. Allow ~1 minute to settle after power-up.<br><i>Water:</i> a guard who doesn't see shapes, only notices when something warm <i>moves</i> between the slats of a fence.</p></div>
+  </div>
+  <h3>Key facts</h3>
+  <ul><li>IR LEDs look like normal LEDs (often clear or bluish) and need a resistor like any LED (~1.2–1.5 V drop).</li><li>Sunlight is full of IR: reflection sensors work best indoors or with modulated light (like the 38 kHz trick).</li><li>A PIR can't see through glass (glass blocks far-infrared) and doesn't detect a person who stays perfectly still.</li></ul>
+  <p>🔧 <b>Ideas:</b> a PIR night light (replace the LDR in <a class="navlink" href="#rl2">project B</a> by a PIR module), a remote-controlled relay with the Arduino, an obstacle-avoiding robot.</p>
+</section>
+
+<section id="serecap">
+  <h2><span class="num">8</span>Recap</h2>
+  <ul>
+    <li>A sensor turns the real world into a resistance, a voltage or an on/off contact.</li>
+    <li><b>LDR:</b> resistance drops with light. Use it in a voltage divider.</li>
+    <li><b>LM35:</b> 10 mV per °C, ready to measure.</li>
+    <li><b>Touch pads:</b> your skin is a big resistor; amplify the µA with a Darlington pair.</li>
+    <li><b>Push button:</b> always add a pull-up or pull-down, and beware of bounce.</li>
+    <li><b>Guitar pickup:</b> a magnet + coil that turns string vibrations into a small AC voltage.</li>
+    <li><b>Infrared:</b> reflection sensors (IR LED + phototransistor), 38 kHz remote receivers, and PIR modules that see warm bodies moving.</li>
+  </ul>
+  <p class="hint">Next sensors to add when you need them: microphone (clap switch), water/rain sensor, potentiometer as a position sensor, hall-effect magnet sensor.</p>
+</section>
+</div></div>

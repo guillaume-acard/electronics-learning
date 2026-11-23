@@ -1,0 +1,141 @@
+<div class="cl-layout">
+<aside class="cl-menu" id="foMenu"><h4>Start</h4>
+<a href="#fobasics" data-fo="fobasics"><span class="n">V</span>Volts, amps, ohms, watts</a>
+<a href="#founits" data-fo="founits"><span class="n">µ</span>Units &amp; prefixes</a>
+<h4>The formulas</h4>
+<a href="#foohm" data-fo="foohm"><span class="n">Ω</span>Ohm's law</a>
+<a href="#fopower" data-fo="fopower"><span class="n">W</span>Power</a>
+<a href="#foseries" data-fo="foseries"><span class="n">+</span>Series &amp; parallel</a>
+<a href="#fodiv" data-fo="fodiv"><span class="n">½</span>Voltage divider</a>
+<a href="#foled" data-fo="foled"><span class="n">💡</span>LED resistor</a>
+<a href="#forc" data-fo="forc"><span class="n">τ</span>RC time &amp; the 555</a>
+<a href="#fobatt" data-fo="fobatt"><span class="n">🔋</span>Battery life</a>
+<h4>End</h4>
+<a href="#focheat" data-fo="focheat"><span class="n">✓</span>Cheat sheet</a>
+</aside>
+<div class="cl-content">
+
+<section id="fobasics">
+  <h2><span class="num">1</span>The four quantities</h2>
+  <p class="tldr">Almost every calculation in these projects uses just four things: <b>voltage</b> (the push), <b>current</b> (the flow), <b>resistance</b> (what holds the flow back) and <b>power</b> (the work done each second).</p>
+  <div class="cards">
+    <div class="card"><div class="ico">⬆️</div><h3>Voltage · V · volt (V)</h3><p>The <b>push</b> between two points: 9 V for a battery, 5 V for USB, 2 V across a red LED. Measured <i>across</i> a part.<br><i>Water:</i> the pressure difference between two points of the pipe.</p></div>
+    <div class="card"><div class="ico">➡️</div><h3>Current · I · ampere (A)</h3><p>How much electricity <b>flows</b> per second: 10 mA through an LED, 500 mA through a motor. Measured <i>through</i> a part (the meter goes in the loop).<br><i>Water:</i> litres per second through the pipe.</p></div>
+    <div class="card"><div class="ico">🚧</div><h3>Resistance · R · ohm (Ω)</h3><p>How much a part <b>holds back</b> the flow: 470 Ω, 10 kΩ, 1 MΩ.<br><i>Water:</i> how narrow the pipe is.</p></div>
+    <div class="card"><div class="ico">🔥</div><h3>Power · P · watt (W)</h3><p>The <b>energy per second</b> a part uses or turns into heat/light/sound: ¼ W resistors, a 0.5 W speaker, a 1.2 W lamp.<br><i>Water:</i> pressure × flow = how hard the water can turn a wheel.</p></div>
+  </div>
+  <p>And two "storage" quantities you'll meet: <b>capacitance</b> (C, farad F: how much charge a capacitor holds per volt, a <i>tank</i>) and <b>battery capacity</b> (mAh: how long a battery can deliver a current, the size of the <i>reservoir</i>).</p>
+  <canvas id="cfBasics" width="800" height="260"></canvas>
+  <p class="hint">The water picture: the pump (battery) makes the pressure (voltage), the narrow pipe (resistor) limits the flow (current), and the wheel turns with a power = pressure × flow.</p>
+</section>
+
+<section id="founits">
+  <h2><span class="num">2</span>Units and prefixes</h2>
+  <p class="tldr">Electronics values span from millionths to millions, so they use <b>prefixes</b>. Always convert to the base unit (V, A, Ω, F) before calculating.</p>
+  <table>
+    <tr><td>Prefix</td><td>Symbol</td><td>Multiply by</td><td>Examples</td></tr>
+    <tr><td>mega</td><td>M</td><td>× 1,000,000</td><td>1 MΩ = 1,000,000 Ω (an LDR in the dark)</td></tr>
+    <tr><td>kilo</td><td>k</td><td>× 1,000</td><td>4.7 kΩ = 4,700 Ω · 1.5 kHz</td></tr>
+    <tr><td>—</td><td></td><td>× 1</td><td>9 V · 1 A · 470 Ω</td></tr>
+    <tr><td>milli</td><td>m</td><td>÷ 1,000</td><td>20 mA = 0.020 A · 250 mV = 0.25 V</td></tr>
+    <tr><td>micro</td><td>µ</td><td>÷ 1,000,000</td><td>10 µF = 0.000 010 F · 17 µA through your skin</td></tr>
+    <tr><td>nano</td><td>n</td><td>÷ 1,000,000,000</td><td>100 nF = 0.1 µF (the decoupling capacitor)</td></tr>
+    <tr><td>pico</td><td>p</td><td>÷ 1,000,000,000,000</td><td>22 pF (tiny capacitors in radios)</td></tr>
+  </table>
+  <h3>Handy shortcuts</h3>
+  <ul><li><b>V ÷ kΩ = mA</b>: 9 V ÷ 1 kΩ = 9 mA. No zeros to juggle.</li><li><b>V ÷ mA = kΩ</b>: 7 V ÷ 10 mA = 0.7 kΩ = 700 Ω.</li><li><b>kΩ × µF = milliseconds</b>: 47 kΩ × 10 µF = 470 ms.</li><li>Resistor codes: "4K7" = 4.7 kΩ, "1M0" = 1 MΩ. Capacitor "104" = 10 + 4 zeros pF = 100 nF.</li></ul>
+  <h3>Try it: converter</h3>
+  <div class="controls"><input id="cvIn" value="4.7" style="width:110px;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);background:#0b1220;color:var(--ink)"><select id="cvFrom" class="fsel"></select><span>=</span><b id="cvOut" style="font-size:1.1rem"></b></div>
+</section>
+
+<section id="foohm">
+  <h2><span class="num">3</span>Ohm's law: V = R × I</h2>
+  <p class="tldr">The one to know by heart: <b>voltage = resistance × current</b>. Rearranged: <b>I = V ÷ R</b> and <b>R = V ÷ I</b>.</p>
+  <p><b>The triangle trick:</b> write V on top, R and I below. Cover the one you want: what's left tells you how. Cover V → R × I. Cover I → V ÷ R. Cover R → V ÷ I.</p>
+  <p><b>Water analogy:</b> more pressure (V) pushes more flow (I); a narrower pipe (R) lets less through for the same pressure.</p>
+  <div class="controls"><span class="hint">Solve for:</span><button class="foSolve active" data-k="I">I (current)</button><button class="foSolve" data-k="V">V (voltage)</button><button class="foSolve" data-k="R">R (resistance)</button></div>
+  <div class="controls" id="ohmCtl"></div>
+  <canvas id="cfOhm" width="800" height="260"></canvas>
+  <h3>Examples from the projects</h3>
+  <ul><li>Base resistor (project 12): (5 − 0.7) V ÷ 1 kΩ = <b>4.3 mA</b> into the transistor.</li><li>Pull-down (projects 13–15): 9 V ÷ 10 kΩ = <b>0.9 mA</b> when the button is pressed, harmless.</li><li>Skin (project 5): 9 V ÷ 500 kΩ = <b>18 µA</b>: too little for an LED, hence the Darlington pair.</li></ul>
+</section>
+
+<section id="fopower">
+  <h2><span class="num">4</span>Power: P = V × I</h2>
+  <p class="tldr"><b>Power = voltage × current</b>. Combined with Ohm's law it has two other forms: <b>P = I² × R</b> and <b>P = V² ÷ R</b>.</p>
+  <p><b>Why it matters:</b> power in a resistor, a regulator or a transistor turns into <b>heat</b>. Every part has a limit: ¼ W for the small resistors, ~0.5 W for a BC547, ~1 W for a 7805 without heatsink.</p>
+  <p><b>Water analogy:</b> a water wheel turns harder with more pressure <i>and</i> more flow: power is the product of both.</p>
+  <div class="controls"><label class="slider" style="flex:1">Voltage across the resistor<input id="pwV" type="range" min="0.5" max="12" step="0.1" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Resistance<input id="pwR" type="range" min="1" max="4" step="0.01" value="2.67" style="flex:1;width:auto"></label></div>
+  <canvas id="cfPow" width="800" height="230"></canvas>
+  <h3>Examples from the projects</h3>
+  <ul><li>LED + 470 Ω on 9 V: 7 V × 15 mA = <b>0.1 W</b> in the resistor: fine for ¼ W.</li><li>Siren speaker (project 17): 220 Ω on a 9 V square wave: 9² ÷ 228 × ½ ≈ <b>0.18 W</b>: that's why it's 220 Ω and not 100 Ω.</li><li>7805 with 12 V in, 5 V out, 300 mA: (12 − 5) × 0.3 = <b>2.1 W</b> of heat: it needs a heatsink.</li><li>LM3914 with 10 LEDs at 7 mA on 9 V: 10 × 0.007 × 7 V ≈ <b>0.5 W</b> inside the chip: warm but OK.</li></ul>
+</section>
+
+<section id="foseries">
+  <h2><span class="num">5</span>Series and parallel</h2>
+  <p class="tldr"><b>Series</b> (one after the other): resistances <b>add up</b>: R = R1 + R2. <b>Parallel</b> (side by side): the total is <b>smaller than the smallest</b>: R = (R1 × R2) ÷ (R1 + R2).</p>
+  <p><b>Water analogy:</b> two narrow pipes one after the other are harder to push through (series); two pipes side by side give the water two routes, so it flows more easily (parallel).</p>
+  <div class="controls"><button id="spS" class="active">Series</button><button id="spP">Parallel</button><label class="slider" style="flex:1">R1<input id="spR1" type="range" min="2" max="5" step="0.01" value="3" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R2<input id="spR2" type="range" min="2" max="5" step="0.01" value="3.67" style="flex:1;width:auto"></label></div>
+  <canvas id="cfSP" width="800" height="250"></canvas>
+  <h3>The two rules behind it (Kirchhoff)</h3>
+  <ul><li><b>Currents:</b> what flows into a junction flows out. In parallel, the battery current splits between the branches.</li><li><b>Voltages:</b> around a loop, the drops add up to the battery voltage. In series, the battery's 9 V is shared between the parts (e.g. 2 V + 2 V for two LEDs, 5 V left for the resistor).</li><li>Capacitors do the <b>opposite</b>: in parallel they add up (C = C1 + C2), in series they shrink.</li></ul>
+</section>
+
+<section id="fodiv">
+  <h2><span class="num">6</span>The voltage divider</h2>
+  <p class="tldr">Two resistors in series between Vin and 0 V: the middle point gives <b>Vout = Vin × R2 ÷ (R1 + R2)</b> (R2 is the bottom one).</p>
+  <p>It's how you make a reference voltage, read a sensor (LDR, thermistor, potentiometer) or scale a voltage down for a chip. <b>Water analogy:</b> two taps in a row on a sloping pipe: the pressure halfway depends on how open each one is.</p>
+  <div class="controls"><label class="slider" style="flex:1">Vin<input id="dvV" type="range" min="1" max="12" step="0.1" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R1 (top)<input id="dvR1" type="range" min="2" max="6" step="0.01" value="4" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R2 (bottom)<input id="dvR2" type="range" min="2" max="6" step="0.01" value="3.67" style="flex:1;width:auto"></label></div>
+  <canvas id="cfDiv" width="800" height="250"></canvas>
+  <p class="hint">⚠️ A divider is weak: if you draw current from the middle point (a load), the voltage sags. Use it to <i>feed an input</i> (a transistor base through a resistor, an op-amp, an Arduino pin), not to power something.</p>
+</section>
+
+<section id="foled">
+  <h2><span class="num">7</span>The LED resistor</h2>
+  <p class="tldr"><b>R = (Vsupply − Vled) ÷ I</b>. The resistor takes whatever voltage the LED doesn't, and that sets the current.</p>
+  <div class="controls"><span class="hint">LED colour:</span><span id="ledCol"></span></div>
+  <div class="controls"><label class="slider" style="flex:1">Supply<input id="lrV" type="range" min="3" max="12" step="0.5" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Wanted current<input id="lrI" type="range" min="2" max="20" step="1" value="10" style="flex:1;width:auto"></label></div>
+  <div id="lrOut" class="howbox"></div>
+  <ul><li>Typical forward voltages: red ≈ 2 V, yellow/green ≈ 2.1 V, blue/white ≈ 3 V. 10 mA is bright enough for a 5 mm LED; 20 mA is the usual maximum.</li><li>Then pick the nearest <b>standard value</b> (E12 series: 1.0 1.2 1.5 1.8 2.2 2.7 3.3 3.9 4.7 5.6 6.8 8.2 × 10ⁿ), preferably the one just above.</li><li>Check the power: (Vsupply − Vled) × I. Under 0.1 W, any ¼ W resistor is fine.</li></ul>
+</section>
+
+<section id="forc">
+  <h2><span class="num">8</span>RC time and the 555</h2>
+  <p class="tldr">A capacitor charging through a resistor follows a curve with a "time constant" <b>τ = R × C</b> (seconds = ohms × farads). After 1 τ it's 63 % full, after 5 τ it's practically full.</p>
+  <p><b>Water analogy:</b> filling a tank through a thin pipe: fast at first, slower and slower as the tank's back-pressure grows. A thinner pipe (bigger R) or a bigger tank (bigger C) = slower.</p>
+  <div class="controls"><label class="slider" style="flex:1">R<input id="foRcR" type="range" min="2" max="6" step="0.01" value="4.67" style="flex:1;width:auto"></label><label class="slider" style="flex:1">C<select id="foRcC" class="fsel"><option value="1e-6">1 µF</option><option value="1e-5" selected>10 µF</option><option value="1e-4">100 µF</option><option value="1e-3">1000 µF</option></select></label></div>
+  <canvas id="cfRC" width="800" height="240"></canvas>
+  <h3>The 555 formulas (astable)</h3>
+  <ul><li>Time ON (output high): <b>0.693 × (R1 + R2) × C</b></li><li>Time OFF: <b>0.693 × R2 × C</b></li><li>Frequency: <b>f = 1.44 ÷ ((R1 + 2 × R2) × C)</b>. Project 8: 1 kΩ, 47 kΩ, 10 µF → 1.5 Hz. Dice: same resistors, 10 nF → 1,500 Hz.</li><li>The flip-flop (project 16): each side ≈ <b>0.69 × R × C</b>.</li></ul>
+</section>
+
+<section id="fobatt">
+  <h2><span class="num">9</span>Battery life</h2>
+  <p class="tldr"><b>Hours ≈ capacity (mAh) ÷ current (mA)</b>. A battery's mAh is its reservoir; the current is how fast you drain it.</p>
+  <div class="controls"><span class="hint">Battery:</span><span id="btType"></span><label class="slider" style="flex:1">Circuit current<input id="btI" type="range" min="0" max="3" step="0.01" value="1.3" style="flex:1;width:auto"></label></div>
+  <div id="btOut" class="howbox"></div>
+  <ul><li>Real life gives less, especially at high currents: count on ~70 % for a 9 V battery.</li><li>Energy (Wh) = V × Ah: a 3.6 V 3500 mAh 18650 cell holds 12.6 Wh, ~25 times a 9 V battery's ~0.5 Wh.</li><li>To save battery: higher LED resistors, "dot" mode on the LM3914, and switch off what you don't need.</li></ul>
+</section>
+
+<section id="focheat">
+  <h2><span class="num">10</span>Cheat sheet</h2>
+  <table>
+    <tr><td>What</td><td>Formula</td><td>Example</td></tr>
+    <tr><td>Ohm's law</td><td><b>V = R × I</b> · I = V ÷ R · R = V ÷ I</td><td>9 V ÷ 1 kΩ = 9 mA</td></tr>
+    <tr><td>Power</td><td><b>P = V × I</b> = I² × R = V² ÷ R</td><td>9 V on 100 Ω = 0.81 W (too much for ¼ W!)</td></tr>
+    <tr><td>Series resistors</td><td>R = R1 + R2 + …</td><td>1 k + 1 k = 2 kΩ</td></tr>
+    <tr><td>Parallel resistors</td><td>R = R1 × R2 ÷ (R1 + R2)</td><td>1 k ∥ 1 k = 500 Ω</td></tr>
+    <tr><td>Voltage divider</td><td>Vout = Vin × R2 ÷ (R1 + R2)</td><td>9 V, 10 k / 4.7 k → 2.9 V</td></tr>
+    <tr><td>LED resistor</td><td>R = (Vs − Vled) ÷ I</td><td>(9 − 2) ÷ 10 mA = 700 Ω → 680 Ω</td></tr>
+    <tr><td>Transistor base resistor</td><td>Rb = (Vin − 0.7) ÷ Ib, with Ib ≈ Iload ÷ 20</td><td>(5 − 0.7) ÷ 4 mA ≈ 1 kΩ</td></tr>
+    <tr><td>RC time constant</td><td>τ = R × C (63 %), ~5 τ = full</td><td>47 kΩ × 10 µF = 0.47 s</td></tr>
+    <tr><td>555 astable</td><td>f = 1.44 ÷ ((R1 + 2 R2) × C)</td><td>1 k, 47 k, 10 µF → 1.5 Hz</td></tr>
+    <tr><td>Capacitors</td><td>parallel: C1 + C2 · series: C1 × C2 ÷ (C1 + C2)</td><td>two 10 µF in parallel = 20 µF</td></tr>
+    <tr><td>LM35</td><td>T (°C) = Vout (mV) ÷ 10</td><td>230 mV → 23 °C</td></tr>
+    <tr><td>Arduino ADC</td><td>V = reading × Vref ÷ 1023</td><td>205 × 1.1 ÷ 1023 = 0.22 V</td></tr>
+    <tr><td>Battery life</td><td>hours ≈ mAh ÷ mA</td><td>500 mAh ÷ 20 mA ≈ 25 h</td></tr>
+    <tr><td>Regulator heat</td><td>P = (Vin − Vout) × I</td><td>(9 − 5) × 0.2 A = 0.8 W</td></tr>
+  </table>
+  <p class="hint">Test yourself on these in the <a class="navlink" href="#quiz">Quiz</a>.</p>
+</section>
+</div></div>

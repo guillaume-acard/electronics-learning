@@ -1,0 +1,203 @@
+<div class="cl-layout">
+<aside class="cl-menu" id="paMenu"><h4>Start</h4>
+<a href="#rpstart" data-pa="rpstart"><span class="n">★</span>The method: 6 questions</a>
+<h4>Example 1: 7-segment</h4>
+<a href="#rpsheet" data-pa="rpsheet"><span class="n">1</span>Shop page &amp; datasheet</a>
+<a href="#rppins" data-pa="rppins"><span class="n">2</span>Pinout</a>
+<a href="#rptest" data-pa="rptest"><span class="n">3</span>Pin finder test</a>
+<a href="#rpres" data-pa="rpres"><span class="n">4</span>Resistors</a>
+<a href="#rpdrive" data-pa="rpdrive"><span class="n">5</span>How to drive it</a>
+<a href="#rplist" data-pa="rplist"><span class="n">6</span>Parts list</a>
+<h4>Example 2: DC10G bar graph</h4>
+<a href="#pbar" data-pa="pbar"><span class="n">7</span>Shop page &amp; datasheet</a>
+<a href="#rpbpins" data-pa="rpbpins"><span class="n">8</span>Pinout</a>
+<a href="#rpbtest" data-pa="rpbtest"><span class="n">9</span>Pin test</a>
+<a href="#rpbres" data-pa="rpbres"><span class="n">10</span>Resistors</a>
+<a href="#rpbdrive" data-pa="rpbdrive"><span class="n">11</span>How to drive it</a>
+<a href="#rpblist" data-pa="rpblist"><span class="n">12</span>Parts list</a>
+<h4>End</h4>
+<a href="#rprecap" data-pa="rprecap"><span class="n">✓</span>Recap</a>
+</aside>
+<div class="cl-content">
+
+<section id="rpstart">
+  <h2><span class="num">★</span>From a shop page to a working circuit</h2>
+  <p>When you buy a real part, the shop page gives a few numbers and a link to the <b>datasheet</b>. This page shows how to go from that to a working circuit, step by step, with two worked examples: the <b>Kingbright SC39-11SURKWA</b> LED display (Gotronic ref. 03099, sections 1–6) and the <b>DC10G</b> 10-LED bar graph (Gotronic ref. 03142, <a class="navlink" href="#pbar">sections 7–12</a>).</p>
+  <p class="tldr"><b>The 6 questions to answer for any part:</b> 1. What is it, really? 2. What are its limits (voltage, current)? 3. Which pin does what? 4. Does it have a polarity or a "common" pin? 5. What else does it need (resistors, a driver chip)? 6. Will it fit my breadboard (pin pitch)?</p>
+</section>
+
+<section id="rpsheet">
+  <h2><span class="num">1</span>Read the shop page and the datasheet</h2>
+  <p>Here is what the Gotronic page and the Kingbright datasheet tell us, translated into what it <i>means</i>:</p>
+  <table>
+    <tr><td>What it says</td><td>What it means for you</td></tr>
+    <tr><td>"Afficheur… à LEDs", 10 mm, 1 digit, right-hand decimal point</td><td>A <b>7-segment display</b>: 7 LED bars (a–g) plus a dot (dp), all in one package. It's just <b>8 LEDs</b>. Everything from the <a data-page="led" class="navlink">LED page</a> applies.</td></tr>
+    <tr><td><b>Cathode commune</b> (common cathode)</td><td>All 8 LEDs share their <b>− leg</b> (cathode) on one pin, the COM pin. You connect COM to <b>ground</b> and feed <b>+</b> to each segment you want lit. (The common-<i>anode</i> version is the opposite: COM to +, segments pulled to −.)</td></tr>
+    <tr><td>Hyper Red, 630 nm</td><td>A red LED, so the forward voltage is low.</td></tr>
+    <tr><td>V<sub>F</sub> 1.85 V typ., 2.35 V max @ 10 mA</td><td>Each segment needs ~1.85 V. The rest of the supply voltage must be taken by a <a data-page="resistor" class="navlink">resistor</a>.</td></tr>
+    <tr><td>Courant nominal 10 mA · I<sub>F</sub> max 30 mA</td><td>Aim for <b>5–10 mA per segment</b>. Never exceed 30 mA.</td></tr>
+    <tr><td>V<sub>R</sub> 5 V</td><td>Connected backwards, each segment can only take 5 V. Don't swap + and −.</td></tr>
+    <tr><td>Peak 185 mA (1/10 duty, 0.1 ms)</td><td>Short pulses can be stronger. That's useful for <b>multiplexing</b> several digits (see below).</td></tr>
+    <tr><td>Pas 2.54 mm, 13 × 10 × 7 mm</td><td>Standard 0.1″ pitch, so it fits a breadboard. Place it across the centre gap.</td></tr>
+  </table>
+  <p class="hint">Tip: the shop page often skips the <b>pinout</b>. It's always in the datasheet, usually a small drawing labelled "Pin connection" or "Internal circuit diagram".</p>
+</section>
+
+<section id="rppins">
+  <h2><span class="num">2</span>Which pin does what? (pinout)</h2>
+  <p>A 10-pin single digit: 5 pins on top, 5 on the bottom, numbered <b>anticlockwise from pin 1</b> (bottom left, seen from the front), like a chip. Pins <b>3 and 8</b> are both COM (connected inside). Use either one.</p>
+  <div class="controls"><span class="hint">Show a digit:</span><span id="pdDigits"></span><button id="pdDp">dp</button></div>
+  <canvas id="cPin" width="800" height="330"></canvas>
+  <p class="hint">Click a segment on the big digit, or a pin, to highlight its partner. The table under the drawing shows exactly which pins get + for the chosen digit. ⚠️ This is the standard Kingbright 10-pin layout. Always confirm it with the datasheet drawing or with the pin test below.</p>
+</section>
+
+<section id="rptest">
+  <h2><span class="num">3</span>Test it before you wire it (pin finder)</h2>
+  <p>Not sure of the pinout, or have a part with no label? Use a <b>9 V battery + 1 kΩ resistor</b> (or a multimeter on "diode test"). Put <b>−</b> on a COM pin and touch <b>+</b> (through the resistor) to each other pin: one segment lights at a time. If nothing lights anywhere, it may be <b>common anode</b>, so swap the probes.</p>
+  <div class="controls"><span id="ptType"></span></div>
+  <div class="controls"><span class="hint">Red probe (+, through 1 kΩ) on pin:</span><span id="ptPlus"></span></div>
+  <div class="controls"><span class="hint">Black probe (−) on pin:</span><span id="ptMinus"></span></div>
+  <canvas id="cTest" width="800" height="325"></canvas>
+</section>
+
+<section id="rpres">
+  <h2><span class="num">4</span>Choose the resistors (and why one per segment)</h2>
+  <p>Each segment is an LED, so it needs its own current-limiting resistor: <code>R = (Supply − 1.85 V) ÷ current</code>.</p>
+  <div class="controls">
+    <label class="slider">Supply <select id="rcV" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <label class="slider" style="flex:1">Current per segment<input id="rcI" type="range" min="2" max="25" step="1" value="10" style="flex:1;width:auto"></label><b id="rcIt" style="min-width:60px"></b>
+  </div>
+  <canvas id="cRes" width="800" height="140"></canvas>
+  <p><b>Why not a single resistor on the COM pin?</b> It's tempting (1 resistor instead of 8), but all lit segments then <b>share</b> one current. A "1" (2 segments) is bright and an "8" (7 segments) is dim, so the brightness changes with the number shown. Try it:</p>
+  <div class="controls"><span id="shMode"></span><span class="hint">Digit:</span><span id="shDigits"></span></div>
+  <canvas id="cShare" width="800" height="240"></canvas>
+</section>
+
+<section id="rpdrive">
+  <h2><span class="num">5</span>How to drive it</h2>
+  <h3>Option A: directly from an Arduino (8 pins)</h3>
+  <p>Each segment's resistor goes to one Arduino pin, and COM goes to GND. Writing HIGH lights a segment. Simple, but it uses 8 pins for one digit.</p>
+<pre style="background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.9rem;line-height:1.45"><code>// SC39-11SURKWA (common cathode): segment a..g, dp → Arduino pins 2..9 (each via 330 Ω)
+const byte SEG[8] = {2, 3, 4, 5, 6, 7, 8, 9};      // a b c d e f g dp
+const byte DIGITS[10] = {                            // bit 0 = a ... bit 6 = g
+  0b0111111, 0b0000110, 0b1011011, 0b1001111, 0b1100110,
+  0b1101101, 0b1111101, 0b0000111, 0b1111111, 0b1101111 };
+
+void show(byte n) {
+  for (byte s = 0; s < 7; s++) digitalWrite(SEG[s], bitRead(DIGITS[n], s)); // HIGH = on (common cathode)
+}
+void setup() { for (byte s = 0; s < 8; s++) pinMode(SEG[s], OUTPUT); }
+void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></pre>
+  <p class="hint">For a <b>common-anode</b> display: COM goes to 5 V, and you invert the logic (LOW = on).</p>
+
+  <h3>Option B: a decoder chip (CD4511), 4 wires instead of 7</h3>
+  <p>The <b>CD4511</b> takes a number in <b>binary</b> on 4 inputs (D C B A = 8 4 2 1) and lights the right segments by itself. It's made for <b>common-cathode</b> displays like this one. Its outputs still need the 7 resistors. Pair it with a counter (e.g. CD4510 + 555 clock) for a digital counter with no microcontroller at all. Flip the switches:</p>
+  <div class="controls" id="bcdSw"></div>
+  <canvas id="cBcd" width="800" height="250"></canvas>
+
+  <h3>Option C: several digits (multiplexing)</h3>
+  <p>For a 4-digit clock you'd need 32 pins. The trick: connect the same segment of all digits together (8 wires), and give each digit's <b>COM</b> its own transistor. Light <b>one digit at a time</b>, very fast. Above ~50 refreshes per second your eye sees all four lit, the same persistence of vision as <a data-page="led" class="navlink">PWM</a>. (That's why the datasheet's <b>peak current</b> rating matters: each digit is only on ¼ of the time, so it's driven a little harder.)</p>
+  <div class="controls"><label class="slider" style="flex:1">Refresh speed<input id="mxF" type="range" min="0" max="2.2" step="0.01" value="0.2" style="flex:1;width:auto"></label><b id="mxFt" style="min-width:120px"></b></div>
+  <canvas id="cMux" width="800" height="250"></canvas>
+</section>
+
+<section id="rplist">
+  <h2><span class="num">6</span>Parts list for a first test</h2>
+  <div class="grid2">
+    <div><h3 style="margin-top:0">🧰 You need</h3><ul><li>1 × SC39-11SURKWA (Gotronic 03099)</li><li>8 × 330 Ω resistors (for 5 V) or 680 Ω (for 9 V)</li><li>Breadboard + jumpers, and a 5 V supply or Arduino</li><li>(Option B) CD4511 + 4 switches or a DIP switch + 4 × 10 kΩ pull-downs</li></ul></div>
+    <div><h3 style="margin-top:0">🔧 Wiring check</h3><ol><li>Display across the breadboard centre gap.</li><li>Pin 3 or 8 (COM) → GND.</li><li>Each segment pin → its own resistor → its driver (Arduino pin, 4511 output, or a switch to +5 V).</li><li>Test one segment first, then all.</li></ol></div>
+  </div>
+</section>
+
+<section id="pbar">
+  <h2><span class="num">7</span>Example 2: the DC10G bar graph. Read the shop page and the datasheet</h2>
+  <p>Second worked example, same method: the <b>DC10G</b>, a bar of 10 green LEDs (Gotronic ref. 03142, €1.90), used in <a class="navlink" href="#p21">project 21: bar-graph thermometer</a>. The shop page is short; the technical sheet ("Fiche technique", a PDF under <i>Ressources</i>) has the rest.</p>
+  <table>
+    <tr><td>What it says</td><td>What it means for you</td></tr>
+    <tr><td>"10 leds vertes rectangulaires <b>indépendantes</b>"</td><td><b>10 separate LEDs</b> in one block. Each has <b>its own anode and its own cathode</b>: there is <b>no common pin</b>, unlike the 7-segment display. You can light any combination, and drive each LED from the + side or from the − side.</td></tr>
+    <tr><td>"Mise en série possible sans discontinuité"</td><td>Put two or three side by side, end to end: the bar continues with no gap, for a 20- or 30-LED bar.</td></tr>
+    <tr><td>Boîtier DIL20, pas 2.54 mm, 25.40 × 10.16 mm</td><td>Shaped like a 20-pin chip: 10 pins per row, standard breadboard pitch. It goes <b>across the centre gap</b>, like a chip.</td></tr>
+    <tr><td>Green, peak wavelength 565 nm</td><td>A green LED: its forward voltage is a bit higher than a red one's.</td></tr>
+    <tr><td>V<sub>F</sub> 2.1 V typ., 2.6 V max @ 20 mA</td><td>Each LED "uses" about <b>2.1 V</b>. The rest of the supply goes to its resistor.</td></tr>
+    <tr><td>I<sub>F</sub> 25 mA continuous per segment (−0.33 mA/°C above 25 °C)</td><td>Never more than 25 mA per LED, a bit less when it's hot. <b>5–10 mA</b> is plenty indoors.</td></tr>
+    <tr><td>Peak 100 mA (1/10 duty, 0.1 ms)</td><td>Short pulses can be stronger: useful if you multiplex several bars.</td></tr>
+    <tr><td>V<sub>R</sub> 5 V · I<sub>R</sub> 100 µA max</td><td>Connected backwards, an LED only survives 5 V. Don't put 9 V across it the wrong way.</td></tr>
+    <tr><td>540–2,000 µcd @ 10 mA, matching ratio 2:1</td><td>Brightness can differ by <b>up to 2×</b> from one segment to the next. That's normal, not a fault.</td></tr>
+    <tr><td>Soldering 260 °C for 3 s max</td><td>Only matters if you solder it: be quick, or use a socket.</td></tr>
+  </table>
+  <p class="hint">The pinout is <b>not</b> on the shop page: it's the small table on page 3 of the technical sheet ("Pin No. / Connection").</p>
+</section>
+
+<section id="rpbpins">
+  <h2><span class="num">8</span>DC10G: which pin does what?</h2>
+  <p>The datasheet's table: <b>pins 1 to 10 are the anodes</b> (+) of segments A to J, <b>pins 11 to 20 are the cathodes</b> (−) of segments J to A. Numbered anticlockwise like a chip, the two rows face each other: segment A has its anode on <b>pin 1</b> and its cathode on <b>pin 20</b>, right above it. The rule: <b>anode n ↔ cathode 21 − n</b>.</p>
+  <canvas id="cBarPin" width="800" height="300"></canvas>
+  <p class="hint">Click a segment or a pin to see its partner. Pin 1 is at the marked corner (bevel, dot or printed side); if you can't see a mark, the 10-second test below tells you.</p>
+</section>
+
+<section id="rpbtest">
+  <h2><span class="num">9</span>DC10G: test it before you wire it</h2>
+  <p>Same tool as before: <b>9 V battery + 1 kΩ</b>, or a multimeter on diode test. + (through the resistor) on an anode, − on the cathode opposite it: one segment lights. If nothing lights, swap the probes: if it lights now, the bar is <b>turned round</b> (anodes and cathodes rows swapped). Turn it 180°.</p>
+  <div class="controls"><span id="btRot"></span></div>
+  <div class="controls"><span class="hint">Red probe (+, through 1 kΩ) on the pin in position:</span><select id="btPlus" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select><span class="hint">Black probe (−) on position:</span><select id="btMinus" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></div>
+  <canvas id="cBarTest" width="800" height="270"></canvas>
+</section>
+
+<section id="rpbres">
+  <h2><span class="num">10</span>DC10G: the resistors</h2>
+  <p>Ten LEDs, so <b>ten resistors</b>, one per LED, for the same reason as the 7-segment display: <code>R = (Supply − 2.1 V) ÷ current</code>. One shared resistor would make the bar dimmer as it grows.</p>
+  <div class="controls">
+    <label class="slider">Supply <select id="brV" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <label class="slider" style="flex:1">Current per LED<input id="brI" type="range" min="2" max="20" step="1" value="6" style="flex:1;width:auto"></label><b id="brIt" style="min-width:60px"></b>
+  </div>
+  <canvas id="cBarRes" width="800" height="150"></canvas>
+  <p><b>Fewer parts: a resistor network.</b> Eight resistors in one flat SIL package. The "common point" kind (Gotronic 04482, 8 × 470 Ω) has all eight joined on one side (pin 1, marked with a dot): put that pin on <b>+5 V</b> and the other eight pins on the <b>anodes</b>. Then pull each cathode to ground to light its LED. That's exactly what project 21 does (with 2 single 470 Ω for the last two LEDs). Isolated networks (4 separate resistors, Gotronic 15864/15863) work on any side.</p>
+</section>
+
+<section id="rpbdrive">
+  <h2><span class="num">11</span>DC10G: how to drive it</h2>
+  <p>Because each LED is independent, you can switch it on from the <b>+ side</b> (feed its anode, cathode to ground) or from the <b>− side</b> (anode to + through its resistor, pull its cathode down). Pick what your driver does best:</p>
+  <table>
+    <tr><td>Driver</td><td>How it's wired</td><td>Good for</td></tr>
+    <tr><td>Arduino, 10 pins</td><td>Each pin → resistor → anode; cathodes 11–20 to GND. HIGH = on.</td><td>Any pattern, any scale, from code</td></tr>
+    <tr><td><a class="navlink" href="#s3914">LM3914</a></td><td>Anodes to +; cathodes straight into LED1–LED10 (pins 1, 18–10). <b>No resistors</b>: the chip regulates the current itself.</td><td>The simplest voltmeter / VU-meter: one chip, bar or dot mode</td></tr>
+    <tr><td>3 × <a class="navlink" href="#s339">LM339</a> + a resistor ladder</td><td>Anodes through 470 Ω from +5 V; each open-collector output pulls one cathode to ground.</td><td>Learning what's inside an LM3914 (project 21)</td></tr>
+    <tr><td>2 × <a class="navlink" href="#s595">74HC595</a></td><td>16 outputs from 3 Arduino pins; each output → resistor → anode.</td><td>Saving Arduino pins</td></tr>
+    <tr><td><a class="navlink" href="#s4017">CD4017</a> + 555</td><td>Each output → resistor → anode, cathodes to GND. One LED at a time.</td><td>A running dot (the chaser of project 9, in one neat block)</td></tr>
+  </table>
+  <p>Try the Arduino version: a potentiometer on A0 sets how many segments light. Switch between a <b>bar</b> (all LEDs up to the level) and a <b>dot</b> (only the top one, which draws 10× less current).</p>
+  <div class="controls"><label class="slider" style="flex:1">Potentiometer on A0<input id="bdV" type="range" min="0" max="5" step="0.01" value="3.2" style="flex:1;width:auto"></label><span id="bdMode"></span></div>
+  <canvas id="cBarDrive" width="800" height="250"></canvas>
+<pre style="background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.9rem;line-height:1.45"><code>// DC10G: anodes (pins 1–10) → 330 Ω → Arduino pins 2..11, cathodes (pins 11–20) → GND
+const byte SEG[10] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};   // segment A (pin 1) ... J (pin 10)
+const bool DOT = false;                                   // true = dot mode
+
+void setup() { for (byte i = 0; i < 10; i++) pinMode(SEG[i], OUTPUT); }
+void loop() {
+  int n = map(analogRead(A0), 0, 1023, 0, 10);            // 0..10 segments
+  for (byte i = 0; i < 10; i++)
+    digitalWrite(SEG[i], DOT ? (i + 1 == n) : (i < n));   // HIGH = on
+}</code></pre>
+  <p class="hint">10 LEDs × 10 mA = 100 mA in bar mode: fine for USB, but stay under the Arduino's ~200 mA total. Use 470 Ω (≈ 6 mA) if you also power other things.</p>
+</section>
+
+<section id="rpblist">
+  <h2><span class="num">12</span>DC10G: parts list for a first test</h2>
+  <div class="grid2">
+    <div><h3 style="margin-top:0">🧰 You need</h3><ul><li>1 × DC10G bar graph (Gotronic 03142)</li><li>10 × 330 Ω (5 V, ≈ 9 mA) or 470 Ω (≈ 6 mA); or a 8 × 470 Ω common-point network (04482) + 2 × 470 Ω</li><li>Breadboard + jumpers, and the 5 V power module or an Arduino</li><li>(Optional) a 10 kΩ potentiometer for the A0 demo</li></ul></div>
+    <div><h3 style="margin-top:0">🔧 Wiring check</h3><ol><li>Bar graph across the centre gap, pin 1 (marked corner) bottom-left: bottom row = anodes 1–10, top row = cathodes 20–11.</li><li>Test segment A first: + through 330 Ω on pin 1, − on pin 20.</li><li>Cathodes 11–20 → GND (for the Arduino version).</li><li>Each anode → its own resistor → its Arduino pin.</li></ol></div>
+  </div>
+</section>
+
+<section id="rprecap">
+  <h2><span class="num">13</span>Recap: the method works for any part</h2>
+  <ul>
+    <li><b>Identify</b> what it really is: a 7-segment display is 8 LEDs with a common pin; a bar graph is 10 fully separate LEDs.</li>
+    <li><b>Limits</b>: forward voltage, current, reverse voltage. Stay well below the maximums.</li>
+    <li><b>Pinout and "common"</b>: common cathode → COM to ground; no common pin → each LED has its own pair (bar graph: anode n ↔ cathode 21 − n). Confirm with a quick test.</li>
+    <li><b>Support parts</b>: one resistor per LED (or a network, or a current-regulating driver like the LM3914), and a decoder, comparators or a microcontroller to drive it.</li>
+    <li><b>Physical fit</b>: 2.54 mm pitch fits a breadboard.</li>
+  </ul>
+  <p class="hint">Want another worked example (a sensor, a motor driver, an LCD screen…)? Send the shop link and it can be added here.</p>
+</section>
+</div></div>

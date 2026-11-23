@@ -1,0 +1,402 @@
+<header>
+  <h1>Common Microchips</h1>
+  <p>Fifteen classic chips: what's inside, what they're for, and how to use them</p>
+</header>
+<main>
+<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
+
+<div class="cl-layout"><aside class="cl-menu" id="chMenu"><h4>Start</h4><a href="#chwhat" data-ch="chwhat"><span class="n">?</span>What is a microchip?</a><a href="#chlist" data-ch="chlist"><span class="n">★</span>The chips at a glance</a><a href="#chfam" data-ch="chfam"><span class="n">Aa</span>Names &amp; families</a><h4>The chips</h4><a href="#s555" data-ch="s555"><span class="n">⏱</span>NE555 timer</a><a href="#s7805" data-ch="s7805"><span class="n">5V</span>7805 regulator</a><a href="#s358" data-ch="s358"><span class="n">▷</span>LM358 op-amp</a><a href="#s339" data-ch="s339"><span class="n">≶</span>LM339 comparators</a><a href="#s386" data-ch="s386"><span class="n">🔊</span>LM386 audio amp</a><a href="#s3914" data-ch="s3914"><span class="n">▮▮</span>LM3914 bar-graph</a><a href="#s4017" data-ch="s4017"><span class="n">10</span>CD4017 counter</a><a href="#s4511" data-ch="s4511"><span class="n">8</span>CD4511 decoder</a><a href="#s4518" data-ch="s4518"><span class="n">99</span>CD4518 counter</a><a href="#s4013" data-ch="s4013"><span class="n">D</span>CD4013 flip-flop</a><a href="#s4060" data-ch="s4060"><span class="n">◷</span>CD4060 + quartz</a><a href="#s595" data-ch="s595"><span class="n">→</span>74HC595 shift reg.</a><a href="#s293" data-ch="s293"><span class="n">⇄</span>L293D motor driver</a><a href="#s4056" data-ch="s4056"><span class="n">🔋</span>TP4056 charger</a><a href="#s328" data-ch="s328"><span class="n">µC</span>ATmega328P (Arduino)</a><h4>End</h4><a href="#chrecap" data-ch="chrecap"><span class="n">✓</span>Recap</a></aside><div class="cl-content"><section id="chwhat">
+  <h2><span class="num">1</span>What is a microchip?</h2>
+  <p class="tldr">A microchip (an <b>integrated circuit</b>, or <b>IC</b>) is a whole circuit, made of <b>transistors, resistors, diodes and sometimes capacitors</b>, built onto a tiny slice of silicon and sealed in a plastic body with metal legs (pins).</p>
+  <p>Instead of soldering 30 parts to make a timer or an amplifier, you use one chip that already contains them. Everything you learned on the <a data-page="transistor" class="navlink">transistor</a>, <a data-page="resistor" class="navlink">resistor</a> and <a data-page="diode" class="navlink">diode</a> pages is <i>inside</i>, just microscopic.</p>
+  <canvas id="cDip" width="800" height="260"></canvas>
+  <ul>
+    <li><b>Finding pin 1:</b> look for the <b>notch</b> or <b>dot</b>. Pin 1 is next to it, and the pins are numbered <b>anticlockwise</b> (seen from above): down the left side, then up the right side.</li>
+    <li><b>Power first:</b> every chip needs a + supply pin (VCC/VDD/VS) and a ground pin (GND/VSS). Get these wrong and the chip dies.</li>
+    <li><b>100 nF beside the power pin:</b> the decoupling capacitor from the <a data-page="capacitor" class="navlink">capacitor page</a> (example D).</li>
+    <li><b>The datasheet</b> is the chip's instruction manual. Search "<i>chip name</i> datasheet" for the pinout, limits and example circuits.</li>
+  </ul>
+</section>
+
+<section id="chlist">
+  <h2><span class="num">2</span>The fifteen chips at a glance</h2>
+  <table>
+    <tr><td>Chip</td><td>What it is</td><td>Used for</td></tr>
+    <tr><td><a href="#s555" class="navlink">NE555</a></td><td>Timer</td><td>Blinking LEDs, beeps and tones, delays, PWM motor and LED dimming</td></tr>
+    <tr><td><a href="#s7805" class="navlink">7805</a></td><td>Voltage regulator</td><td>A steady 5 V from a 7–20 V battery or adapter: powering logic chips and microcontrollers</td></tr>
+    <tr><td><a href="#s358" class="navlink">LM358</a></td><td>Op-amp (×2)</td><td>Amplifying sensor and audio signals, comparing voltages (thermostats, light switches), filters</td></tr>
+    <tr><td><a href="#s339" class="navlink">LM339</a></td><td>Comparator (×4)</td><td>Yes/no decisions on voltages: thresholds, bar thermometers, alarms, "is it dark?"</td></tr>
+    <tr><td><a href="#s386" class="navlink">LM386</a></td><td>Audio power amplifier</td><td>Driving a small speaker: mini guitar amps (your Ruby!), radios, intercoms</td></tr>
+    <tr><td><a href="#s4017" class="navlink">CD4017</a></td><td>Decade counter</td><td>LED chasers, running lights, sequencers, "count to N" circuits</td></tr>
+    <tr><td><a href="#s3914" class="navlink">LM3914</a></td><td>Bar-graph driver</td><td>Lighting 1–10 LEDs from a voltage: battery gauges, VU-meters, bar thermometers</td></tr>
+    <tr><td><a href="#s4511" class="navlink">CD4511</a></td><td>BCD → 7-segment decoder</td><td>Showing a number (0–9) on a 7-segment display from 4 wires: counters, clocks, scoreboards, dice</td></tr>
+    <tr><td><a href="#s4518" class="navlink">CD4518</a></td><td>Dual decimal (BCD) counter</td><td>Counting 0–9 (or 00–99 with both halves): stopwatches, people counters, timers</td></tr>
+    <tr><td><a href="#s4013" class="navlink">CD4013</a></td><td>Dual D flip-flop</td><td>1-bit memory, divide-by-2, push-on/push-off switches</td></tr>
+    <tr><td><a href="#s4060" class="navlink">CD4060</a></td><td>Oscillator + 14-stage divider</td><td>Precise time from a quartz: 32.768 kHz → 2 Hz for clocks and stopwatches, long timers</td></tr>
+    <tr><td><a href="#s595" class="navlink">74HC595</a></td><td>Shift register</td><td>Controlling 8 (or 16, 24…) outputs with only 3 wires from a microcontroller: LED bars, displays</td></tr>
+    <tr><td><a href="#s293" class="navlink">L293D</a></td><td>Dual H-bridge motor driver</td><td>Running 1–2 DC motors forwards and backwards, with speed control: robots, small vehicles</td></tr>
+    <tr><td><a href="#s4056" class="navlink">TP4056</a></td><td>Li-ion charger</td><td>Charging an 18650 / Li-po cell from USB at up to 1 A, then 4.2 V exactly (on the charger module)</td></tr>
+    <tr><td><a href="#s328" class="navlink">ATmega328P</a></td><td>Microcontroller</td><td>The programmable brain of the Arduino Uno: reads sensors, drives displays, makes decisions in code</td></tr>
+  </table>
+  <p class="hint">They work well together: a 7805 powers them, an NE555 provides the clock, a 4017 or 4518 counts it, a 4511 shows the count on a display, an LM358 or LM339 reads a sensor, an LM386 makes the sound, and an L293D runs a motor. For precise time, a CD4060 and a quartz replace the 555.</p>
+</section>
+<section id="chfam">
+  <h2><span class="num">3</span>Chip names decoded: prefixes, families, suffixes</h2>
+  <p class="tldr">A chip name usually has three parts: a <b>prefix</b> (who makes it, or which family), a <b>number</b> (what it does) and a <b>suffix</b> (the package and grade). <b>NE555P</b> = made in the NE (Signetics) line · 555 timer · P = plastic DIP.</p>
+  <p>The number is what matters most: the same function is often made by several companies under different prefixes. An <b>NE555</b>, <b>LM555</b> or <b>SA555</b> are the same timer; a <b>CD4017</b>, <b>HEF4017</b> or <b>MC14017</b> are the same counter.</p>
+  <h3>Try it: decode a part number</h3>
+  <div class="controls" id="pnBtns"></div>
+  <div id="pnOut" class="pnout"></div>
+  <h3>The prefixes you'll meet</h3>
+  <table>
+    <tr><td>Prefix</td><td>Meaning / origin</td><td>Typical chips</td></tr>
+    <tr><td><b>NE · SA · SE</b></td><td>Signetics linear chips (now NXP/TI). The letters also give the temperature range: NE 0–70 °C, SA −40–85 °C, SE −55–125 °C.</td><td>NE555 timer, NE5532 audio op-amp</td></tr>
+    <tr><td><b>LM</b></td><td>"Linear Monolithic": National Semiconductor's analog line (now Texas Instruments). Op-amps, regulators, amplifiers, sensors.</td><td>LM358, LM386, LM3914, LM35, LM317</td></tr>
+    <tr><td><b>78xx / 79xx</b></td><td>Fixed voltage regulators: 78 = positive, 79 = negative, the last digits are the volts. The letters in front are the maker (L = ST, LM = TI, µA = Fairchild).</td><td>7805 (5 V), 7812 (12 V), 7905 (−5 V)</td></tr>
+    <tr><td><b>CD4xxx</b></td><td>The CMOS <b>4000 series</b> logic (RCA's "COS/MOS" from 1968). Works from 3 to 15 V, uses almost no current, but is slow (a few MHz). Same chips as HEF4xxx (NXP) and MC14xxx (Motorola).</td><td>CD4017, CD4511, CD4518, CD4011</td></tr>
+    <tr><td><b>74xx</b></td><td>The 7400 logic family. The letters after 74 are the <b>technology</b>: <b>LS</b> = old TTL (5 V only), <b>HC</b> = CMOS 2–6 V (what you use), <b>HCT</b> = HC that understands TTL levels, <b>AHC / LVC</b> = modern 3.3 V. The prefix before 74 is the maker (SN = Texas Instruments).</td><td>74HC595, 74HC00, 74LS47</td></tr>
+    <tr><td><b>ATmega · ATtiny</b></td><td>Atmel's AVR microcontrollers (now Microchip). ATmega<b>32</b>8P: 32 KB of program memory; P = picoPower.</td><td>ATmega328P (Arduino Uno), ATtiny85</td></tr>
+    <tr><td><b>TL · TLC</b></td><td>Texas Instruments linear chips; the C means CMOS (low power).</td><td>TL072 (audio op-amp), TL431 (reference), TLC555</td></tr>
+    <tr><td><b>ICL · ICM</b></td><td>Intersil (now Renesas).</td><td>ICL7106/7107 voltmeter chips, ICM7555</td></tr>
+    <tr><td><b>MAX</b></td><td>Maxim (now Analog Devices).</td><td>MAX7219 LED driver, MAX232</td></tr>
+    <tr><td><b>TP · DW · HT…</b></td><td>Chinese chip makers' own codes (Top Power, Fortune, Holtek…), found on cheap modules.</td><td>TP4056 charger, DW01A battery protection</td></tr>
+    <tr><td><b>JRC · NJM</b></td><td>New Japan Radio: classic guitar-pedal op-amps.</td><td>JRC4558 (the Tube Screamer's op-amp)</td></tr>
+  </table>
+  <h3>Suffixes: package and grade</h3>
+  <ul>
+    <li><b>N, P, PU, E, BE, CN</b>: plastic <b>DIP</b> (through-hole, 2.54 mm): fits your breadboard. ✓</li>
+    <li><b>D, DR, M, SO, SOIC, TSSOP</b>: surface-mount: tiny, needs an adapter board for breadboards.</li>
+    <li><b>C, I, A, M</b> (in the middle or at the end): commercial / industrial / automotive / military temperature range.</li>
+    <li><b>B</b> on 4000 chips (CD4017<b>B</b>): "buffered", the standard version today.</li>
+    <li>Special cases: <b>LM35DZ</b>: D = accuracy grade, Z = TO-92 package. <b>L7805CV</b>: C = commercial, V = TO-220.</li>
+  </ul>
+  <h3>The big families, in one picture</h3>
+  <div class="cards">
+    <div class="card"><div class="ico">📈</div><h3>Linear / analog</h3><p>Work with smooth voltages: op-amps, comparators, audio amps, regulators, sensors.<br><i>Yours:</i> LM358, LM386, LM3914, 7805, LM35.</p></div>
+    <div class="card"><div class="ico">⏱️</div><h3>Mixed (analog + digital)</h3><p>Analog inside, on/off outside: timers, converters, chargers.<br><i>Yours:</i> NE555, TP4056.</p></div>
+    <div class="card"><div class="ico">🔢</div><h3>Logic (digital)</h3><p>Only 0 and 1: gates, counters, decoders, shift registers. Two families: 4000 (3–15 V) and 74HC (2–6 V).<br><i>Yours:</i> CD4017, CD4511, CD4518, 74HC595.</p></div>
+    <div class="card"><div class="ico">🧠</div><h3>Microcontrollers</h3><p>Programmable: a tiny computer that can replace many logic chips with code.<br><i>Yours:</i> ATmega328P (Arduino).</p></div>
+  </div>
+</section>
+
+
+<section id="s555">
+  <h2><span class="num">4</span>NE555 timer: the blinker</h2>
+  <p><b>What it does:</b> it turns on and off by itself at a rate you choose with two resistors and a capacitor. Made in 1972, it's still produced by the <b>billions</b>.</p>
+  <p><b>How it works inside:</b> a capacitor fills through R1 + R2. Two <b>comparators</b> (voltage watchers) watch it: when it reaches <b>⅔</b> of the supply, the chip flips its output <b>off</b> and opens a <b>discharge</b> transistor that drains the capacitor through R2. When it falls to <b>⅓</b>, the output flips back <b>on</b> and filling starts again.</p>
+  <p><b>Water analogy:</b> a tank with a float. When the water reaches the high mark, the float opens a drain. When it drops to the low mark, the drain closes and the tank refills. The light is on while the tank is filling.</p>
+  <div class="controls">
+    <label class="slider">R1<input id="tR1" type="range" min="0" max="2" step="0.01" value="1"></label>
+    <label class="slider">R2<input id="tR2" type="range" min="0" max="2" step="0.01" value="1.7"></label>
+    <span id="tCch"></span><button id="tSnd">🔊 Listen</button>
+  </div>
+  <canvas id="c555" width="800" height="300"></canvas>
+  <p class="hint">Frequency = 1.44 ÷ ((R1 + 2×R2) × C). Pick 10 nF and the blinking becomes an audible <b>tone</b>: that's how cheap buzzers, sirens and the classic "Atari Punk Console" synth work.</p>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="555"></div>
+  <h3 class="cx-h">📌 NE555 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="555"></div>
+</section>
+
+<section id="s7805">
+  <h2><span class="num">5</span>7805 voltage regulator: the steady 5 V</h2>
+  <p><b>What it does:</b> you feed it anything from about 7 V to 20 V, and it always gives exactly <b>5 V</b> out, even as the battery drains or the load changes. (Its cousins: 7809 → 9 V, 7812 → 12 V, and the LM317, which is adjustable.)</p>
+  <p><b>How it works inside:</b> a big transistor acts as a valve between input and output. A <b>reference</b> (a precise Zener-like voltage) and a comparator constantly check the output: too high, close the valve a bit; too low, open it. The extra voltage is burned off as <b>heat</b>: power = (Vin − 5 V) × current.</p>
+  <p><b>Water analogy:</b> a pressure-reducing valve on a house's water supply. Whatever the street pressure, the taps get the same gentle pressure, and the valve gets warm doing it.</p>
+  <div class="controls">
+    <label class="slider" style="flex:1">Input voltage<input id="rgV" type="range" min="0" max="20" step="0.1" value="9" style="flex:1;width:auto"></label>
+    <label class="slider" style="flex:1">Current drawn by the circuit<input id="rgI" type="range" min="0" max="1" step="0.01" value="0.2" style="flex:1;width:auto"></label>
+    <span id="rgChoices"></span>
+  </div>
+  <canvas id="c7805" width="800" height="260"></canvas>
+  <p class="hint">Note the <b>dropout</b>: the input must be at least ~2 V above 5 V (so 7 V or more). Big voltage drop × big current = lots of heat, so add a <b>heatsink</b>. Without one, it protects itself by shutting down when too hot.</p>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="7805"></div>
+  <h3 class="cx-h">📌 7805 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="7805"></div>
+</section>
+
+<section id="s358">
+  <h2><span class="num">6</span>LM358 op-amp: the comparer and amplifier</h2>
+  <p><b>What it does:</b> an <b>op-amp</b> (operational amplifier) has two inputs, <b>+</b> and <b>−</b>, and one output. It looks at the <b>difference</b> between the inputs and multiplies it by a huge number (about 100,000). The LM358 has <b>two</b> op-amps in one chip.</p>
+  <p><b>Two ways to use it:</b></p>
+  <ul>
+    <li><b>Comparator (no feedback):</b> the huge gain means the output simply slams to <b>high</b> if + is above −, or <b>low</b> if + is below −. It makes a yes/no decision: "is it dark?", "is it too hot?"</li>
+    <li><b>Amplifier (with feedback):</b> two resistors feed part of the output back to the − input. The op-amp adjusts its output until both inputs are equal, which gives an exact, stable gain = <b>1 + Rf ÷ Rg</b>.</li>
+  </ul>
+  <p><b>Water analogy:</b> a super-sensitive see-saw (the two inputs) connected to a powerful pump (the output). The slightest tilt drives the pump fully one way. With feedback, the pump's own pressure pushes the see-saw back level, so it settles at an exact amount.</p>
+  <div class="controls"><span id="oaChoices"></span></div>
+  <div class="controls" id="oaCmp"><label class="slider" style="flex:1">+ input (sensor)<input id="oaP" type="range" min="0" max="5" step="0.01" value="2.2" style="flex:1;width:auto"></label><label class="slider" style="flex:1">− input (threshold knob)<input id="oaN" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label></div>
+  <div class="controls" id="oaAmp" style="display:none"><label class="slider" style="flex:1">Rf ÷ Rg (feedback ratio)<input id="oaG" type="range" min="0" max="20" step="0.5" value="4" style="flex:1;width:auto"></label></div>
+  <canvas id="c358" width="800" height="270"></canvas>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="358"></div>
+  <h3 class="cx-h">📌 LM358 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="358"></div>
+</section>
+
+<section id="s339">
+  <h2><span class="num">7</span>LM339 quad comparator: four yes/no questions</h2>
+  <p><b>What it does:</b> four <b>comparators</b> in one chip. Each one compares two voltages and answers one question: <i>"is the − input higher than the + input?"</i> If <b>yes</b>, its output <b>connects to ground</b>. If <b>no</b>, its output is simply <b>disconnected</b> (it "floats"). It runs from one supply, 2 to 36 V, and its inputs work right down to 0 V.</p>
+  <p><b>How it works inside:</b> each comparator is a high-gain amplifier (like an op-amp) with no feedback: the tiniest difference between the inputs, a few millivolts, swings it fully one way or the other. Its output stage is a single transistor to ground, called an <b>open collector</b>. That is why every output needs a <b>pull-up resistor</b> to + (to give a clean "high" when the transistor is off), or an LED + resistor coming from + into the pin (it lights when the transistor switches on).</p>
+  <p><b>Water analogy:</b> four lock-keepers, each watching two water levels. When the level on his − side gets higher than on his + side, he opens a drain to the ground. He never pumps water in, he can only drain it.</p>
+  <p class="hint">Move the signal (on −) past the threshold (on +). Then switch the pull-up off: without it, a "no" answer leaves the output floating and nothing defines the voltage.</p>
+  <div class="controls"><label class="slider" style="flex:1">Signal on IN−<input id="c9sig" type="range" min="0" max="5" step="0.01" value="1.8" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Threshold on IN+<input id="c9thr" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label><label class="slider"><input type="checkbox" id="c9pu" checked> Pull-up 10 kΩ</label></div>
+  <canvas id="c339" width="800" height="280"></canvas>
+  <table>
+    <tr><td></td><td><b>LM339</b> (comparator)</td><td><b>LM358</b> (op-amp)</td></tr>
+    <tr><td>Made for</td><td>Comparing only: yes / no</td><td>Amplifying (with feedback), comparing in a pinch</td></tr>
+    <tr><td>Output</td><td>Open collector: pulls to ground, needs a pull-up</td><td>Push-pull: drives high and low by itself</td></tr>
+    <tr><td>Switching</td><td>Fast, clean edges (~1 µs)</td><td>Slow edges as a comparator</td></tr>
+    <tr><td>Bonus</td><td>Outputs can be joined (any "yes" pulls the line low), and the pull-up can go to a different voltage (5 V logic from a 12 V circuit)</td><td>2 in a package, can also make filters and preamps</td></tr>
+  </table>
+  <p class="hint">Three LM339 = 12 comparators: <a class="navlink" href="#p21">project 21</a> uses 10 of them on a resistor ladder to build a bar thermometer by hand, which is exactly what the <a class="navlink" href="#s3914">LM3914</a> has inside. To stop the output flickering when the signal sits right on the threshold, add <b>hysteresis</b>: a 1 MΩ from the output back to the + input.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="339"></div>
+  <h3 class="cx-h">📌 LM339 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="339"></div>
+</section>
+
+<section id="s386">
+  <h2><span class="num">8</span>LM386 audio amplifier: drives a speaker</h2>
+  <p><b>What it does:</b> it takes a small audio signal and gives it enough <b>power</b> (up to ~0.5–1 W) to move a speaker cone. It's the heart of countless mini amps, <b>including your Ruby amp</b>.</p>
+  <p><b>How it works inside:</b> an input stage, a gain stage, then a <b>push-pull output</b>: two transistors, one that <b>pushes</b> the speaker out (from +9 V) and one that <b>pulls</b> it in (to ground). The gain is <b>20×</b> by default, and up to <b>200×</b> if you connect a capacitor between <b>pins 1 and 8</b>. In the Ruby, the 1 kΩ <b>gain knob</b> sits there, so you choose anywhere in between.</p>
+  <p><b>Water analogy:</b> two pumps facing a flexible membrane (the speaker cone). One pushes, the other pulls, in time with the music.</p>
+  <div class="controls">
+    <label class="slider" style="flex:1">🎸 Guitar signal<input id="laIn" type="range" min="0" max="1" step="0.01" value="0.4" style="flex:1;width:auto"></label>
+    <label class="slider" style="flex:1">Gain knob (pins 1–8)<input id="laG" type="range" min="0" max="1" step="0.01" value="0.2" style="flex:1;width:auto"></label>
+  </div>
+  <canvas id="c386" width="800" height="270"></canvas>
+  <p class="hint">The output sits at half the supply (4.5 V) and swings up and down around it. That's why there's a big <b>220 µF capacitor</b> before the speaker: it blocks the 4.5 V DC and passes the music, exactly the coupling trick from the <a data-page="capacitor" class="navlink">capacitor page</a>. Push the gain too far and the swing hits 0 V / 9 V and clips, which is the Ruby's overdrive.</p>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="386"></div>
+  <h3 class="cx-h">📌 LM386 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="386"></div>
+</section>
+
+<section id="s3914">
+  <h2><span class="num">9</span>LM3914 bar-graph driver: a voltage becomes a bar</h2>
+  <p><b>What it does:</b> it lights <b>1 to 10 LEDs</b> depending on a voltage: a little voltage lights the first LED, the full-scale voltage lights all ten. It's a ready-made "level meter": battery gauges, VU-meters, thermometers (<a class="navlink" href="#p21">project 21</a> builds the same thing by hand with 3 × LM339, and lists the LM3914 as a variant), no microcontroller needed. It also <b>regulates the LED current itself</b>, so no resistor per LED.</p>
+  <p><b>How it works inside:</b> a ladder of <b>10 equal resistors</b> between RLO and RHI makes 10 evenly spaced voltages. <b>10 comparators</b> (op-amps, see the <a class="navlink" href="#s358">LM358</a>) each compare the input with one rung: if the input is higher, that comparator turns its LED on. A built-in <b>1.25 V reference</b> lets you set the scale with a trimmer, and the current it supplies (× 10) sets the LED brightness. MODE chooses a <b>bar</b> (all LEDs up to the level) or a single moving <b>dot</b>.</p>
+  <p><b>Water analogy:</b> a tall tank with 10 overflow holes at equal heights, each feeding a little light. The higher the water, the more holes spill.</p>
+  <div class="controls"><label class="slider" style="flex:1">Input (SIG)<input id="lm39In" type="range" min="0" max="1.3" step="0.005" value="0.3" style="flex:1;width:auto"></label><label class="slider" style="flex:1">RHI (top of scale)<input id="lm39Hi" type="range" min="0.2" max="1.25" step="0.01" value="0.5" style="flex:1;width:auto"></label><label class="slider"><input type="checkbox" id="lm39Dot"> dot mode</label></div>
+  <canvas id="c3914" width="800" height="280"></canvas>
+  <p class="hint">Cousins: the <b>LM3915</b> (logarithmic steps of 3 dB, for audio) and <b>LM3916</b> (VU-meter scale). Chain two LM3914s for 20 LEDs. Gotronic: LM3914N, code 21122.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="3914"></div>
+  <h3 class="cx-h">📌 LM3914 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="3914"></div>
+</section>
+<section id="s4017">
+  <h2><span class="num">10</span>CD4017 decade counter: the LED chaser</h2>
+  <p><b>What it does:</b> it has <b>10 outputs</b>. Only one is on at a time. Each pulse on the <b>clock</b> pin moves the "on" to the next output: 0, 1, 2 … 9, then back to 0.</p>
+  <p><b>How it works inside:</b> a chain of <b>flip-flops</b> (tiny 1-bit memories made of transistors) counts the pulses, and a <b>decoder</b> turns the count into "light output number N". Connect an output to the <b>reset</b> pin and it starts over early, so it counts to any number from 2 to 10.</p>
+  <p><b>Water analogy:</b> a rotating distributor valve that sends water to the next of 10 pipes each time you push its lever. The classic pairing: a <b>555 provides the clock pulses</b> and the 4017 counts them.</p>
+  <div class="controls">
+    <label class="slider" style="flex:1">Clock speed (from a 555)<input id="ctF" type="range" min="0" max="12" step="0.1" value="3" style="flex:1;width:auto"></label>
+    <button id="ctStep">👆 One pulse</button>
+    <label class="slider">Count to <select id="ctN" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></label>
+  </div>
+  <canvas id="c4017" width="800" height="250"></canvas>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4017"></div>
+  <h3 class="cx-h">📌 CD4017 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4017"></div>
+</section>
+
+<section id="s4511">
+  <h2><span class="num">11</span>CD4511 decoder: number → digit</h2>
+  <p><b>What it does:</b> it reads a number from 0 to 9 written in <b>binary</b> on 4 wires (A = 1, B = 2, C = 4, D = 8: that's called <b>BCD</b>, binary-coded decimal), and lights the right segments of a <b>7-segment display</b>. Give it 0110 (4 + 2 = 6) and it lights a, f, g, e, d, c: a "6". It also drives the segments itself, with up to ~25 mA each.</p>
+  <p><b>How it works inside:</b> a small <b>latch</b> (a 4-bit memory) holds the number, then a <b>decoder</b> made of logic gates works out which of the 7 segments each number needs (a hard-wired lookup table, like the 27-diode matrix of <a class="navlink" href="#p14">dice project 14</a>), and 7 <b>output transistors</b> push current into the segments. Three control pins: <b>LT</b> (lamp test: all on), <b>BI</b> (blank: all off) and <b>LE</b> (latch: freeze the digit).</p>
+  <p><b>Water analogy:</b> a fountain with 7 nozzles shaped like a digit. You set 4 levers (on/off), and a mechanism behind the wall opens exactly the nozzles that spray the shape of that number.</p>
+  <p class="hint">Click the 4 input bits (or the controls) to see what the display shows. Numbers above 9 (1010–1111) are not valid BCD: the 4511 shows nothing.</p>
+  <div class="controls"><button id="d11up">➕ Count up</button><button id="d11LT">LT (lamp test)</button><button id="d11BI">BI (blank)</button><button id="d11LE">LE (latch) </button></div>
+  <canvas id="c4511" width="800" height="270"></canvas>
+  <p class="hint">Only for <b>common-cathode</b> displays like your SC39-11SURKWA (COM to ground). Each segment still needs its own resistor (470 Ω–1 kΩ at 5–9 V). Used in <a class="navlink" href="#p15">project 15</a>, <a class="navlink" href="#p19">project 19</a> and <a class="navlink" href="#parts">Using real parts</a>.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4511"></div>
+  <h3 class="cx-h">📌 CD4511 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4511"></div>
+</section>
+<section id="s4518">
+  <h2><span class="num">12</span>CD4518 dual counter: counting in decimal</h2>
+  <p><b>What it does:</b> it contains <b>two counters</b>, A and B. Each one counts clock pulses from 0 to 9 and then starts again at 0, giving the count in <b>BCD</b> on 4 outputs (Q1 = 1, Q2 = 2, Q3 = 4, Q4 = 8): exactly what a CD4511 wants. Chain the two halves and you count from <b>00 to 99</b>.</p>
+  <p><b>How it works inside:</b> each counter is 4 <b>flip-flops</b> (1-bit memories) that count in binary, plus a little logic that jumps from 1001 (9) straight back to 0000 instead of going on to 10–15. A counter moves on each <b>rising edge of CLK</b> while EN is high, <b>or</b> on each <b>falling edge of EN</b> while CLK is low. That second way is the trick for chaining: the units' Q4 (the "8") drops when going 9 → 0, so wired to the tens' EN it adds one ten. RESET (high) sends it back to 0.</p>
+  <p><b>Water analogy:</b> a row of buckets that each hold 9 cups. Every tick pours one cup into the first bucket. When it gets its 10th cup, it tips over, empties itself, and pours one cup into the next bucket: the units carry over into the tens.</p>
+  <div class="controls"><button id="d18run" class="active">⏸ Pause</button><button id="d18tick">👆 One clock pulse</button><button id="d18rst">↺ RESET</button><label class="slider">Speed<input id="d18sp" type="range" min="0.5" max="12" step="0.5" value="2"></label><label class="slider"><input type="checkbox" id="d18chain" checked> Chain: Q4A → EN B</label></div>
+  <canvas id="c4518" width="800" height="270"></canvas>
+  <p class="hint">Untick "chain" and counter B never moves: the carry is just one wire. Its cousins: the CD4017 (one output per count, <a class="navlink" href="#s4017">above</a>), and the CD4510 (counts up <i>or</i> down, can be preset, not sold at Gotronic). Used in <a class="navlink" href="#p19">project 19: counter 00–99</a>.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4518"></div>
+  <h3 class="cx-h">📌 CD4518 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4518"></div>
+</section>
+<section id="s4013">
+  <h2><span class="num">13</span>CD4013 dual D flip-flop: a 1-bit memory with a camera shutter</h2>
+  <p><b>What it does:</b> two <b>D flip-flops</b>. Each one remembers <b>one bit</b>. At the exact moment its <b>clock</b> rises (low → high), it copies its <b>D</b> input to its <b>Q</b> output, and keeps it there until the next rising edge, whatever D does in between. <b>Q̅</b> is always the opposite of Q. Two extra pins force it: <b>S</b> (set, Q = 1) and <b>R</b> (reset, Q = 0); keep them low for normal use.</p>
+  <p><b>The divide-by-2 trick:</b> wire Q̅ back to D. Now D always asks for "the opposite of what Q is now", so every clock edge <b>flips</b> Q: 0, 1, 0, 1… Q changes once per clock pulse, so it makes one full cycle every <b>two</b> clock pulses: half the frequency. That's how <a class="navlink" href="#p26">project 26</a> turns the CD4060's 2 Hz into exactly <b>1 Hz</b>. The <a class="navlink" href="#s4060">CD4060</a> and <a class="navlink" href="#s4518">CD4518</a> are built from exactly these flip-flops.</p>
+  <p><b>Water analogy:</b> a camera pointed at a tap. D is the tap (open or closed); the clock is the shutter button. The photo (Q) shows the tap as it was at the click, and stays on the screen until the next click. In toggle mode it is a <b>ballpoint pen</b>: each click swaps in ↔ out.</p>
+  <p class="hint">Change D, then send clock pulses: Q only changes on the rising edge. Tick "toggle" to wire Q̅ → D and watch Q run at half the clock speed.</p>
+  <div class="controls"><button id="d13clk">👆 Clock pulse</button><button id="d13d">D = 0</button><button id="d13run">▶ Auto clock</button><label class="slider"><input type="checkbox" id="d13tog"> Toggle (Q̅ → D)</label><button id="d13r">R (reset)</button></div>
+  <canvas id="c4013" width="800" height="280"></canvas>
+  <p class="hint">Other uses: a <b>push-on / push-off</b> switch (one button press = one clock; you need a debounced button, because a raw button bounces and gives several clocks), storing a sensor state at a precise moment, or a 2-bit counter with both halves chained.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4013"></div>
+  <h3 class="cx-h">📌 CD4013 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4013"></div>
+</section>
+
+<section id="s4060">
+  <h2><span class="num">14</span>CD4060 oscillator + 14-stage divider: quartz time</h2>
+  <p><b>What it does:</b> two things in one chip. An <b>oscillator</b> (pins 9–11) that makes a fast clock with a quartz crystal, or with a resistor and a capacitor. And a chain of <b>14 flip-flops</b>, each one halving the frequency of the one before (like the <a class="navlink" href="#s4013">CD4013</a> in toggle mode). Ten of those stages come out on pins: Q4 to Q10 and Q12 to Q14.</p>
+  <p><b>How it works inside:</b> the oscillator is an <b>inverter</b> (a NOT gate): its output is always the opposite of its input. Put a quartz from output to input and it keeps "correcting" itself back and forth, at the one frequency the quartz accepts. Every output Qn gives the oscillator frequency divided by 2ⁿ. With a <b>32.768 kHz</b> watch quartz: Q4 = 2,048 Hz (a tone), Q10 = 32 Hz, Q14 = <b>exactly 2 Hz</b>. Add one more ÷2 (a CD4013) and you have <b>1 Hz: a clock's second</b>.</p>
+  <p><b>Water analogy:</b> a pendulum clock. The quartz is the pendulum, the inverter is the little kick that keeps it swinging, and the 14 stages are the gears that turn its fast ticks into seconds.</p>
+  <p class="hint">Fourteen stages, each half as fast as the one before. The first ones are far too fast for your eyes (they look half lit); watch the last ones blink. The grey stages exist inside but have no pin.</p>
+  <div class="controls"><button id="d60run" class="active">⏸ Pause</button><button id="d60rst">↺ RESET (pin 12)</button></div>
+  <canvas id="c4060" width="800" height="300"></canvas>
+
+  <h3>🔷 What is a quartz crystal, and why is it so precise?</h3>
+  <p>A <b>quartz</b> is a thin slice of quartz crystal (the mineral, silicon dioxide) with a metal film on each side. Quartz is <b>piezoelectric</b>: squeeze it and it makes a small voltage; put a voltage on it and it bends a tiny bit. The same effect makes a piezo buzzer click (see <a data-page="motion" class="navlink">Sound &amp; motion</a>).</p>
+  <p>The slice is cut so that it rings, mechanically, at one very exact frequency, like a <b>tuning fork</b>. A watch quartz is literally a tiny tuning fork inside the little metal cylinder. Electrically, it lets through almost nothing except that one frequency. So the inverter around it can only oscillate there: the quartz <b>decides the rhythm</b>, the chip just keeps it going.</p>
+  <ul>
+    <li><b>Why 32,768 Hz?</b> It's 2¹⁵: divide by 2 fifteen times and you get exactly 1 Hz. It's also slow enough for a tiny, very low-power watch circuit.</li>
+    <li><b>Precision:</b> about ±20 ppm (parts per million): less than 2 seconds a day. A 555 with a resistor and a capacitor is off by 5–10 % and drifts with temperature and battery voltage: minutes a day.</li>
+    <li><b>The parts around it:</b> the <b>10 MΩ</b> biases the inverter to its middle point so it amplifies (it can't start otherwise). The two <b>22 pF</b> capacitors are the "load" the quartz is tuned for. The <b>100 kΩ</b> limits how hard the inverter shakes the tiny crystal: too much drive can damage a watch quartz.</li>
+    <li><b>Elsewhere:</b> the Arduino's 16 MHz crystal (<a class="navlink" href="#s328">ATmega328P</a>), every computer, phone, radio and watch. Faster crystals are thicker slices, not forks.</li>
+  </ul>
+  <p class="hint">Push the quartz at different frequencies. Away from its own frequency, even by a few hertz, it barely moves. That razor-sharp response is why it's so precise.</p>
+  <div class="controls"><label class="slider" style="flex:1">Push frequency<input id="xtF" type="range" min="32740" max="32796" step="0.25" value="32760" style="flex:1;width:auto"></label><b id="xtFt" style="min-width:110px"></b></div>
+  <canvas id="cXtal" width="800" height="260"></canvas>
+  <p class="hint">Used in <a class="navlink" href="#p26">project 26: quartz stopwatch</a>. Keep the quartz legs short and don't touch it while it runs: your finger adds capacitance and can stop it.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4060"></div>
+  <h3 class="cx-h">📌 CD4060 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4060"></div>
+</section>
+
+<section id="s595">
+  <h2><span class="num">15</span>74HC595 shift register: 8 outputs from 3 wires</h2>
+  <p><b>What it does:</b> a microcontroller often doesn't have enough pins. The 595 lets you control <b>8 outputs with just 3 wires</b>. Chain several and you get 16, 24 or more, still with 3 wires.</p>
+  <p><b>How it works inside (3 steps):</b></p>
+  <ol>
+    <li>Put a bit (1 or 0) on the <b>DATA</b> wire.</li>
+    <li>Pulse the <b>CLOCK</b> wire. Every bit inside shifts one place along, and the new bit enters at the start. Repeat 8 times.</li>
+    <li>Pulse the <b>LATCH</b> wire. All 8 bits are copied to the outputs <b>at the same moment</b>, so the LEDs don't flicker while bits are moving.</li>
+  </ol>
+  <p><b>Water analogy:</b> a bucket brigade. Cups of water (1) or empty cups (0) are passed down a line of 8 people, one step per clock. When the line is full, everyone pours into their own tank at the same time (the latch).</p>
+  <p class="hint">Click the LEDs at the bottom to choose a pattern, then press <b>Send</b>.</p>
+  <div class="controls"><button id="srSend">▶ Send pattern</button><button id="srRand">🎲 Random</button><label class="slider">Speed<input id="srSp" type="range" min="0.5" max="6" step="0.1" value="2"></label></div>
+  <canvas id="c595" width="800" height="300"></canvas>
+
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="595"></div>
+  <h3 class="cx-h">📌 74HC595 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="595"></div>
+</section>
+
+<section id="s293">
+  <h2><span class="num">16</span>L293D H-bridge: a motor forwards and backwards</h2>
+  <p><b>What it does:</b> it drives <b>two DC motors</b> in <b>both directions</b>, from logic signals (buttons, an Arduino). Up to <b>600 mA</b> per motor (1.2 A peaks), with a motor supply from 4.5 to 36 V on pin 8 and a separate logic supply on pin 16. The "D" means the <b>flyback diodes are built in</b>: no extra diodes for the motor's switch-off spikes.</p>
+  <p><b>How it works inside: the H-bridge.</b> To reverse a DC motor, you reverse the current through it. An H-bridge is four switches arranged like the letter <b>H</b>, with the motor as the middle bar. Close top-left and bottom-right: current flows left → right. Close the other diagonal: right → left. The L293D has four "half-bridges" (1Y, 2Y, 3Y, 4Y): each output is switched either to + or to ground, copying its input. Two outputs make one H-bridge. Because each output is either + or −, never both, you can't make the deadly short circuit of closing both switches on one side.</p>
+  <p><b>Water analogy:</b> a water wheel in a pipe between two tanks. Raise the left tank and lower the right: it turns one way. Swap them: it turns the other way. Same level on both sides: it stops. The L293D is the one lifting the tanks.</p>
+  <div class="controls"><button id="hbF">▶ Forward (1A=1, 2A=0)</button><button id="hbR">◀ Reverse (1A=0, 2A=1)</button><button id="hbB">■ Brake (1A=2A)</button><button id="hbC">○ Coast (EN=0)</button><label class="slider" style="flex:1">Speed (PWM on EN)<input id="hbS" type="range" min="0" max="100" step="1" value="100" style="flex:1;width:auto"></label></div>
+  <canvas id="c293" width="800" height="300"></canvas>
+  <table>
+    <tr><td>EN</td><td>1A</td><td>2A</td><td>Motor</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>Turns one way (forward)</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>Turns the other way (reverse)</td></tr>
+    <tr><td>1</td><td>same</td><td>same</td><td><b>Brake</b>: both ends at the same voltage, the motor is short-circuited through the chip and stops quickly</td></tr>
+    <tr><td>0</td><td>×</td><td>×</td><td><b>Coast</b>: outputs off, the motor spins down freely</td></tr>
+    <tr><td>PWM</td><td>1</td><td>0</td><td>Forward at reduced speed (on/off very fast, like the <a class="navlink" href="#p23">PWM of project 23</a>)</td></tr>
+  </table>
+  <p class="hint">Good to know: the L293D uses bipolar transistors, which lose about <b>1.5–3 V</b> in total, so from a 9 V battery the motor gets about 6–7 V, and the chip gets warm (the 4 middle ground pins are its heat sink). Modern MOSFET drivers (TB6612, DRV8833) lose much less. Used in <a class="navlink" href="#p24">project 24: motor forward / reverse</a>. How the motor itself works: <a data-page="motion" class="navlink">Sound &amp; motion</a>.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="293"></div>
+  <h3 class="cx-h">📌 L293D pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="293"></div>
+</section>
+
+<section id="s4056">
+  <h2><span class="num">17</span>TP4056 Li-ion charger: filling a battery safely</h2>
+  <p><b>What it does:</b> it charges a single <b>Li-ion / Li-po cell</b> (like an 18650) from 5 V USB, the safe way: first with a <b>constant current</b> (up to 1 A), then with a <b>constant voltage</b> of exactly <b>4.2 V</b> while the current fades, then it stops. Two pins drive a red "charging" and a green "done" LED. It's the chip on the charger module of <a class="navlink" href="#rl1">real-life build A</a>, a tiny 8-pin SOP soldered on the board.</p>
+  <p><b>How it works inside:</b> a power transistor between VCC and BAT acts as an adjustable valve. A control loop watches the battery: below 4.2 V it regulates the <b>current</b> (set by the PROG resistor: I = 1200 ÷ R); at 4.2 V it switches to holding the <b>voltage</b>. When the current falls to a tenth of the setting, the cell is full: CHRG turns off, STDBY turns on. A thermal loop lowers the current if the chip gets too hot.</p>
+  <p><b>Water analogy:</b> filling a bottle from a tap: full flow at first, then you slow down as you approach the brim, and stop exactly at the line. Over-filling a Li-ion cell (above ~4.25 V) is dangerous, hence the precise chip.</p>
+  <div class="controls"><button id="tpGo" class="active">▶ Charge (sped up)</button><label class="slider" style="flex:1">PROG resistor<input id="tpR" type="range" min="0" max="3" step="1" value="3" style="flex:1;width:auto"></label><span id="tpRl" class="hint"></span></div>
+  <canvas id="c4056" width="800" height="280"></canvas>
+  <p class="hint">The TP4056 does <b>not</b> protect against over-discharge or short circuits: that's the job of the separate protection chip (DW01A + dual MOSFET) on the BMS module, or on "protected" TP4056 boards (6 pins: IN+, IN−, B+, B−, OUT+, OUT−).</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="4056"></div>
+  <h3 class="cx-h">📌 TP4056 pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="4056"></div>
+</section>
+<section id="s328">
+  <h2><span class="num">18</span>ATmega328P: the brain of the Arduino</h2>
+  <p><b>What it does:</b> it's a complete little <b>computer on one chip</b>: a processor, 32 KB of memory for your program, 2 KB of working memory, and 23 input/output pins that your code can switch, read, time and measure. The Arduino Uno (and the ONE-C, with its cousin the ATmega328P<b>B</b>) is just this chip plus USB, a 16 MHz crystal and a 5 V regulator. It runs the dice (<a class="navlink" href="#p12">project 12</a>) and the thermometer (<a class="navlink" href="#p20">project 20</a>).</p>
+  <p><b>How it works inside:</b> a <b>CPU</b> reads your program from <b>Flash</b> memory and executes ~16 million simple instructions per second, ticking with the crystal. It talks to the outside through <b>ports</b> (B, C, D): each pin is a tiny switch to 5 V or 0 V (digitalWrite), or an input (digitalRead). Some pins have extras: an <b>ADC</b> (analogRead, 6 pins A0–A5, 10 bits = 0–1023), <b>timers</b> for PWM (analogWrite on 6 pins), serial (TX/RX to the PC).</p>
+  <p><b>Water analogy:</b> a control room with 23 valves and gauges, and an operator (the CPU) who follows a written procedure (your program) 16 million steps per second.</p>
+  <div class="controls"><label class="slider" style="flex:1">Potentiometer on A0<input id="avA0" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label></div>
+  <canvas id="c328" width="800" height="280"></canvas>
+  <p class="hint">The demo runs a tiny program: <code>value = analogRead(A0); analogWrite(9, value / 4); digitalWrite(13, millis() / 500 % 2);</code>. Arduino pin names (D0–D13, A0–A5) are not the chip's pin numbers: D13 is chip pin 19, A0 is pin 23.</p>
+  <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
+  <p class="hint">The chip as it really sits (seen from above, notch at the top): each leg goes straight out to what it connects to. Hover a leg or a table row to highlight it.</p>
+  <div class="chmin" data-chip="328"></div>
+  <h3 class="cx-h">📌 ATmega328P pinout and what each pin does</h3>
+  <p class="hint">Tap or hover a pin (on the chip, in the schematic or in the table) to see what it does and how to wire it. Colours: red = power, grey = ground, blue = input, green = output, amber = control.</p>
+  <div class="chipx" data-chip="328"></div>
+</section>
+<section id="chrecap">
+  <h2><span class="num">19</span>Recap</h2>
+  <ul>
+    <li>A chip is a whole circuit (mostly transistors) in one package. Pin 1 is by the notch, numbered anticlockwise. Always connect power and add a 100 nF capacitor beside it.</li>
+    <li><b>NE555:</b> fills and drains a capacitor between ⅓ and ⅔, which gives blinks, tones and delays.</li>
+    <li><b>7805:</b> an automatic valve that holds exactly 5 V, turning the extra into heat.</li>
+    <li><b>LM358:</b> compares two voltages (yes/no) or amplifies precisely with feedback.</li>
+    <li><b>LM339:</b> four comparators with open-collector outputs: each one pulls to ground when − is above +.</li>
+    <li><b>LM386:</b> push-pull power to drive a speaker, with gain 20–200 (your Ruby amp).</li>
+    <li><b>CD4017:</b> moves a single "on" along 10 outputs, one per clock pulse.</li>
+    <li><b>CD4511:</b> turns a 4-bit number into the 7 segments of a digit.</li>
+    <li><b>CD4518:</b> two decimal counters (0–9) that chain into 00–99.</li>
+    <li><b>CD4013:</b> two 1-bit memories that copy D to Q on the clock edge; Q̅ → D makes a divide-by-2.</li>
+    <li><b>CD4060:</b> a quartz oscillator plus 14 divide-by-2 stages: 32.768 kHz → 2 Hz.</li>
+    <li><b>74HC595:</b> shifts bits in one by one, then latches all 8 outputs at once.</li>
+    <li><b>LM3914:</b> 10 comparators on a resistor ladder turn a voltage into a bar of LEDs.</li>
+    <li><b>L293D:</b> two H-bridges: each motor end is switched to + or −, so the motor can turn both ways.</li>
+    <li><b>TP4056:</b> charges a Li-ion cell with constant current, then exactly 4.2 V.</li>
+    <li><b>ATmega328P:</b> a whole computer on a chip, the brain of the Arduino.</li>
+    <li>The <b>LM35</b> temperature chip is on the <a class="navlink" href="#selm35">Sensors</a> page.</li>
+  </ul>
+</section></div></div>
+</main>

@@ -1,0 +1,20 @@
+
+  <h3>Try it: push past the limit</h3>
+  <p>This capacitor is <b>1000 µF, rated 16 V</b>. Move the battery voltage slider and watch the rubber sheet.</p>
+  <ul>
+    <li><b>Below 16 V:</b> the sheet stretches, the flow stops, and it's fully charged. A higher voltage just means more stretch and more charge.</li>
+    <li><b>Near 16 V:</b> the sheet is under strain. A tiny leak appears, and in real life the capacitor wears out faster.</li>
+    <li><b>Above 16 V:</b> the sheet is overstretched. After a moment it <b>tears</b>, and water then flows straight through the hole <i>non-stop</i>. That isn't charging, it's a broken capacitor acting like a short circuit.</li>
+  </ul>
+  <div class="controls">
+    <label class="slider" style="flex:1">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9" style="flex:1;width:auto"></label>
+    <b id="bVlab" style="min-width:52px">9 V</b>
+    <button id="bNew">🔧 Replace capacitor</button>
+  </div>
+  <div class="readout">
+    <span>Capacitor voltage: <b id="bVc">0 V</b></span>
+    <span>Charge stored: <b id="bQ">0 mC</b></span>
+    <span>Status: <b id="bStat">charging</b></span>
+  </div>
+  <canvas id="cBurst" width="800" height="320"></canvas>
+  <p class="hint">Try 9 V, then 12 V: both stop flowing, but 12 V stores more. Then try 20 V or 25 V. The higher you go over the rating, the faster it fails.</p>

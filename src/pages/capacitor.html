@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="color-scheme" content="dark">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How a Capacitor Works</title>
+<style>
+  :root{
+    --bg:#0b1120; --card:#151e30; --ink:#e2e8f0; --muted:#94a3b8; --line:#2a3650;
+    --water:#3b82f6; --water-light:#bcd6fb; --accent:#f59e0b; --good:#10b981; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:40px 20px 34px;text-align:center}
+  header h1{margin:0 0 6px;font-size:2.2rem}
+  header p{margin:0;opacity:.9;font-size:1.1rem}
+  main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  h2{margin-top:0;font-size:1.4rem}
+  h2 .num{display:inline-block;background:var(--water);color:#fff;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;font-size:1rem;margin-right:8px}
+  .tldr{font-size:1.15rem;background:#1b2e4f;border-left:5px solid var(--water);padding:14px 18px;border-radius:8px}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#0b1220;border:1px solid var(--line)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 8px}
+  button{font:inherit;font-weight:600;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;background:#2a3650;color:var(--ink);transition:.15s}
+  button:hover{filter:brightness(.95)}
+  button.active{background:var(--water);color:#fff}
+  button.active.dis{background:var(--accent)}
+  button.active.hold{background:#64748b}
+  label.slider{display:flex;align-items:center;gap:8px;font-size:.95rem;color:var(--muted)}
+  input[type=range]{width:140px}
+  .readout{display:flex;gap:18px;flex-wrap:wrap;font-size:.95rem;margin:6px 0 10px}
+  .readout b{font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;font-weight:600}
+  .hint{color:var(--muted);font-size:.95rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .map{display:grid;grid-template-columns:1fr auto 1fr;gap:8px 12px;align-items:center}
+  .map div{padding:8px 12px;border-radius:8px}
+  .map .w{background:#1b2e4f}.map .e{background:#3a2c12}.map .arrow{text-align:center;color:var(--muted)}
+  .map .h{font-weight:700;background:none}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#101827}
+  .card .ico{font-size:1.8rem}
+  .card h3{margin:6px 0 4px;font-size:1.05rem}
+  .card p{margin:0;font-size:.93rem;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  td:first-child{font-weight:600;width:34%}
+  .warn{background:#3a1a1d;border-left:5px solid var(--bad);padding:12px 16px;border-radius:8px}
+  #fPress{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  code{background:#2a3650;padding:1px 6px;border-radius:5px}
+  .navlink{color:#93c5fd;text-decoration:none;font-weight:600;cursor:pointer}
+  .navlink:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<header>
+  <h1>The Capacitor</h1>
+  <p>A tiny, very fast rechargeable store of electric charge</p>
+</header>
+<main>
+<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
+
+<section>
+  <h2><span class="num">1</span>The short version</h2>
+  <p class="tldr">A capacitor is <b>two metal plates separated by an insulator</b>.
+  Electricity can't pass through the gap, but charge can <b>pile up</b> on the plates. It fills up quickly, holds the charge,
+  and can release it all at once.</p>
+  <p>Think of it as a very small battery that charges and empties in a fraction of a second.
+  A battery stores energy using chemistry. A capacitor stores it as charge sitting on the plates.</p>
+</section>
+
+<section>
+  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <p>Batteries and power supplies are great at giving <b>steady</b> energy, but they are slow to react, and the electricity they deliver is never perfectly clean.
+  Capacitors fix those problems. They do <b>five main jobs</b>:</p>
+  <div class="cards">
+    <div class="card"><div class="ico">⚡</div><h3>1. Quick energy reserve</h3><p><b>Why:</b> some parts need a big burst instantly, such as a camera flash or a chip switching on. A battery can't deliver that fast enough, but a capacitor can empty in a split second.<br><i>Water:</i> a bucket ready to dump, instead of waiting for a slow tap.</p></div>
+    <div class="card"><div class="ico">〰️</div><h3>2. Smoothing</h3><p><b>Why:</b> power from a wall adapter comes in bumps. The capacitor fills during the peaks and gives back during the dips, so the voltage stays steady and devices don't glitch.<br><i>Water:</i> a water tower that keeps pressure even when the pump pulses.</p></div>
+    <div class="card"><div class="ico">🚧</div><h3>3. Blocking DC, passing signals</h3><p><b>Why:</b> in audio, you want the <b>music</b> to go from one stage to the next, but not the steady DC voltage, which would cause distortion or damage. A capacitor lets only the changing part through.<br><i>Water:</i> the rubber sheet (see section 5).</p></div>
+    <div class="card"><div class="ico">🔇</div><h3>4. Filtering noise and tone</h3><p><b>Why:</b> capacitors let fast wiggles through more easily than slow ones. Used cleverly, they dump hiss and buzz to ground, or cut treble (your guitar's tone knob).<br><i>Water:</i> a side drain that only swallows quick ripples.</p></div>
+    <div class="card"><div class="ico">⏱️</div><h3>5. Timing</h3><p><b>Why:</b> filling through a resistor always takes the same time, so circuits use it as a clock: blinking LEDs, delays, and the "hold" before lights turn off.<br><i>Water:</i> an hourglass that always takes the same time to fill.</p></div>
+  </div>
+  <p style="margin-top:14px"><b>In one sentence:</b> capacitors are used wherever a circuit needs to <b>store a little energy for a moment</b>,
+  <b>steady</b> a voltage, <b>separate</b> signals from DC, or <b>measure time</b>. That's why almost every electronic device contains dozens of them.</p>
+</section>
+
+<section>
+  <h2><span class="num">3</span>The water analogy: a rubber sheet in a pipe</h2>
+  <p>Picture a water pipe with a <b>stretchy rubber sheet</b> sealed across the middle. Water <i>cannot</i> pass through the sheet.</p>
+  <ul>
+    <li>Turn on the <b>pump</b> (the battery). Water rushes in on one side and stretches the sheet. The same amount of water is pushed out of the other side, so water flows around the whole loop.</li>
+    <li>As the sheet stretches, it <b>pushes back</b> harder and harder. The flow slows down, and when the sheet's push equals the pump's push, the flow <b>stops</b>. The capacitor is now <b>full</b>.</li>
+    <li>Remove the pump and the stretched sheet springs back, pushing the water the <b>other way</b>. That's <b>discharging</b>.</li>
+  </ul>
+  <p class="hint">Try it: press <b>Charge</b>, wait, then <b>Hold</b>, then <b>Discharge</b>. The moving dashes show the flow.</p>
+
+  <div class="controls">
+    <button id="bCharge">▶ Charge</button>
+    <button id="bHold">⏸ Hold (close valve)</button>
+    <button id="bDis">↩ Discharge</button>
+    <button id="bReset">Reset</button>
+    <label class="slider">Pump pressure (voltage)<input id="sV" type="range" min="0.3" max="1" step="0.05" value="0.9"></label>
+    <label class="slider">Capacitor size<input id="sC" type="range" min="0.5" max="4" step="0.1" value="1.5"></label>
+  </div>
+  <div class="readout">
+    <span>Mode: <span id="rMode" class="pill" style="background:#e5e9f2">idle</span></span>
+    <span>Charge stored: <b id="rQ">0%</b></span>
+    <span>Flow right now: <b id="rI">0%</b></span>
+  </div>
+  <canvas id="cWater" width="800" height="300"></canvas>
+
+  <h3 style="margin-bottom:4px">The same thing as a real circuit</h3>
+  <p class="hint" style="margin-top:0">The yellow dots are electrons. The <b>+</b> and <b>−</b> signs are charge piling up on the plates. Not a single electron crosses the gap.</p>
+  <canvas id="cCirc" width="800" height="300"></canvas>
+
+  <h3 style="margin-bottom:4px">What it looks like over time</h3>
+  <canvas id="cGraph" width="800" height="210"></canvas>
+  <p class="hint">Notice the shape. The flow (orange) is <b>strongest at the start</b> and fades away. The stored charge (blue) rises fast at first, then levels off.
+  A <b>bigger</b> capacitor takes longer to fill, like a bigger, softer rubber sheet. Try the size slider.</p>
+</section>
+
+<section>
+  <h2><span class="num">4</span>Translating water ↔ electricity</h2>
+  <div class="map">
+    <div class="h">Water</div><div></div><div class="h">Electricity</div>
+    <div class="w">Pump</div><div class="arrow">→</div><div class="e">Battery / power supply</div>
+    <div class="w">Water pressure</div><div class="arrow">→</div><div class="e">Voltage (V)</div>
+    <div class="w">Flow of water</div><div class="arrow">→</div><div class="e">Current (A)</div>
+    <div class="w">Narrow pipe</div><div class="arrow">→</div><div class="e">Resistor (Ω)</div>
+    <div class="w">Rubber sheet</div><div class="arrow">→</div><div class="e">Insulator between the plates</div>
+    <div class="w">How much the sheet is stretched</div><div class="arrow">→</div><div class="e">Charge stored (Q)</div>
+    <div class="w">Size / softness of the sheet</div><div class="arrow">→</div><div class="e">Capacitance (F, farads)</div>
+  </div>
+  <p style="margin-top:14px">The key formula is <code>Q = C × V</code>: <b>charge stored = capacitance × voltage</b>.
+  In water terms, a bigger, softer sheet (more C) holds more water at the same pressure (V).</p>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Its superpower: blocks steady flow, lets wiggles through</h2>
+  <div style="border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 14px;background:#101827">
+  <h4 style="margin:0 0 6px;font-size:1.05rem">📖 First: what are DC and AC?</h4>
+  <table>
+    <tr><td>DC: <b>Direct Current</b></td><td>Flows in <b>one direction</b> and stays <b>steady</b>. Like a <b>river</b>. Examples: batteries, USB (5 V), a phone charger's output.</td></tr>
+    <tr><td>AC: <b>Alternating Current</b></td><td>Keeps <b>changing direction</b>, back and forth. Like <b>waves sloshing</b> in a bathtub. Examples: the wall socket (230 V, 50 times a second in France), a guitar or music signal.</td></tr>
+  </table>
+  <p style="margin:10px 0 0">People also say <b>"DC"</b> for the <b>steady part of a signal</b>, and <b>"AC"</b> for the part that <b>wiggles</b>. A signal can be both at once: a wiggle riding on a steady level, as in example C below.</p>
+  </div>
+  <p>Because of the rubber sheet, a <b>steady push</b> (DC, like a battery) only moves water briefly, until the sheet is stretched. After that, nothing flows.
+  A <b>back-and-forth push</b> (AC, like an audio signal) makes the sheet flex one way and then the other, <i>forever</i>. Water keeps sloshing, so the waterwheel keeps moving.</p>
+  <div class="controls">
+    <button id="bDC">Steady push (DC / battery)</button>
+    <button id="bAC">Back-and-forth push (AC / music signal)</button>
+    <button id="bOff">Off</button>
+  </div>
+  <canvas id="cACDC" width="800" height="250"></canvas>
+  <p class="hint">This is why guitar amps and audio gear put capacitors between stages. The <b>music</b> (a fast wiggle) passes through,
+  while unwanted <b>steady DC voltage</b> is blocked. This job is called a <b>coupling capacitor</b>.</p>
+</section>
+
+<section>
+  <h2><span class="num">6</span>Where you'll find capacitors</h2>
+  <div class="cards">
+    <div class="card"><div class="ico">📸</div><h3>Camera flash</h3><p>A capacitor charges slowly (that whine you hear), then dumps everything in one bright burst.</p></div>
+    <div class="card"><div class="ico">🔌</div><h3>Power supplies</h3><p>They smooth out bumpy voltage. Like a water tower, they top up the dips and absorb the peaks.</p></div>
+    <div class="card"><div class="ico">🎸</div><h3>Audio and guitar amps</h3><p>They pass the music signal between stages while blocking DC. They also shape tone, for example in a guitar's tone knob.</p></div>
+    <div class="card"><div class="ico">⏱️</div><h3>Timers and blinkers</h3><p>A capacitor filling through a resistor takes a predictable time. That sets the blink rate of an LED.</p></div>
+    <div class="card"><div class="ico">💻</div><h3>Next to every chip</h3><p>Small "decoupling" caps sit by each chip as a local reserve, giving instant energy when the chip needs a burst.</p></div>
+    <div class="card"><div class="ico">📱</div><h3>Touchscreens</h3><p>Your finger changes the capacitance of the screen, so the phone knows where you touched.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">7</span>Different sizes ("strengths") and what each is used for</h2>
+  <p>Capacitors come in a huge range of sizes, from tiny to enormous. The "strength" of a capacitor means two different things:</p>
+  <ul>
+    <li><b>Capacitance (size)</b>, in farads: <i>how much</i> charge it holds. In water terms, how big and stretchy the rubber sheet is.</li>
+    <li><b>Voltage rating</b>, in volts: <i>how much pressure</i> it can take before it fails. In water terms, how thick and tough the sheet is.</li>
+  </ul>
+
+  <h3>Capacitance: from thimble to swimming pool</h3>
+  <p class="tldr" style="font-size:1rem"><b>Rule of thumb:</b> <b>small</b> capacitors fill and empty in a flash, so they deal with <b>fast</b> things like high frequencies and noise.
+  <b>Big</b> capacitors hold more energy and react slowly, so they deal with <b>slow</b> things like power, smoothing and long delays.</p>
+  <p class="hint">Drag the slider to see how size changes the job. The fill time assumes the capacitor fills through the same 1 kΩ resistor every time.</p>
+  <div class="controls"><label class="slider" style="flex:1">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7" style="flex:1;width:auto"></label></div>
+  <canvas id="cSize" width="800" height="230"></canvas>
+
+  <table style="margin-top:14px">
+    <tr><td>🥄 <b>pF</b> (picofarads)<br><span class="hint">a thimble</span></td><td>Radio tuning, high-frequency filters, and the two little 22 pF caps beside a microcontroller's crystal.</td></tr>
+    <tr><td>☕ <b>nF</b> (nanofarads)<br><span class="hint">a cup</span></td><td>The famous <b>100 nF</b> "decoupling" cap next to every chip, guitar tone controls (22–47 nF), and noise filters.</td></tr>
+    <tr><td>🪣 <b>1–100 µF</b><br><span class="hint">a bucket</span></td><td>Passing audio between stages (coupling), timing and blinking circuits, and LED fade-outs.</td></tr>
+    <tr><td>🛁 <b>100–10,000 µF</b><br><span class="hint">a bathtub</span></td><td>Power supply smoothing, and energy reserves for amplifiers and motors.</td></tr>
+    <tr><td>🏊 <b>Farads</b> (supercapacitors)<br><span class="hint">a swimming pool</span></td><td>Keeping a clock or memory alive during power cuts, torches that charge in seconds, and buses that recover braking energy.</td></tr>
+  </table>
+
+  <h3>Voltage rating: how tough the rubber sheet is</h3>
+  <p>Every capacitor has a maximum voltage printed on it, such as <code>16V</code>, <code>25V</code> or <code>400V</code>.
+  Exceed it and the insulator breaks down, like a rubber sheet bursting under too much pressure. The part fails, and electrolytics can bulge or pop.</p>
+  <ul>
+    <li><b>Rule of thumb:</b> choose a rating around <b>1.5–2× the voltage</b> in your circuit. For a 9 V circuit, use 16 V or 25 V caps.</li>
+    <li>A higher rating never hurts the circuit. It just means a physically bigger and pricier part. A thicker sheet needs more room.</li>
+    <li>That's why a 1000 µF 16 V capacitor is fingertip-sized, but a 1000 µF 400 V one is the size of a drinks can.</li>
+  </ul>
+  <h3>Try it: push past the limit</h3>
+  <p>This capacitor is <b>1000 µF, rated 16 V</b>. Move the battery voltage slider and watch the rubber sheet.</p>
+  <ul>
+    <li><b>Below 16 V:</b> the sheet stretches, the flow stops, and it's fully charged. A higher voltage just means more stretch and more charge.</li>
+    <li><b>Near 16 V:</b> the sheet is under strain. A tiny leak appears, and in real life the capacitor wears out faster.</li>
+    <li><b>Above 16 V:</b> the sheet is overstretched. After a moment it <b>tears</b>, and water then flows straight through the hole <i>non-stop</i>. That isn't charging, it's a broken capacitor acting like a short circuit.</li>
+  </ul>
+  <div class="controls">
+    <label class="slider" style="flex:1">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9" style="flex:1;width:auto"></label>
+    <b id="bVlab" style="min-width:52px">9 V</b>
+    <button id="bNew">🔧 Replace capacitor</button>
+  </div>
+  <div class="readout">
+    <span>Capacitor voltage: <b id="bVc">0 V</b></span>
+    <span>Charge stored: <b id="bQ">0 mC</b></span>
+    <span>Status: <b id="bStat">charging</b></span>
+  </div>
+  <canvas id="cBurst" width="800" height="320"></canvas>
+  <p class="hint">Try 9 V, then 12 V: both stop flowing, but 12 V stores more. Then try 20 V or 25 V. The higher you go over the rating, the faster it fails.</p>
+
+</section>
+
+<section>
+  <h2><span class="num">8</span>Simple example circuits</h2>
+  <p>Here are four small circuits you'll meet again and again. In each one you can <b>swap the capacitor size</b> and see what changes.</p>
+
+  <h3>A. LED that fades out slowly (energy reserve)</h3>
+  <p>A battery, a push button, and an LED with its resistor. A capacitor sits beside the LED. Pressing the button lights the LED and fills the capacitor.
+  When you let go, the capacitor <b>keeps feeding the LED</b> for a while, so it fades instead of snapping off.
+  <b>Why:</b> this is the "dim slowly" effect in car interior lights and the glow that lingers on a charger after you unplug it.</p>
+  <div class="controls"><button id="fPress" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="fChoices"></span></div>
+  <canvas id="cFade" width="800" height="260"></canvas>
+  <p class="hint">Bigger capacitor = bigger reserve = longer fade. 10 µF is gone almost instantly, while 1000 µF glows for seconds.</p>
+
+  <h3>B. Power supply smoothing (the water tower)</h3>
+  <p>Electricity from the wall is <b>AC</b>: it swings back and forth 50 times a second. A <b>diode</b>, a one-way valve, lets only the forward pushes through,
+  which leaves a stream of <b>bumps</b>. A big capacitor fills at each bump and <b>tops up the gaps</b> in between, so the output is almost flat.
+  <b>Why:</b> every phone charger, guitar amp and computer needs steady DC, and this is how they get it.</p>
+  <div class="controls"><span id="pChoices"></span></div>
+  <canvas id="cSmooth" width="800" height="260"></canvas>
+  <p class="hint">Slowed down so you can see it. With no capacitor the lamp flickers. Bigger capacitors give smaller dips ("ripple"), which is why power supplies use the bathtub-sized ones.</p>
+
+  <h3>C. Coupling capacitor in audio (pass the music, block the DC)</h3>
+  <p>Inside an amp, the guitar signal often <b>rides on top of a steady DC voltage</b>, which the circuit needs to work. Sending that DC into the next stage would upset it.
+  A capacitor in series passes the <b>wiggles</b> (the music) and blocks the DC. The output is the same sound, now centred on zero.
+  <b>Why:</b> it's used between almost every stage of an amplifier, and on the input of a guitar amp or pedal.</p>
+  <div class="controls"><span id="kChoices"></span></div>
+  <canvas id="cCouple" width="800" height="270"></canvas>
+  <p class="hint">Size matters here too. A capacitor that is <b>too small</b> only lets fast wiggles (treble) through, so the bass disappears and the sound gets thin. That's also how a <b>tone control</b> works on purpose.</p>
+  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <h4 style="margin:0 0 8px;font-size:1.1rem">🔍 Why does the output end up centred on 0?</h4>
+  <p style="margin-top:0">The signal is made of <b>two parts</b>: a <b>steady 4.5 V</b> (DC) plus a <b>wiggle of ±0.5 V</b> (the music), so it moves between 4 V and 5 V.</p>
+  <ol>
+    <li><b>The steady 4.5 V stretches the rubber sheet once and it stays stretched.</b> The capacitor is now charged to 4.5 V. A steady push causes no more flow, so the sheet <i>absorbs</i> it.</li>
+    <li><b>The wiggle makes the sheet flex</b> a bit more, then a bit less. Each flex pushes water back and forth on the other side, so the wiggle gets through.</li>
+    <li>The capacitor keeps holding 4.5 V, so the output is always <b>input − 4.5 V</b>:</li>
+  </ol>
+  <table style="max-width:520px;margin:6px 0 12px">
+    <tr><td>Input</td><td>− capacitor holds</td><td>= Output</td></tr>
+    <tr><td>5.0 V (top)</td><td>− 4.5 V</td><td><b>+0.5 V</b></td></tr>
+    <tr><td>4.5 V (middle)</td><td>− 4.5 V</td><td><b>0 V</b></td></tr>
+    <tr><td>4.0 V (bottom)</td><td>− 4.5 V</td><td><b>−0.5 V</b></td></tr>
+  </table>
+  <p><b>Why exactly the average?</b> The next stage has a resistor to ground (0 V). If the output sat above 0 on average, current would flow through that resistor and charge the capacitor a bit more, pulling the output down. If it sat below 0, the opposite would happen. It only stops adjusting when the output averages exactly <b>0</b>.</p>
+  <p><b>Try it:</b> press <b>Plug in</b> to start with an <i>empty</i> capacitor. At first the output is the same as the input, still sitting up at 4.5 V. Then watch the capacitor fill up to the average, which slides the output down until it is centred on 0. Notice the output <b>already wiggles</b> while it slides: the music passes from the very first moment.
+  Both graphs use the <b>same scale</b>, so you can see the shift.</p>
+  <div class="controls"><button id="zPlug">🔌 Plug in (empty capacitor)</button><button id="zSettled">Skip to settled</button></div>
+  <canvas id="cCenter" width="800" height="360"></canvas>
+  <p class="hint" style="margin-bottom:0">🚤 <b>Boat analogy:</b> you hold a rope tied to a boat on a lake. You feel the <b>waves</b> tugging back and forth, but never the <b>height</b> of the lake. The capacitor is the rope: it passes the movement on and ignores the level.</p>
+  </div>
+  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 But I thought a full capacitor blocks current?</h4>
+  <p style="margin-top:0">"Full" doesn't mean closed for good. It means <b>in balance</b>: the capacitor pushes back exactly as hard as the input pushes, so nothing flows.</p>
+  <ul>
+    <li><b>Steady push (DC):</b> the push never changes, so once balanced it <b>stays</b> balanced, and the current stops for good. That's how DC gets blocked.</li>
+    <li><b>Changing push (music):</b> the balance keeps breaking. When the input rises above what the capacitor holds, a little charge flows <b>in</b>. When it drops below, a little flows <b>back out</b>. Current keeps sloshing back and forth.</li>
+    <li><b>No charge ever crosses the gap.</b> Charge arriving on one plate pushes the same amount <i>off</i> the other plate. From outside it looks like current passed through, just as pushing the rubber sheet moves the water on the other side.</li>
+  </ul>
+  <p><b>The wobble doesn't wait for the capacitor to fill.</b> The capacitor does two jobs at the same time: it <b>slowly absorbs</b> the steady part and <b>immediately passes</b> the changes. (Don't confuse the capacitor's voltage, which is what it currently holds, with its <i>voltage rating</i>, which is its burst limit.)</p>
+  <div class="controls"><span id="eChoices"></span></div>
+  <canvas id="cElec" width="800" height="270"></canvas>
+  <p class="hint" style="margin-bottom:0">Watch the two bars. When they're equal, nothing moves. With the steady push they become equal and stay that way. With music they never stay equal for long, so the charges keep moving on <b>both</b> sides of the gap.</p>
+  </div>
+
+  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <h4 style="margin:0 0 8px;font-size:1.1rem">📏 Why does the size (pF, nF, 100 nF) change the sound?</h4>
+  <p style="margin-top:0"><b>Rule: a capacitor blocks any change slow enough for it to catch up with.</b>
+  The capacitor always tries to <b>match</b> the input. When it matches, nothing gets through. So the question is: <i>can it catch up before the wiggle turns around?</i></p>
+  <ul>
+    <li><b>Small capacitor</b> (a thimble): fills almost instantly. It keeps up with slow wiggles (bass) and cancels them. Only fast wiggles (treble) escape. Result: a <b>thin, tinny</b> sound.</li>
+    <li><b>Big capacitor</b> (a bathtub): fills slowly and can't keep up with bass or treble. Everything passes. Result: a <b>full</b> sound.</li>
+    <li><b>DC</b> is the slowest change there is, a push that never changes. Every capacitor eventually catches up with it, so DC is <b>always</b> blocked.</li>
+  </ul>
+  <div class="controls"><span id="sChoices"></span></div>
+  <canvas id="cRace" width="800" height="300"></canvas>
+  <p class="hint">Orange is the input. Blue is the capacitor trying to keep up. The <b>green gap</b> between them is what gets through to the output.</p>
+  <p>With real numbers (the next stage has a 1 MΩ resistor), the catch-up time is <b>resistance × capacitance</b>:</p>
+  <table>
+    <tr><td>Capacitor</td><td>Catch-up time</td><td>Bass (100 Hz, flips every 5 ms)</td><td>Treble (5 kHz, flips every 0.1 ms)</td><td>Sound</td></tr>
+    <tr><td>100 pF</td><td>0.1 ms</td><td>caught: <b>blocked</b></td><td>about as fast: partly blocked</td><td>very tinny</td></tr>
+    <tr><td>1 nF</td><td>1 ms</td><td>partly caught: <b>reduced</b></td><td>too fast: <b>passes</b></td><td>thin</td></tr>
+    <tr><td>100 nF</td><td>100 ms</td><td>too fast: <b>passes</b></td><td><b>passes</b></td><td>full</td></tr>
+  </table>
+  <p class="hint" style="margin-bottom:0">🚪 <b>Door analogy:</b> you push and pull a door, and someone on the other side tries to match you. If they're <b>quick</b> (small capacitor), they cancel your slow pushes and only your fast jabs get through. If they're <b>slow</b> (big capacitor), every push gets through. A guitar's <b>tone knob</b> uses this on purpose to separate bass from treble.</p>
+  </div>
+
+
+
+  <h3>D. Decoupling capacitor next to a chip (a local reserve)</h3>
+  <p>Chips such as microcontrollers and op-amps draw power in <b>sudden little gulps</b>. The power has to travel down a long wire, so it can't arrive fast enough, and the voltage at the chip briefly sags.
+  If it sags too far, the chip glitches or resets. A small <b>100 nF</b> capacitor placed <b>right beside</b> the chip supplies each gulp instantly.
+  <b>Why:</b> it's a cheap fix for random crashes, so every chip's datasheet asks for one.</p>
+  <div class="controls"><button id="dToggle">Add the 100 nF capacitor</button></div>
+  <canvas id="cDecouple" width="800" height="260"></canvas>
+  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 Why does a long wire make the voltage sag?</h4>
+  <p style="margin-top:0">It's not mainly because the wire is "far". It's because <b>the current in a wire has inertia</b>, like the water in a long pipe.</p>
+  <ul>
+    <li><b>Small reason: resistance.</b> Every wire loses a little voltage (current × resistance). On a circuit board that's only a few millivolts, so it's not the real problem.</li>
+    <li><b>Big reason: inertia (called <i>inductance</i>).</b> Picture a long pipe full of still water with a tap at the end. When the tap suddenly opens, the whole column of water has to <b>speed up</b> first. During that moment the <b>pressure at the tap drops</b>: it wants water now, but the pipe can't deliver it yet. It's like your shower going weak when someone opens another tap. A wire resists sudden changes in current in the same way, and the longer the wire, the more "water" there is to get moving.</li>
+  </ul>
+  <p><b>Why chips care:</b> chips switch in a few <b>nanoseconds</b> (billionths of a second), and at that speed even a few centimetres of wire counts as long. Rough numbers: a 10 cm wire has about 100 nH of inductance. If the chip suddenly wants 0.1 A more within 10 ns, the sag ≈ 100 nH × (0.1 A ÷ 10 ns) ≈ <b>1 V</b>. On a 3.3 V or 5 V chip that's huge, enough to cause a glitch or reset. The power supply also needs time to react, so it can't fix the dip fast enough either.</p>
+  <p><b>The fix:</b> a small <b>tank right next to the tap</b>. When the tap opens suddenly, the tank supplies the water instantly while the long pipe catches up, then the pipe refills it calmly. That's why the 100 nF capacitor must sit <b>right beside</b> the chip's power pin. If it's far away, there's still a stretch of pipe between the tank and the tap, and the problem is only partly fixed.</p>
+  <div class="controls"><span id="lChoices"></span></div>
+  <canvas id="cPipe" width="800" height="350"></canvas>
+  <p class="hint" style="margin-bottom:0">Watch the dashes in the long pipe. They speed up <b>slowly</b> after each gulp, which is the inertia. Compare the dip on the pressure gauge and the graph with no tank, with a tank far away, and with a tank right beside the chip.</p>
+  </div>
+
+</section>
+
+<section>
+  <h2><span class="num">9</span>Key facts</h2>
+  <div class="grid2">
+    <div>
+      <canvas id="cSym" width="380" height="170"></canvas>
+      <p class="hint" style="text-align:center">Left: normal (ceramic/film). Right: polarized (electrolytic). The curved or marked plate is −.</p>
+    </div>
+    <table>
+      <tr><td>Unit</td><td>Farad (F). 1 F is huge, so you'll usually see <b>µF</b> (micro, millionth), <b>nF</b> (nano), <b>pF</b> (pico).</td></tr>
+      <tr><td>Code "104"</td><td>Means 10 followed by 4 zeros, in pF: 100,000 pF = <b>100 nF</b> = 0.1 µF.</td></tr>
+      <tr><td>Voltage rating</td><td>The max voltage it can safely handle. Pick one comfortably above your circuit's voltage.</td></tr>
+      <tr><td>Fill time</td><td>R × C = one "time constant" (τ). After 1τ it's about 63% full. After 5τ it's basically full.</td></tr>
+    </table>
+  </div>
+  <h3>Common types</h3>
+  <table>
+    <tr><td>Ceramic (small, beige/blue disc)</td><td>Small values (pF–µF), no polarity. Used for decoupling and high frequencies.</td></tr>
+    <tr><td>Electrolytic (cylinder can)</td><td>Big values (µF–mF). <b>Polarized</b>: the − leg is marked with a stripe and is usually the shorter leg.</td></tr>
+    <tr><td>Film (boxy, often coloured)</td><td>Stable and low-noise. Popular in audio signal paths.</td></tr>
+  </table>
+  <p class="warn" style="margin-top:16px"><b>⚠️ Safety:</b> capacitors can <b>stay charged after the power is off</b>. Big ones in amps, TVs and power supplies
+  can give a nasty shock. Also, an electrolytic installed <b>backwards</b> can bulge or pop. Always check the stripe.</p>
+</section>
+
+<section>
+  <h2><span class="num">10</span>Recap</h2>
+  <ul>
+    <li>Two plates and a gap: charge <b>piles up</b> but never crosses.</li>
+    <li>Charging: big flow at first, then it slows to zero as it fills.</li>
+    <li>It can <b>hold</b> charge and <b>release</b> it quickly.</li>
+    <li><b>DC</b> = steady, one direction (a river). <b>AC</b> = back and forth (waves).</li>
+    <li>It <b>blocks steady DC</b> but <b>lets changing signals (AC) through</b>.</li>
+    <li>"Full" means <b>balanced</b>, not closed. A steady push stays balanced, while a changing push keeps breaking the balance, so current sloshes in and out. No charge ever crosses the gap.</li>
+    <li>A capacitor blocks any change <b>slow enough for it to catch up with</b>. Small caps block bass, big caps pass everything except DC.</li>
+    <li><code>Q = C × V</code>. A bigger C holds more charge at the same voltage.</li>
+    <li><b>Small caps (pF–nF)</b> handle fast things like noise and high frequencies. <b>Big caps (µF–F)</b> handle energy, smoothing and long delays.</li>
+    <li>Always pick a <b>voltage rating</b> above your circuit voltage.</li>
+  </ul>
+</section>
+</main>
+
+<script>
+// ---------- Shared helpers ----------
+const $ = id => document.getElementById(id);
+function loopPath(ctx, x1, y1, x2, y2){
+  ctx.beginPath(); ctx.moveTo(x1, (y1+y2)/2); ctx.lineTo(x1, y1); ctx.lineTo(x2, y1);
+  ctx.lineTo(x2, y2); ctx.lineTo(x1, y2); ctx.closePath();
+}
+function arrowText(ctx, txt, x, y, color='#94a3b8', size=14, align='center'){
+  ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);
+}
+
+// ---------- Simulation 1: charge / hold / discharge ----------
+const S = { mode:'idle', vc:0, vs:0.9, C:1.5, flow:0, t:0, hist:[], offW:0, offE:0, pumpAng:0 };
+const tau = () => 0.55 * S.C;   // seconds per time constant
+
+function setMode(m){
+  S.mode = m;
+  $('bCharge').className = m==='charge' ? 'active' : '';
+  $('bHold').className   = m==='hold' ? 'active hold' : '';
+  $('bDis').className    = m==='discharge' ? 'active dis' : '';
+  const pill = $('rMode');
+  const map = {idle:['idle','#2a3650','#e2e8f0'], charge:['charging','#3b82f6','#fff'], hold:['holding','#64748b','#fff'], discharge:['discharging','#f59e0b','#fff']};
+  pill.textContent = map[m][0]; pill.style.background = map[m][1]; pill.style.color = map[m][2];
+}
+$('bCharge').onclick = () => setMode('charge');
+$('bHold').onclick   = () => setMode('hold');
+$('bDis').onclick    = () => setMode('discharge');
+$('bReset').onclick  = () => { S.vc=0; S.hist=[]; setMode('idle'); };
+$('sV').oninput = e => S.vs = +e.target.value;
+$('sC').oninput = e => S.C = +e.target.value;
+
+function step1(dt){
+  let I = 0;
+  if (S.mode==='charge')    I = (S.vs - S.vc);
+  if (S.mode==='discharge') I = (0 - S.vc);
+  S.vc += I * dt / tau();
+  S.flow = I;
+  S.offW -= I * dt * 260;
+  S.offE += I * dt * 200;   // electrons go opposite to conventional current
+  S.pumpAng += (S.mode==='charge' ? I : 0) * dt * 12;
+  S.t += dt;
+  S.hist.push([S.t, S.vc, I]);
+  while (S.hist.length && S.hist[0][0] < S.t - 12) S.hist.shift();
+}
+
+function drawWater(){
+  const c = $('cWater'), ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const X1=110, X2=700, Y1=80, Y2=240;
+  // pipe body
+  loopPath(ctx,X1,Y1,X2,Y2); ctx.strokeStyle='#bcd6fb'; ctx.lineWidth=26; ctx.lineJoin='round'; ctx.stroke();
+  // flowing dashes
+  loopPath(ctx,X1,Y1,X2,Y2); ctx.strokeStyle='#3b82f6'; ctx.lineWidth=6; ctx.setLineDash([16,14]);
+  ctx.lineDashOffset = S.offW; ctx.stroke(); ctx.setLineDash([]);
+
+  // narrow pipe (resistor) on bottom
+  ctx.fillStyle='#94a3b8';
+  ctx.fillRect(360,Y2-15,100,8); ctx.fillRect(360,Y2+7,100,8);
+  arrowText(ctx,'narrow pipe = resistor',410,Y2+40);
+
+  // capacitor chamber
+  const cx=400, top=22, bot=138;
+  const pressure = Math.max(0,Math.min(1,S.vc));
+  ctx.fillStyle='#bcd6fb'; ctx.fillRect(cx-70,top,140,bot-top);
+  const b = S.vc*55;
+  // left (pushed) side tint
+  ctx.beginPath(); ctx.moveTo(cx-70,top); ctx.lineTo(cx,top); ctx.quadraticCurveTo(cx+2*b,(top+bot)/2,cx,bot);
+  ctx.lineTo(cx-70,bot); ctx.closePath();
+  ctx.fillStyle=`rgba(37,99,235,${0.25+0.55*pressure})`; ctx.fill();
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3; ctx.strokeRect(cx-70,top,140,bot-top);
+  // membrane
+  ctx.beginPath(); ctx.moveTo(cx,top); ctx.quadraticCurveTo(cx+2*b,(top+bot)/2,cx,bot);
+  ctx.strokeStyle='#dc2626'; ctx.lineWidth=5; ctx.stroke();
+  arrowText(ctx,'rubber sheet = capacitor',cx,bot+20,'#dc2626');
+  arrowText(ctx,`stretched ${Math.round(S.vc*100)}%`,cx,top-6,'#e2e8f0',13);
+
+  // pump
+  const px=X1, py=(Y1+Y2)/2, on = S.mode==='charge';
+  ctx.beginPath(); ctx.arc(px,py,34,0,Math.PI*2);
+  ctx.fillStyle = S.mode==='discharge' ? '#2a3650' : '#fef3c7'; ctx.fill();
+  ctx.strokeStyle = S.mode==='discharge' ? '#475569' : '#b45309'; ctx.lineWidth=3; ctx.stroke();
+  ctx.save(); ctx.translate(px,py); ctx.rotate(-S.pumpAng);
+  ctx.strokeStyle = S.mode==='discharge' ? '#475569' : '#b45309'; ctx.lineWidth=4;
+  for(let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(24,0); ctx.stroke(); }
+  ctx.restore();
+  arrowText(ctx, S.mode==='discharge' ? 'pump bypassed' : 'pump = battery', px+44, py+5, '#94a3b8', 13, 'left');
+  if (S.mode==='discharge'){ // bypass pipe
+    ctx.strokeStyle='#bcd6fb'; ctx.lineWidth=14; ctx.beginPath(); ctx.moveTo(px-50,py-50); ctx.lineTo(px-50,py+50); ctx.stroke();
+  }
+
+  // valve
+  if (S.mode==='hold'){
+    ctx.fillStyle='#64748b'; ctx.fillRect(225,Y1-22,10,44);
+    arrowText(ctx,'valve closed: water trapped, sheet stays stretched',230+250,Y1+44,'#64748b',13);
+  }
+  // flow arrow text
+  const f=S.flow;
+  if (Math.abs(f)>0.02){
+    arrowText(ctx, f>0 ? 'flow →' : '← flow', 560, Y1-22, f>0?'#3b82f6':'#f59e0b', 15);
+  }
+  arrowText(ctx,'No water passes through the sheet. It only bulges.',X2-24,Y2-30,'#94a3b8',13,'right');
+}
+
+function drawCircuit(){
+  const c = $('cCirc'), ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const X1=110, X2=700, Y1=80, Y2=240, cx=400;
+  // wires
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=4; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(X1,(Y1+Y2)/2-22); ctx.lineTo(X1,Y1); ctx.lineTo(cx-10,Y1);
+  ctx.moveTo(cx+10,Y1); ctx.lineTo(X2,Y1); ctx.lineTo(X2,Y2); ctx.lineTo(450,Y2);
+  ctx.moveTo(370,Y2); ctx.lineTo(X1,Y2); ctx.lineTo(X1,(Y1+Y2)/2+22); ctx.stroke();
+  // electrons (dots) on wires
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=8; ctx.lineCap='round'; ctx.setLineDash([0,22]); ctx.lineDashOffset=S.offE;
+  ctx.beginPath(); ctx.moveTo(X1,(Y1+Y2)/2-22); ctx.lineTo(X1,Y1); ctx.lineTo(cx-18,Y1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+18,Y1); ctx.lineTo(X2,Y1); ctx.lineTo(X2,Y2); ctx.lineTo(452,Y2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(368,Y2); ctx.lineTo(X1,Y2); ctx.lineTo(X1,(Y1+Y2)/2+22); ctx.stroke();
+  ctx.setLineDash([]); ctx.lineCap='butt';
+
+  // capacitor plates
+  ctx.fillStyle='#cbd5e1'; ctx.fillRect(cx-14,Y1-45,6,90); ctx.fillRect(cx+8,Y1-45,6,90);
+  const n = Math.round(Math.max(0,S.vc)*7);
+  for(let i=0;i<n;i++){
+    const y = Y1-38 + i*(76/6);
+    arrowText(ctx,'+',cx-26,y+5,'#dc2626',16);
+    arrowText(ctx,'−',cx+26,y+5,'#2563eb',16);
+  }
+  // field lines in gap
+  if (S.vc>0.02){ ctx.strokeStyle=`rgba(124,58,237,${Math.min(1,S.vc)})`; ctx.lineWidth=1.5;
+    for(let i=0;i<5;i++){ const y=Y1-34+i*17; ctx.beginPath(); ctx.moveTo(cx-6,y); ctx.lineTo(cx+6,y); ctx.stroke(); } }
+  arrowText(ctx,'capacitor: 2 plates + gap',cx,Y1+68,'#cbd5e1',13);
+
+  // resistor zigzag
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(370,Y2);
+  for(let i=0;i<8;i++) ctx.lineTo(375+i*10, Y2 + (i%2?-10:10));
+  ctx.lineTo(450,Y2); ctx.stroke();
+  arrowText(ctx,'resistor',410,Y2+32,'#cbd5e1',13);
+
+  // battery or bypass
+  const by=(Y1+Y2)/2;
+  if (S.mode==='discharge'){
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(X1,by-22); ctx.lineTo(X1,by+22); ctx.stroke();
+    arrowText(ctx,'battery removed',X1+12,by+5,'#94a3b8',13,'left');
+  } else {
+    ctx.fillStyle='#cbd5e1'; ctx.fillRect(X1-22,by-12,44,4); ctx.fillRect(X1-12,by+8,24,6);
+    arrowText(ctx,'+',X1+32,by-4,'#dc2626',16); arrowText(ctx,'−',X1+32,by+18,'#2563eb',16);
+    arrowText(ctx,'battery',X1-34,by+5,'#cbd5e1',13,'right');
+  }
+  // switch open in hold
+  if (S.mode==='hold'){
+    ctx.fillStyle='#0b1220'; ctx.fillRect(215,Y1-6,40,12);
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(215,Y1); ctx.lineTo(252,Y1-22); ctx.stroke();
+    arrowText(ctx,'switch open',235,Y1-30,'#64748b',13);
+  }
+  arrowText(ctx,'electrons (yellow) pile onto the right plate and leave the left plate',X2-10,290,'#94a3b8',13,'right');
+}
+
+function drawGraph(){
+  const c=$('cGraph'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  const L=50,R=780,T=20,B=180, mid=(T+B)/2;
+  ctx.strokeStyle='#2a3650'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){ const y=T+i*(B-T)/4; ctx.beginPath(); ctx.moveTo(L,y); ctx.lineTo(R,y); ctx.stroke(); }
+  ctx.strokeStyle='#94a3b8'; ctx.beginPath(); ctx.moveTo(L,mid); ctx.lineTo(R,mid); ctx.stroke();
+  arrowText(ctx,'+100%',L-6,T+5,'#94a3b8',11,'right'); arrowText(ctx,'0',L-6,mid+4,'#94a3b8',11,'right'); arrowText(ctx,'−100%',L-6,B+4,'#94a3b8',11,'right');
+  arrowText(ctx,'last 12 seconds →',R,B+22,'#94a3b8',12,'right');
+  const yOf=v=>mid - v*(B-T)/2, xOf=t=>R-(S.t-t)/12*(R-L);
+  [[1,'#3b82f6'],[2,'#f59e0b']].forEach(([k,col])=>{
+    ctx.strokeStyle=col; ctx.lineWidth=3; ctx.beginPath();
+    S.hist.forEach((h,i)=>{ const x=xOf(h[0]), y=yOf(h[k]); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke();
+  });
+  ctx.fillStyle='#3b82f6'; ctx.fillRect(L+10,B+12,14,4); arrowText(ctx,'charge stored',L+30,B+18,'#3b82f6',12,'left');
+  ctx.fillStyle='#f59e0b'; ctx.fillRect(L+140,B+12,14,4); arrowText(ctx,'flow (current)',L+160,B+18,'#f59e0b',12,'left');
+}
+
+// ---------- Simulation 2: DC vs AC ----------
+const A = { mode:'off', vc:0, t:0, off:0, wheel:0, flow:0, src:0 };
+const tau2 = 0.22;
+function setA(m){ A.mode=m; A.t=0;
+  $('bDC').className = m==='dc'?'active':''; $('bAC').className = m==='ac'?'active':''; $('bOff').className = m==='off'?'active hold':''; }
+$('bDC').onclick=()=>setA('dc'); $('bAC').onclick=()=>setA('ac'); $('bOff').onclick=()=>setA('off');
+setA('off');
+
+function step2(dt){
+  A.t+=dt;
+  A.src = A.mode==='dc' ? 0.9 : A.mode==='ac' ? 0.9*Math.sin(2*Math.PI*0.9*A.t) : 0;
+  const I = A.src - A.vc;
+  A.vc += I*dt/tau2; A.flow=I;
+  A.off -= I*dt*260; A.wheel += I*dt*7;
+}
+function drawACDC(){
+  const c=$('cACDC'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  const X1=110,X2=700,Y1=70,Y2=200;
+  loopPath(ctx,X1,Y1,X2,Y2); ctx.strokeStyle='#bcd6fb'; ctx.lineWidth=24; ctx.lineJoin='round'; ctx.stroke();
+  loopPath(ctx,X1,Y1,X2,Y2); ctx.strokeStyle='#3b82f6'; ctx.lineWidth=6; ctx.setLineDash([16,14]); ctx.lineDashOffset=A.off; ctx.stroke(); ctx.setLineDash([]);
+  // chamber + membrane
+  const cx=320, top=22, bot=118, b=A.vc*45;
+  ctx.fillStyle='#bcd6fb'; ctx.fillRect(cx-55,top,110,bot-top);
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3; ctx.strokeRect(cx-55,top,110,bot-top);
+  ctx.beginPath(); ctx.moveTo(cx,top); ctx.quadraticCurveTo(cx+2*b,(top+bot)/2,cx,bot); ctx.strokeStyle='#dc2626'; ctx.lineWidth=5; ctx.stroke();
+  arrowText(ctx,'capacitor',cx,bot+18,'#dc2626',13);
+  // waterwheel
+  const wx=560, wy=Y1;
+  ctx.beginPath(); ctx.arc(wx,wy,40,0,Math.PI*2); ctx.fillStyle='#ecfdf5'; ctx.fill(); ctx.strokeStyle='#059669'; ctx.lineWidth=3; ctx.stroke();
+  ctx.save(); ctx.translate(wx,wy); ctx.rotate(A.wheel);
+  for(let i=0;i<6;i++){ ctx.rotate(Math.PI/3); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(38,0); ctx.stroke(); ctx.fillStyle='#059669'; ctx.fillRect(30,-6,10,12); }
+  ctx.restore();
+  const active = Math.abs(A.flow)>0.05;
+  arrowText(ctx, active ? 'waterwheel turning: signal gets through!' : 'waterwheel still: nothing gets through', wx, wy+62, active?'#059669':'#94a3b8', 13);
+  // source
+  const py=(Y1+Y2)/2;
+  ctx.beginPath(); ctx.arc(X1,py,32,0,Math.PI*2); ctx.fillStyle='#fef3c7'; ctx.fill(); ctx.strokeStyle='#b45309'; ctx.lineWidth=3; ctx.stroke();
+  const lbl = A.mode==='dc' ? 'steady push' : A.mode==='ac' ? 'push ↔ pull' : 'off';
+  arrowText(ctx,lbl,X1,py+5,'#b45309',13);
+  // source arrow showing direction
+  if (Math.abs(A.src)>0.05){ ctx.fillStyle='#b45309'; ctx.beginPath();
+    const d = A.src>0 ? -1 : 1; ctx.moveTo(X1-50,py+d*14); ctx.lineTo(X1-60,py-d*4); ctx.lineTo(X1-40,py-d*4); ctx.fill(); }
+  arrowText(ctx, A.mode==='dc' ? 'DC: one quick push, then the sheet is stretched and flow stops.' :
+                 A.mode==='ac' ? 'AC: the sheet flexes back and forth, so flow never stops.' : 'Pick DC or AC above.',
+                 400, 240, '#e2e8f0', 14);
+}
+
+// ---------- Symbols ----------
+(function drawSym(){
+  const c=$('cSym'), ctx=c.getContext('2d'); ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=4;
+  // normal
+  let x=95,y=80; ctx.beginPath(); ctx.moveTo(x-60,y); ctx.lineTo(x-10,y); ctx.moveTo(x+10,y); ctx.lineTo(x+60,y);
+  ctx.moveTo(x-10,y-30); ctx.lineTo(x-10,y+30); ctx.moveTo(x+10,y-30); ctx.lineTo(x+10,y+30); ctx.stroke();
+  arrowText(ctx,'non-polarized',x,y+60,'#94a3b8',13);
+  // polarized
+  x=285; ctx.beginPath(); ctx.moveTo(x-60,y); ctx.lineTo(x-10,y); ctx.moveTo(x+14,y); ctx.lineTo(x+60,y);
+  ctx.moveTo(x-10,y-30); ctx.lineTo(x-10,y+30); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x+40,y,30,Math.PI*0.78,Math.PI*1.22); ctx.stroke();
+  arrowText(ctx,'+',x-24,y-30,'#dc2626',18); arrowText(ctx,'−',x+28,y-30,'#2563eb',18);
+  arrowText(ctx,'polarized',x,y+60,'#94a3b8',13);
+})();
+
+// ---------- Loop ----------
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  step1(dt); step2(dt);
+  drawWater(); drawCircuit(); drawGraph(); drawACDC();
+  $('rQ').textContent = Math.round(S.vc*100)+'%';
+  $('rI').textContent = Math.round(Math.abs(S.flow)*100)+'%' + (S.flow<-0.01?' (reversed)':'');
+  requestAnimationFrame(frame);
+}
+setMode('idle');
+requestAnimationFrame(frame);
+</script>
+<script>
+// ===== Helpers for schematics and plots =====
+function W(ctx,pts,col='#cbd5e1',lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
+function dot(ctx,x,y){ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
+function resV(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-24]]);ctx.beginPath();ctx.moveTo(x,m-24);for(let i=0;i<6;i++)ctx.lineTo(x+(i%2?-8:8),m-20+i*8);ctx.lineTo(x,m+24);ctx.stroke();W(ctx,[[x,m+24],[x,y2]]);if(label)arrowText(ctx,label,x+14,m+4,'#cbd5e1',12,'left');}
+function capV(ctx,x,y1,y2,label,faded){const m=(y1+y2)/2,col=faded?'#475569':'#cbd5e1';W(ctx,[[x,y1],[x,m-6]],col);W(ctx,[[x,m+6],[x,y2]],col);ctx.fillStyle=col;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-18,m+4,36,4);if(label)arrowText(ctx,label,x+24,m+4,faded?'#94a3b8':'#2563eb',12,'left');}
+function capH(ctx,x1,x2,y,label){const m=(x1+x2)/2;W(ctx,[[x1,y],[m-6,y]]);W(ctx,[[m+6,y],[x2,y]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(m-8,y-18,4,36);ctx.fillRect(m+4,y-18,4,36);if(label)arrowText(ctx,label,m,y-26,'#2563eb',12);}
+function batt(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-6]]);W(ctx,[[x,m+6],[x,y2]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-10,m+4,20,6);arrowText(ctx,'+',x+22,m-6,'#dc2626',14);if(label)arrowText(ctx,label,x-24,m+4,'#cbd5e1',12,'right');}
+function glow(ctx,x,y,b,col='255,80,60'){if(b<=0.01)return;const g=ctx.createRadialGradient(x,y,2,x,y,46);g.addColorStop(0,`rgba(${col},${0.9*b})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,46,0,7);ctx.fill();}
+function ledV(ctx,x,y1,y2,b){const m=(y1+y2)/2;glow(ctx,x,m,b);W(ctx,[[x,y1],[x,m-10]]);W(ctx,[[x,m+10],[x,y2]]);ctx.fillStyle=b>0.05?`rgb(255,${Math.round(200-150*b)},${Math.round(200-160*b)})`:'#fff';ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-12,m-10);ctx.lineTo(x+12,m-10);ctx.lineTo(x,m+10);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[x-12,m+10],[x+12,m+10]]);arrowText(ctx,'LED',x+20,m+4,'#cbd5e1',12,'left');}
+function gndSym(ctx,x,y){W(ctx,[[x-14,y],[x+14,y]]);W(ctx,[[x-9,y+6],[x+9,y+6]]);W(ctx,[[x-4,y+12],[x+4,y+12]]);}
+function plot(ctx,x,y,w,h,hist,tNow,span,series,min,max,title){
+  ctx.fillStyle='#1e293b';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#2a3650';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+  if(title)arrowText(ctx,title,x+2,y-7,'#94a3b8',12,'left');
+  const X=t=>x+w-(tNow-t)/span*w, Y=v=>y+h-(v-min)/(max-min)*h;
+  if(min<0&&max>0){ctx.setLineDash([4,4]);ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x+w,Y(0));ctx.stroke();ctx.setLineDash([]);arrowText(ctx,'0',x-6,Y(0)+4,'#94a3b8',11,'right');}
+  series.forEach(s=>{ctx.setLineDash(s.dash||[]);ctx.strokeStyle=s.col;ctx.lineWidth=s.lw||2.5;ctx.beginPath();let st=false;
+    hist.forEach(p=>{if(p.t<tNow-span)return;const xx=X(p.t),yy=Y(Math.max(min,Math.min(max,p[s.k])));st?ctx.lineTo(xx,yy):(ctx.moveTo(xx,yy),st=true);});ctx.stroke();ctx.setLineDash([]);});
+  let lx=x;series.forEach(s=>{if(!s.label)return;ctx.fillStyle=s.col;ctx.fillRect(lx,y+h+11,12,3);arrowText(ctx,s.label,lx+16,y+h+16,s.col,11,'left');lx+=ctx.measureText(s.label).width+32;});
+  return {X,Y};
+}
+function choices(id,labels,init,cb){const el=$(id);el.style.display='inline-flex';el.style.gap='8px';el.style.flexWrap='wrap';
+  const bs=labels.map((l,i)=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{bs.forEach(x=>x.className='');b.className='active';cb(i);};el.appendChild(b);return b;});
+  bs[init].className='active';cb(init);}
+function prune(h,t,span){while(h.length&&h[0].t<t-span)h.shift();}
+
+// ===== Size explorer =====
+function fmtC(c){const u=[[1,'F'],[1e-3,'mF'],[1e-6,'µF'],[1e-9,'nF'],[1e-12,'pF']];for(const [v,n] of u){if(c>=v*0.999){const x=c/v;return (x>=100?x.toFixed(0):x>=10?x.toFixed(0):x.toFixed(1))+' '+n;}}return (c/1e-12).toFixed(1)+' pF';}
+function fmtT(s){if(s<1e-6)return (s*1e9).toFixed(0)+' nanoseconds';if(s<1e-3)return (s*1e6).toFixed(0)+' microseconds';if(s<1)return (s*1e3).toFixed(0)+' milliseconds';if(s<120)return s.toFixed(1)+' seconds';return (s/60).toFixed(0)+' minutes';}
+function drawSize(){
+  const c=$('cSize'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const e=+$('sSize').value, C=Math.pow(10,e), fill=5*1000*C, k=(e+11)/11;
+  const cats=[[1e-9,'🥄 Thimble','Radio tuning, high-frequency filters, crystal oscillators'],[1e-6,'☕ Cup','Decoupling next to chips, tone controls, noise filters'],[1e-4,'🪣 Bucket','Audio coupling, timing and blinking, LED fade-outs'],[0.1,'🛁 Bathtub','Power supply smoothing, amp energy reserves'],[1e9,'🏊 Swimming pool (supercap)','Memory backup, quick-charge torches, braking energy']];
+  const cat=cats.find(x=>C<x[0]);
+  const w=30+k*170,h=24+k*150,x0=140-w/2,y0=205-h;
+  ctx.fillStyle='#bcd6fb';ctx.fillRect(x0,y0+h*0.3,w,h*0.7);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0,y0+h);ctx.lineTo(x0+w,y0+h);ctx.lineTo(x0+w,y0);ctx.stroke();
+  arrowText(ctx,fmtC(C),330,60,'#e2e8f0',34,'left');
+  arrowText(ctx,cat[1],330,100,'#2563eb',20,'left');
+  arrowText(ctx,'Used for: '+cat[2],330,135,'#cbd5e1',15,'left');
+  const cmp=fill<1e-6?'a million times faster than a blink':fill<0.1?'faster than a blink':fill<10?'a few heartbeats':fill<300?'time to make a sandwich':'go make a coffee…';
+  arrowText(ctx,'Fills through 1 kΩ in about '+fmtT(fill),330,170,'#cbd5e1',15,'left');
+  arrowText(ctx,'('+cmp+')',330,193,'#94a3b8',14,'left');
+}
+$('sSize').oninput=drawSize; drawSize();
+
+// ===== A. Fading LED =====
+const FA={C:1,pressed:false,vc:0,t:0,h:[]}, fadeTau=[0.04,0.5,4];
+choices('fChoices',['10 µF','100 µF','1000 µF'],1,i=>FA.C=i);
+const fp=$('fPress');
+['pointerdown'].forEach(ev=>fp.addEventListener(ev,e=>{e.preventDefault();FA.pressed=true;}));
+['pointerup','pointerleave','pointercancel'].forEach(ev=>fp.addEventListener(ev,()=>FA.pressed=false));
+function stepFade(dt){FA.t+=dt;FA.vc+= FA.pressed?(1-FA.vc)*dt/0.05:-FA.vc*dt/fadeTau[FA.C];
+  FA.b=FA.pressed?1:Math.max(0,(FA.vc-0.15)/0.85);FA.h.push({t:FA.t,b:FA.b,q:FA.vc});prune(FA.h,FA.t,8);}
+function drawFade(){const c=$('cFade'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const T=50,B=210;batt(ctx,50,T,B,'9V');
+  W(ctx,[[50,T],[100,T]]);dot(ctx,100,T);dot(ctx,150,T);
+  if(FA.pressed)W(ctx,[[100,T-6],[150,T-6]],'#10b981',4);else W(ctx,[[100,T-6],[146,T-26]],'#cbd5e1',4);
+  arrowText(ctx,'button',125,T+22,'#cbd5e1',12);
+  W(ctx,[[150,T],[320,T]]);dot(ctx,220,T);
+  capV(ctx,220,T,B,['10 µF','100 µF','1000 µF'][FA.C]);
+  resV(ctx,320,T,T+80,'470 Ω');ledV(ctx,320,T+80,B,FA.b);
+  W(ctx,[[50,B],[320,B]]);dot(ctx,220,B);
+  // charge bar
+  ctx.fillStyle='#2a3650';ctx.fillRect(180,T+44,12,70);ctx.fillStyle='#3b82f6';ctx.fillRect(180,T+44+70*(1-FA.vc),12,70*FA.vc);
+  plot(ctx,420,30,360,170,FA.h,FA.t,8,[{k:'q',col:'#3b82f6',label:'capacitor charge'},{k:'b',col:'#ef4444',label:'LED brightness'}],-0.05,1.1,'last 8 seconds');
+}
+
+// ===== B. Smoothing =====
+const PS={C:0,t:0,vout:0,h:[]}, smTau=[0,0.15,1.2,10];
+choices('pChoices',['No capacitor','10 µF','100 µF','1000 µF'],0,i=>PS.C=i);
+function stepSmooth(dt){PS.t+=dt;const vin=Math.max(0,Math.sin(2*Math.PI*PS.t));
+  if(PS.C===0)PS.vout=vin;else if(vin>PS.vout)PS.vout=vin;else PS.vout-=PS.vout*dt/smTau[PS.C];
+  PS.h.push({t:PS.t,vin,vout:PS.vout});prune(PS.h,PS.t,4);}
+function drawSmooth(){const c=$('cSmooth'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const T=50,B=210;
+  // AC source
+  W(ctx,[[50,T],[50,110]]);W(ctx,[[50,150],[50,B]]);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;ctx.beginPath();ctx.arc(50,130,20,0,7);ctx.stroke();
+  ctx.beginPath();for(let i=0;i<=20;i++){const x=38+i*1.2,y=130-8*Math.sin(i/20*2*Math.PI);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+  arrowText(ctx,'AC in',76,134,'#cbd5e1',12,'left');
+  // diode
+  W(ctx,[[50,T],[110,T]]);ctx.fillStyle='#1e293b';ctx.beginPath();ctx.moveTo(110,T-12);ctx.lineTo(132,T);ctx.lineTo(110,T+12);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[132,T-12],[132,T+12]]);
+  arrowText(ctx,'diode (one-way valve)',122,T-20,'#cbd5e1',12);
+  W(ctx,[[132,T],[320,T]]);dot(ctx,210,T);
+  capV(ctx,210,T,B,PS.C?['','10 µF','100 µF','1000 µF'][PS.C]:'(none)',PS.C===0);
+  // lamp
+  glow(ctx,320,130,PS.vout,'255,200,60');W(ctx,[[320,T],[320,112]]);W(ctx,[[320,148],[320,B]]);
+  ctx.fillStyle='#1e293b';ctx.beginPath();ctx.arc(320,130,18,0,7);ctx.fill();ctx.stroke();W(ctx,[[307,117],[333,143]]);W(ctx,[[333,117],[307,143]]);
+  arrowText(ctx,'lamp',346,134,'#cbd5e1',12,'left');
+  W(ctx,[[50,B],[320,B]]);dot(ctx,210,B);
+  plot(ctx,420,30,360,170,PS.h,PS.t,4,[{k:'vin',col:'#94a3b8',dash:[5,4],lw:2,label:'bumps after diode'},{k:'vout',col:'#3b82f6',label:'output to lamp'}],-0.05,1.1,'voltage (slowed down)');
+  let mn=1;PS.h.forEach(p=>{if(p.t>PS.t-1.1)mn=Math.min(mn,p.vout);});
+  arrowText(ctx,'ripple (dip): '+Math.round((1-mn)*100)+'%',780,22,mn>0.85?'#059669':'#ef4444',13,'right');
+}
+
+// ===== C. Coupling =====
+const KC={C:2,t:0,vc:0.6,h:[]}, kTau=[0.03,0.2,3];
+choices('kChoices',['100 pF (tinny)','1 nF (thin)','100 nF (full sound)'],2,i=>KC.C=i);
+function stepCouple(dt){KC.t+=dt;const t=KC.t;const vin=0.6+0.25*Math.sin(2*Math.PI*0.7*t)+0.12*Math.sin(2*Math.PI*5*t);
+  KC.vc+=(vin-KC.vc)*dt/kTau[KC.C];KC.h.push({t,vin,out:vin-KC.vc});prune(KC.h,t,4);}
+function drawCouple(){const c=$('cCouple'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const y=110;
+  ctx.fillStyle='#fef3c7';ctx.strokeStyle='#b45309';ctx.lineWidth=2;ctx.fillRect(20,y-35,100,70);ctx.strokeRect(20,y-35,100,70);
+  arrowText(ctx,'Guitar /',70,y-6,'#b45309',13);arrowText(ctx,'previous stage',70,y+12,'#b45309',13);
+  W(ctx,[[120,y],[160,y]]);capH(ctx,160,230,y,['100 pF','1 nF','100 nF'][KC.C]);W(ctx,[[230,y],[290,y]]);
+  ctx.fillStyle='#ecfdf5';ctx.strokeStyle='#059669';ctx.lineWidth=2;ctx.fillRect(290,y-35,100,70);ctx.strokeRect(290,y-35,100,70);
+  arrowText(ctx,'Next stage',340,y-6,'#059669',13);arrowText(ctx,'(amplifier)',340,y+12,'#059669',13);
+  arrowText(ctx,'DC blocked, music passes',195,y+44,'#94a3b8',12);
+  // bass/treble bars
+  const g=f=>{const wt=2*Math.PI*f*kTau[KC.C];return wt/Math.sqrt(1+wt*wt);};
+  [['Bass',g(0.7),'#7c3aed'],['Treble',g(5),'#0891b2']].forEach(([n,v],i)=>{const yy=190+i*28;arrowText(ctx,n,70,yy+10,'#cbd5e1',13,'right');
+    ctx.fillStyle='#2a3650';ctx.fillRect(80,yy,240,14);ctx.fillStyle=i?'#0891b2':'#7c3aed';ctx.fillRect(80,yy,240*v,14);arrowText(ctx,Math.round(v*100)+'% gets through',330,yy+11,'#cbd5e1',12,'left');});
+  plot(ctx,450,22,330,85,KC.h,KC.t,4,[{k:'vin',col:'#b45309',label:''}],-0.1,1.05,'Before the capacitor: music riding on DC');
+  plot(ctx,450,150,330,85,KC.h,KC.t,4,[{k:'out',col:'#059669',label:''}],-0.5,0.5,'After the capacitor: music only, centred on 0');
+}
+
+// ===== D. Decoupling =====
+const DC={on:false,t:0,v:1,h:[],glitch:0};
+$('dToggle').onclick=()=>{DC.on=!DC.on;$('dToggle').className=DC.on?'active':'';$('dToggle').textContent=DC.on?'Remove the 100 nF capacitor':'Add the 100 nF capacitor';};
+function stepDecouple(dt){DC.t+=dt;const load=(DC.t%0.7)<0.07?1.5:0;const Cf=DC.on?1:0.1;
+  DC.v+=((1-DC.v)/0.12-load*0.6/Cf)*dt;if(DC.v<0.75)DC.glitch=0.5;DC.glitch=Math.max(0,DC.glitch-dt);
+  DC.h.push({t:DC.t,v:DC.v,th:0.75});prune(DC.h,DC.t,4);}
+function drawDecouple(){const c=$('cDecouple'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const T=50,B=210;batt(ctx,60,T,B,'5V');
+  W(ctx,[[60,T],[80,T]]);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(80,T);
+  for(let i=0;i<=40;i++)ctx.lineTo(80+i*3,T+6*Math.sin(i/2));ctx.stroke();
+  arrowText(ctx,'long wire',140,T-14,'#94a3b8',12);
+  W(ctx,[[200,T],[330,T],[330,95]]);dot(ctx,265,T);
+  capV(ctx,265,T,B,'',!DC.on);arrowText(ctx,DC.on?'100 nF':'missing!',240,134,DC.on?'#2563eb':'#94a3b8',12,'right');
+  const bad=DC.glitch>0;
+  ctx.fillStyle=bad?'#fee2e2':'#475569';ctx.fillRect(295,95,70,70);
+  for(let i=0;i<4;i++){ctx.fillStyle='#94a3b8';ctx.fillRect(285,102+i*16,10,5);ctx.fillRect(365,102+i*16,10,5);}
+  arrowText(ctx,'CHIP',330,125,bad?'#b91c1c':'#fff',14);arrowText(ctx,bad?'GLITCH!':'OK',330,145,bad?'#b91c1c':'#4ade80',13);
+  W(ctx,[[330,165],[330,B],[60,B]]);dot(ctx,265,B);
+  arrowText(ctx,'chip takes sudden gulps of current',330,240,'#94a3b8',12);
+  plot(ctx,420,30,360,170,DC.h,DC.t,4,[{k:'v',col:'#3b82f6',label:'voltage at the chip'},{k:'th',col:'#ef4444',dash:[6,4],lw:1.5,label:'below this the chip glitches'}],0.3,1.05,'');
+}
+
+// ===== Loop =====
+let last2=performance.now();
+function frame2(now){const dt=Math.min(0.05,(now-last2)/1000);last2=now;
+  stepFade(dt);stepSmooth(dt);stepCouple(dt);stepDecouple(dt);
+  drawFade();drawSmooth();drawCouple();drawDecouple();requestAnimationFrame(frame2);}
+requestAnimationFrame(frame2);
+</script>
+
+<script>
+// ===== Burst demo =====
+const BU={V:9,vc:0,stress:0,broken:false,heat:0,off:0,flow:0,t:0,smoke:[],popT:0};
+const RATING=16, VMAX=30;
+$('bV').oninput=e=>{BU.V=+e.target.value;$('bVlab').textContent=BU.V+' V';};
+$('bNew').onclick=()=>{BU.vc=0;BU.stress=0;BU.broken=false;BU.heat=0;BU.smoke=[];BU.popT=0;};
+function stepBurst(dt){
+  BU.t+=dt;
+  if(!BU.broken){
+    const I=(BU.V-BU.vc)/BU.V||0; // normalised
+    BU.vc+=(BU.V-BU.vc)*dt/0.6;
+    const leak = BU.vc>12 ? Math.pow((BU.vc-12)/4,2)*0.06 : 0.004*BU.vc/16;
+    BU.flow=(BU.V-BU.vc)/16 + leak;
+    if(BU.vc>RATING){BU.stress+=dt*(BU.vc-RATING)/5;}
+    else BU.stress=Math.max(0,BU.stress-dt*0.2);
+    if(BU.stress>=1){BU.broken=true;BU.popT=0.8;}
+  } else {
+    BU.vc+=(BU.V*0.08-BU.vc)*dt/0.1;   // shorted: almost no voltage held
+    BU.flow=BU.V/12;                    // big continuous flow
+    BU.heat=Math.min(1,BU.heat+dt*BU.V/40);
+    if(BU.V>0 && Math.random()<dt*12) BU.smoke.push({x:400+(Math.random()-0.5)*40,y:30,a:1,r:6});
+  }
+  BU.popT=Math.max(0,BU.popT-dt);
+  BU.smoke.forEach(s=>{s.y-=dt*30;s.r+=dt*14;s.a-=dt*0.5;});BU.smoke=BU.smoke.filter(s=>s.a>0);
+  BU.off-=BU.flow*dt*260;
+}
+function drawBurst(){
+  const c=$('cBurst'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const X1=110,X2=600,Y1=90,Y2=250,cx=360,top=40,bot=140;
+  loopPath(ctx,X1,Y1,X2,Y2);ctx.strokeStyle='#bcd6fb';ctx.lineWidth=26;ctx.lineJoin='round';ctx.stroke();
+  loopPath(ctx,X1,Y1,X2,Y2);ctx.strokeStyle='#3b82f6';ctx.lineWidth=6;ctx.setLineDash([16,14]);ctx.lineDashOffset=BU.off;ctx.stroke();ctx.setLineDash([]);
+  // chamber (glows red when hot)
+  ctx.fillStyle='#bcd6fb';ctx.fillRect(cx-70,top,140,bot-top);
+  if(BU.heat>0){ctx.fillStyle=`rgba(239,68,68,${0.6*BU.heat})`;ctx.fillRect(cx-70,top,140,bot-top);}
+  const ratio=BU.vc/RATING, b=Math.min(1.6,ratio)*42, mid=(top+bot)/2;
+  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=3;ctx.strokeRect(cx-70,top,140,bot-top);
+  const sheetCol = ratio<0.75?'#10b981':ratio<=1?'#f59e0b':'#ef4444';
+  if(!BU.broken){
+    ctx.beginPath();ctx.moveTo(cx,top);ctx.quadraticCurveTo(cx+2*b,mid,cx,bot);
+    ctx.strokeStyle=sheetCol;ctx.lineWidth=ratio>1?3:5;ctx.stroke();
+    if(ratio>1){ // strain marks, shaking
+      const sh=(Math.random()-0.5)*4*Math.min(1,BU.stress*2);
+      ctx.strokeStyle='#fecaca';ctx.lineWidth=1.5;
+      for(let i=0;i<4;i++){const yy=mid-18+i*12;ctx.beginPath();ctx.moveTo(cx+b+sh-4,yy);ctx.lineTo(cx+b+sh+4,yy+4);ctx.stroke();}
+    }
+  } else {
+    // torn: two flaps with a hole
+    ctx.strokeStyle='#ef4444';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(cx,top);ctx.quadraticCurveTo(cx+30,top+20,cx+44,mid-14);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,bot);ctx.quadraticCurveTo(cx+30,bot-20,cx+44,mid+14);ctx.stroke();
+    arrowText(ctx,'TORN',cx+12,mid+5,'#7f1d1d',15);
+  }
+  BU.smoke.forEach(s=>{ctx.fillStyle=`rgba(148,163,184,${0.5*s.a})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill();});
+  if(BU.popT>0){arrowText(ctx,'💥 POP!',cx,top-8,'#fbbf24',26);}
+  arrowText(ctx,'capacitor (1000 µF, 16 V)',cx,bot+22,'#e2e8f0',13);
+  // pump with pressure
+  const py=(Y1+Y2)/2;ctx.beginPath();ctx.arc(X1,py,34,0,7);ctx.fillStyle='#fef3c7';ctx.fill();ctx.strokeStyle='#b45309';ctx.lineWidth=3;ctx.stroke();
+  arrowText(ctx,BU.V+' V',X1,py+6,'#b45309',16);arrowText(ctx,'battery (pump)',X1+44,py+5,'#94a3b8',13,'left');
+  // narrow pipe
+  ctx.fillStyle='#64748b';ctx.fillRect(320,Y2-15,80,8);ctx.fillRect(320,Y2+7,80,8);
+  // flow label
+  let flowTxt, flowCol;
+  if(BU.broken){flowTxt=BU.V>0?'flow NEVER stops: short circuit!':'no push, no flow';flowCol='#ef4444';}
+  else if(BU.flow>0.03){flowTxt='flowing: charging';flowCol='#3b82f6';}
+  else if(BU.vc>12.5){flowTxt='flow stopped, but a small leak (strained)';flowCol='#f59e0b';}
+  else {flowTxt='flow stopped: fully charged';flowCol='#10b981';}
+  arrowText(ctx,flowTxt,(X1+X2)/2+30,Y2+42,flowCol,15);
+  // stretch meter
+  const mx=680,mt=30,mh=240,Yv=v=>mt+mh-v/VMAX*mh;
+  ctx.fillStyle='#10b981';ctx.fillRect(mx,Yv(12),24,Yv(0)-Yv(12));
+  ctx.fillStyle='#f59e0b';ctx.fillRect(mx,Yv(RATING),24,Yv(12)-Yv(RATING));
+  ctx.fillStyle='#ef4444';ctx.fillRect(mx,Yv(VMAX),24,Yv(RATING)-Yv(VMAX));
+  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=2;ctx.strokeRect(mx,mt,24,mh);
+  arrowText(ctx,'16 V limit',mx+30,Yv(RATING)+4,'#fca5a5',12,'left');
+  arrowText(ctx,'0 V',mx+30,Yv(0)+4,'#94a3b8',12,'left');arrowText(ctx,'30 V',mx+30,Yv(VMAX)+8,'#94a3b8',12,'left');
+  // markers: battery (triangle) and cap (line)
+  ctx.fillStyle='#fbbf24';const yb=Yv(BU.V);ctx.beginPath();ctx.moveTo(mx-4,yb);ctx.lineTo(mx-16,yb-7);ctx.lineTo(mx-16,yb+7);ctx.fill();
+  arrowText(ctx,'battery',mx-20,yb+4,'#fbbf24',11,'right');
+  ctx.strokeStyle='#fff';ctx.lineWidth=4;const yc=Yv(Math.max(0,BU.vc));ctx.beginPath();ctx.moveTo(mx-2,yc);ctx.lineTo(mx+26,yc);ctx.stroke();
+  arrowText(ctx,'stretch',mx+12,mt+mh+20,'#94a3b8',12);
+  // readouts
+  $('bVc').textContent=BU.vc.toFixed(1)+' V';
+  $('bQ').textContent=(BU.broken?0:BU.vc).toFixed(1)+' mC';
+  const st=$('bStat');
+  if(BU.broken){st.textContent='BROKEN: replace it';st.style.color='#ef4444';}
+  else if(BU.vc>RATING){st.textContent='over the limit: about to fail!';st.style.color='#ef4444';}
+  else if(BU.vc>12){st.textContent='near the limit: strained';st.style.color='#f59e0b';}
+  else if(BU.flow>0.03){st.textContent='charging';st.style.color='#3b82f6';}
+  else {st.textContent='full and healthy';st.style.color='#10b981';}
+}
+let lastB=performance.now();
+function frameB(now){const dt=Math.min(0.05,(now-lastB)/1000);lastB=now;stepBurst(dt);drawBurst();requestAnimationFrame(frameB);}
+requestAnimationFrame(frameB);
+</script>
+
+<script>
+// ===== Coupling: why centred on 0 =====
+const Z={t:0,vc:4.5,h:[]}, zTau=1.2;
+$('zPlug').onclick=()=>{Z.vc=0;};
+$('zSettled').onclick=()=>{Z.vc=4.5;};
+function stepZ(dt){Z.t+=dt;const vin=4.5+0.5*Math.sin(2*Math.PI*0.8*Z.t);
+  const out=vin-Z.vc; Z.vc+=out*dt/zTau; Z.h.push({t:Z.t,vin,out,vc:Z.vc});prune(Z.h,Z.t,6);}
+function drawZ(){
+  const c=$('cCenter'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const T=30,H=240,min=-1.5,max=6, Y=v=>T+H-(v-min)/(max-min)*H;
+  const gL=60,gW=250,gR=500;
+  const last=Z.h[Z.h.length-1]||{vin:4.5,out:0,vc:4.5};
+  // scales + gridlines (same for both)
+  [0,1,2,3,4,4.5,5,6,-1].forEach(v=>{if(v<min||v>max)return;
+    ctx.strokeStyle=v===0?'#64748b':'#1f2a40';ctx.lineWidth=v===0?1.5:1;ctx.setLineDash(v===0?[5,4]:[]);
+    [[gL,gL+gW],[gR,gR+gW]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(a,Y(v));ctx.lineTo(b,Y(v));ctx.stroke();});ctx.setLineDash([]);
+    if(Number.isInteger(v)){arrowText(ctx,v+' V',gL-6,Y(v)+4,'#94a3b8',11,'right');arrowText(ctx,v+' V',gR-6,Y(v)+4,'#94a3b8',11,'right');}});
+  // average line on input
+  ctx.strokeStyle='#f59e0b';ctx.setLineDash([6,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gL,Y(4.5));ctx.lineTo(gL+gW,Y(4.5));ctx.stroke();ctx.setLineDash([]);
+  arrowText(ctx,'- - average 4.5 V',gL+4,Y(5.7),'#f59e0b',11,'left');
+  // traces
+  const span=6, X=(x0,t)=>x0+gW-(Z.t-t)/span*gW;
+  [['vin',gL,'#f59e0b'],['out',gR,'#10b981']].forEach(([k,x0,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
+    Z.h.forEach((p,i)=>{const x=X(x0,p.t),y=Y(p[k]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
+  arrowText(ctx,'INPUT (DC + music)',gL+gW/2,T-10,'#f59e0b',13);
+  arrowText(ctx,'OUTPUT = input − capacitor',gR+gW/2,T-10,'#10b981',13);
+  // live dots
+  ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(gL+gW,Y(last.vin),5,0,7);ctx.fill();
+  ctx.fillStyle='#10b981';ctx.beginPath();ctx.arc(gR+gW,Y(last.out),5,0,7);ctx.fill();
+  // middle: capacitor as a "height shifter"
+  const mx=(gL+gW+gR)/2, frac=Math.max(0,Math.min(1,last.vc/4.5));
+  ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(gL+gW+10,Y(last.vin));ctx.lineTo(mx-8,Y(last.vin));ctx.stroke();
+  ctx.fillStyle='#cbd5e1';ctx.fillRect(mx-8,Y(last.vin)-16,4,32);ctx.fillRect(mx+4,Y(last.out)-16,4,32);
+  ctx.beginPath();ctx.moveTo(mx+8,Y(last.out));ctx.lineTo(gR-10,Y(last.out));ctx.stroke();
+  // held voltage bracket
+  if(last.vc>0.05){ctx.strokeStyle='#60a5fa';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mx-1,Y(last.vin));ctx.lineTo(mx-1,Y(last.out));ctx.stroke();
+    ctx.fillStyle='#60a5fa';ctx.beginPath();ctx.moveTo(mx-1,Y(last.out));ctx.lineTo(mx-6,Y(last.out)-9);ctx.lineTo(mx+4,Y(last.out)-9);ctx.fill();}
+  arrowText(ctx,'capacitor holds',mx,Y(-1.5)+22,'#60a5fa',12);
+  arrowText(ctx,last.vc.toFixed(2)+' V',mx,Y(-1.5)+40,'#60a5fa',16);
+  // output average + explanation
+  let s=0,n=0;Z.h.forEach(p=>{if(p.t>Z.t-1.25){s+=p.out;n++;}});const avg=n?s/n:0;
+  let msg,col;
+  if(avg>0.15){msg='Output average is '+avg.toFixed(2)+' V, above 0, so current flows through the resistor and keeps filling the capacitor…';col='#fbbf24';}
+  else {msg='Settled: the capacitor holds the 4.5 V average, so the output wiggles around 0 V ✓';col='#10b981';}
+  arrowText(ctx,msg,400,Y(-1.5)+75,col,13);
+}
+let lastZ=performance.now();
+function frameZ(now){const dt=Math.min(0.05,(now-lastZ)/1000);lastZ=now;stepZ(dt);drawZ();requestAnimationFrame(frameZ);}
+requestAnimationFrame(frameZ);
+</script>
+
+<script>
+// ===== Balance / electrons demo =====
+const E={mode:1,t:0,vc:0.6,off:0,vin:0.6,I:0};
+choices('eChoices',['Steady push (DC)','Music (changing push)'],1,i=>{E.mode=i;});
+function stepE(dt){E.t+=dt;E.vin=E.mode===0?0.9:0.6+0.35*Math.sin(2*Math.PI*0.5*E.t);
+  E.I=E.vin-E.vc;E.vc+=E.I*dt/0.35;E.off-=E.I*dt*900;}
+function drawE(){const c=$('cElec'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const y=170,cx=400;
+  // wires + moving charges
+  ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(cx-14,y);ctx.moveTo(cx+14,y);ctx.lineTo(740,y);ctx.stroke();
+  ctx.strokeStyle='#fbbf24';ctx.lineWidth=9;ctx.lineCap='round';ctx.setLineDash([0,24]);ctx.lineDashOffset=E.off;
+  ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(cx-24,y);ctx.stroke();ctx.beginPath();ctx.moveTo(cx+24,y);ctx.lineTo(740,y);ctx.stroke();ctx.setLineDash([]);ctx.lineCap='butt';
+  // plates
+  ctx.fillStyle='#cbd5e1';ctx.fillRect(cx-16,y-50,6,100);ctx.fillRect(cx+10,y-50,6,100);
+  const n=Math.round(Math.max(0,E.vc)*8);for(let i=0;i<n;i++){const yy=y-44+i*(88/8);arrowText(ctx,'+',cx-28,yy+8,'#f87171',14);arrowText(ctx,'−',cx+28,yy+8,'#60a5fa',14);}
+  arrowText(ctx,'gap',cx,y+68,'#94a3b8',12);arrowText(ctx,'nothing crosses',cx,y+84,'#94a3b8',12);
+  arrowText(ctx,'input side',150,y+40,'#94a3b8',12);arrowText(ctx,'output side',650,y+40,'#94a3b8',12);
+  // balance bars
+  const bx=60,bw=60,bh=90,by=20;
+  [[E.vin,'#f59e0b','input push',bx],[E.vc,'#60a5fa','capacitor push-back',bx+150]].forEach(([v,col,l,x])=>{
+    ctx.fillStyle='#2a3650';ctx.fillRect(x,by,bw,bh);ctx.fillStyle=col;const hh=Math.min(1,v)*bh;ctx.fillRect(x,by+bh-hh,bw,hh);
+    arrowText(ctx,l,x+bw/2,by+bh+16,col,12);});
+  let msg,col;
+  if(Math.abs(E.I)<0.015){msg='Balanced: no flow';col='#10b981';}
+  else if(E.I>0){msg='Input pushes harder: charge flows forward →';col='#fbbf24';}
+  else {msg='← Capacitor pushes harder: charge flows back';col='#fbbf24';}
+  arrowText(ctx,msg,340,60,col,16,'left');
+  arrowText(ctx,E.mode===0?'Steady push: balances once, then stays still forever.':'Changing push: balance keeps breaking, so the charges keep sloshing.',340,88,'#cbd5e1',13,'left');
+}
+// ===== Race: thimble vs bathtub =====
+const RC={w:0,t:0,a:0,b:0,h:[]}, waves=[{f:0.3,lab:'Slow wave (bass)'},{f:2.5,lab:'Fast wave (treble)'}], tS=0.08,tB=3;
+choices('sChoices',waves.map(w=>w.lab),0,i=>{RC.w=i;RC.h=[];});
+function stepR(dt){RC.t+=dt;const vin=0.8*Math.sin(2*Math.PI*waves[RC.w].f*RC.t);
+  RC.a+=(vin-RC.a)*dt/tS;RC.b+=(vin-RC.b)*dt/tB;RC.h.push({t:RC.t,vin,a:RC.a,b:RC.b});prune(RC.h,RC.t,waves[RC.w].f<1?7:2.5);}
+function drawR(){const c=$('cRace'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const span=waves[RC.w].f<1?7:2.5, T=45,H=170;
+  [[20,'a','🥄 Small capacitor (thimble)',tS],[410,'b','🛁 Big capacitor (bathtub)',tB]].forEach(([x0,k,title,tau])=>{
+    const W=370,X=t=>x0+W-(RC.t-t)/span*W,Y=v=>T+H/2-v*H/2.1;
+    ctx.fillStyle='#1e293b';ctx.fillRect(x0,T,W,H);
+    arrowText(ctx,title,x0+W/2,T-14,'#e2e8f0',15);
+    // gap shading
+    ctx.strokeStyle='rgba(16,185,129,0.35)';ctx.lineWidth=2;
+    RC.h.forEach((p,i)=>{if(i%3)return;const x=X(p.t);ctx.beginPath();ctx.moveTo(x,Y(p.vin));ctx.lineTo(x,Y(p[k]));ctx.stroke();});
+    [['vin','#f59e0b'],[k,'#60a5fa']].forEach(([kk,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
+      RC.h.forEach((p,i)=>{const x=X(p.t),y=Y(p[kk]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
+    const wt=2*Math.PI*waves[RC.w].f*tau, g=wt/Math.sqrt(1+wt*wt);
+    ctx.fillStyle='#2a3650';ctx.fillRect(x0,T+H+22,W,14);ctx.fillStyle='#10b981';ctx.fillRect(x0,T+H+22,W*g,14);
+    arrowText(ctx,'gets through: '+Math.round(g*100)+'%',x0+W/2,T+H+56,g>0.6?'#10b981':'#f87171',14);
+    arrowText(ctx,g>0.6?'can\'t keep up, so the wave passes':'keeps up, so the wave is cancelled',x0+W/2,T+H+74,'#94a3b8',12);
+  });
+}
+let lastE=performance.now();
+function frameE(now){const dt=Math.min(0.05,(now-lastE)/1000);lastE=now;stepE(dt);stepR(dt);drawE();drawR();requestAnimationFrame(frameE);}
+requestAnimationFrame(frameE);
+</script>
+
+<script>
+// ===== Long pipe inertia demo =====
+const LP={mode:0,t:0,q:0.15,q2:0.15,S:1,d:0.15,P:1,off1:0,off2:0,h:[],glitch:0};
+choices('lChoices',['No tank','Tank far away','Tank right beside the chip'],0,i=>{LP.mode=i;LP.S=1;LP.q=LP.q2=LP.d;});
+function stepLP(DT){const n=10,dt=DT/n;for(let k=0;k<n;k++){
+  LP.t+=dt;const ph=LP.t%0.9;const r=0.05,g=0.1;
+  LP.d=0.15+1.05*(ph<r?ph/r:ph<g?1:ph<g+r?1-(ph-g)/r:0);
+  const tau=0.35,tau2=0.025,C=0.6;let short;
+  if(LP.mode===0){LP.q+=(LP.d-LP.q)*dt/tau;LP.q2=LP.q;LP.S=1;short=LP.d-LP.q;}
+  else if(LP.mode===1){LP.q+=(LP.q2+2*(1-LP.S)-LP.q)*dt/tau;LP.q2+=(LP.d-LP.q2)*dt/tau2;LP.S=Math.min(1,Math.max(0,LP.S+(LP.q-LP.q2)*dt/C));short=LP.d-LP.q2;}
+  else {LP.q+=(LP.d+2*(1-LP.S)-LP.q)*dt/tau;LP.q2=LP.d;LP.S=Math.min(1,Math.max(0,LP.S+(LP.q-LP.d)*dt/C));short=0;}
+  LP.P=1-0.6*Math.max(0,short)-0.3*(1-LP.S);
+  LP.off1-=LP.q*dt*300;LP.off2-=LP.q2*dt*300;
+ }
+ if(LP.P<0.75)LP.glitch=0.4;LP.glitch=Math.max(0,LP.glitch-DT);
+ LP.h.push({t:LP.t,P:LP.P,th:0.75});prune(LP.h,LP.t,4);}
+function drawLP(){const c=$('cPipe'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const y=120,x0=120,xT=650,xm=390;
+  const pipe=(a,b,off)=>{ctx.strokeStyle='#bcd6fb';ctx.lineWidth=22;ctx.beginPath();ctx.moveTo(a,y);ctx.lineTo(b,y);ctx.stroke();
+    ctx.strokeStyle='#3b82f6';ctx.lineWidth=6;ctx.setLineDash([16,14]);ctx.lineDashOffset=off;ctx.beginPath();ctx.moveTo(a,y);ctx.lineTo(b,y);ctx.stroke();ctx.setLineDash([]);};
+  // supply tank
+  ctx.fillStyle='#3b82f6';ctx.fillRect(30,40,90,140);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=3;ctx.strokeRect(30,40,90,140);
+  arrowText(ctx,'power',75,100,'#fff',14);arrowText(ctx,'supply',75,118,'#fff',14);
+  if(LP.mode===1){pipe(x0,xm,LP.off1);pipe(xm,xT,LP.off2);}else if(LP.mode===2){pipe(x0,xT-70,LP.off1);pipe(xT-70,xT,LP.off2);}else pipe(x0,xT,LP.off1);
+  arrowText(ctx,'long pipe: the water must speed up first (inertia)',400,y+34,'#94a3b8',12);
+  arrowText(ctx,'speed: '+Math.round(LP.q*100)+'%',x0+60,y+34,'#60a5fa',12);
+  // small tank
+  const tx=LP.mode===1?xm:LP.mode===2?xT-70:null;
+  if(tx){const w=56,h=60,tt=y-11-h;ctx.fillStyle='#1e293b';ctx.fillRect(tx-w/2,tt,w,h);ctx.fillStyle='#60a5fa';ctx.fillRect(tx-w/2,tt+h*(1-LP.S),w,h*LP.S);
+    ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;ctx.strokeRect(tx-w/2,tt,w,h);arrowText(ctx,'100 nF tank',tx,tt-8,'#60a5fa',12);}
+  // tap / chip
+  ctx.fillStyle=LP.glitch>0?'#fee2e2':'#475569';ctx.fillRect(xT,y-35,80,70);
+  arrowText(ctx,'CHIP',xT+40,y-4,LP.glitch>0?'#b91c1c':'#fff',14);arrowText(ctx,LP.glitch>0?'GLITCH!':'OK',xT+40,y+16,LP.glitch>0?'#b91c1c':'#4ade80',13);
+  // gulp stream
+  const sw=4+14*(LP.d-0.15);ctx.fillStyle='#3b82f6';ctx.fillRect(xT+40-sw/2,y+35,sw,30);
+  arrowText(ctx,LP.d>0.5?'GULP!':'sipping',xT+40,y+82,LP.d>0.5?'#fbbf24':'#94a3b8',12);
+  // gauge
+  const gx=740,gy=y-58;ctx.strokeStyle='#2a3650';ctx.lineWidth=8;ctx.beginPath();ctx.arc(gx,gy,22,Math.PI,2*Math.PI);ctx.stroke();
+  ctx.strokeStyle='#ef4444';ctx.beginPath();ctx.arc(gx,gy,22,Math.PI,Math.PI*1.75);ctx.stroke();
+  ctx.strokeStyle='#10b981';ctx.beginPath();ctx.arc(gx,gy,22,Math.PI*1.75,2*Math.PI);ctx.stroke();
+  const a=Math.PI+Math.max(0,Math.min(1,LP.P))*Math.PI;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+20*Math.cos(a),gy+20*Math.sin(a));ctx.stroke();
+  arrowText(ctx,'pressure',gx,gy+16,'#94a3b8',11);
+  plot(ctx,60,230,700,80,LP.h,LP.t,4,[{k:'P',col:'#3b82f6',label:'pressure (voltage) at the chip'},{k:'th',col:'#ef4444',dash:[6,4],lw:1.5,label:'below this the chip glitches'}],0.2,1.05,'');
+}
+let lastLP=performance.now();
+function frameLP(now){const dt=Math.min(0.05,(now-lastLP)/1000);lastLP=now;stepLP(dt);drawLP();requestAnimationFrame(frameLP);}
+requestAnimationFrame(frameLP);
+</script>
+
+<script>
+const LINKS={"hub": {"web": "https://claude.ai/artifact/PMq2YkU4BVFW8M5MXWXPG6", "file": "index.html"}, "capacitor": {"web": "https://claude.ai/artifact/1o6HM5cbubAaBdgnwipgfP", "file": "capacitor.html"}, "resistor": {"web": "https://claude.ai/artifact/WAXu6C27xupiicC5hkDcEa", "file": "resistor.html"}, "diode": {"web": "https://claude.ai/artifact/Ny8bfjVrvdDofDt6kC4DSb", "file": "diode.html"}, "led": {"web": "https://claude.ai/artifact/7Cbu5cYi8sZcNzqe86DvWm", "file": "led.html"}, "transistor": {"web": "https://claude.ai/artifact/VEvxPsqDqPm9pZ74THwNsa", "file": "transistor.html"}, "chips": {"web": "https://claude.ai/artifact/LrYTBReH3ve9cRPbtd5wyJ", "file": "chips.html"}, "inductor": {"web": "#", "file": "inductor.html"}, "relay": {"web": "#", "file": "relay.html"}, "circuits": {"web": "#", "file": "circuits.html"}, "quiz": {"web": "#", "file": "quiz.html"}};
+document.querySelectorAll('a[data-page]').forEach(a=>{const l=LINKS[a.dataset.page];if(!l)return;const local=location.protocol==='file:';a.href=local?l.file:l.web;if(!local)a.target='_blank';});
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+
+<section>
+  <h2><span class="num">?</span>How the quiz works</h2>
+  <p>31 challenges based on the lessons. Each one shows a circuit. Your answer is <b>put into the circuit and simulated</b>, so you see what really happens, whether you were right or wrong.</p>
+  <div class="cards">
+    <div class="card"><div class="ico">🧩</div><h3>Pick the part</h3><p>A circuit has a gap marked <b>?</b>. Choose which component belongs there.</p></div>
+    <div class="card"><div class="ico">🎚️</div><h3>Choose the value</h3><p>Pick an approximate strength (ohms, farads…) with a slider, then test it.</p></div>
+    <div class="card"><div class="ico">🔮</div><h3>What will happen?</h3><p>Predict the behaviour, then watch the simulation.</p></div>
+    <div class="card"><div class="ico">🛠️</div><h3>Build it</h3><p>Fill several slots to make a circuit that does a job, then press <b>Test circuit</b>.</p></div>
+  </div>
+  <p class="hint">Only your <b>first</b> answer counts towards the score, but you can retry as often as you like to experiment.</p>
+</section>
+
+<section id="quizCard">
+  <div class="qtop">
+    <div id="qMeta" class="qmeta"></div>
+    <div id="qScore" class="qscore"></div>
+  </div>
+  <div id="qDots" class="qdots"></div>
+  <h2 id="qTitle" style="margin:14px 0 6px"></h2>
+  <p id="qPrompt" style="margin-top:0"></p>
+  <canvas id="cQuiz" width="800" height="340"></canvas>
+  <div id="qControls" style="margin-top:12px"></div>
+  <div id="qFeedback" class="qfb" hidden></div>
+  <div class="qnav"><button id="qPrev">← Previous</button><button id="qResults">🏁 See results</button><button id="qNext" class="active">Next →</button></div>
+</section>
+
+<section id="quizResults" hidden>
+  <h2>🏁 Your results</h2>
+  <div id="qResBody"></div>
+  <div class="qnav"><button id="qBack">← Back to the questions</button><button id="qRestart" class="active">🔄 Start over</button></div>
+</section>

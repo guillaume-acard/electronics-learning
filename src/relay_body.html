@@ -1,0 +1,78 @@
+
+<section>
+  <h2><span class="num">1</span>The short version</h2>
+  <p class="tldr">A relay is a <b>switch flipped by an electromagnet</b>. A small current through its <b>coil</b> makes a magnet that pulls a metal arm, which closes (or opens) a <b>completely separate</b> circuit. You hear it go <i>click</i>.</p>
+  <p>The two sides are <b>not electrically connected</b>: a 5 V microcontroller can safely switch a 12 V motor or even a 230 V lamp. It combines the <a data-page="inductor" class="navlink">inductor</a> (the coil) with a mechanical switch.</p>
+</section>
+
+<section>
+  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <div class="cards">
+    <div class="card"><div class="ico">🏠</div><h3>Switching mains appliances</h3><p><b>Why:</b> an Arduino can't touch 230 V, but a relay can switch a lamp, heater or pump while keeping the low-voltage side fully isolated.</p></div>
+    <div class="card"><div class="ico">🚗</div><h3>Cars</h3><p><b>Why:</b> headlights, horn and starter need big currents. A thin wire from the dashboard switch drives a relay near the battery, which carries the heavy current.</p></div>
+    <div class="card"><div class="ico">🔀</div><h3>Changeover</h3><p><b>Why:</b> one relay can switch between two circuits (NC ↔ NO), for example mains to backup battery, or speaker A to speaker B.</p></div>
+    <div class="card"><div class="ico">🧠</div><h3>Simple memory and logic</h3><p><b>Why:</b> a relay can hold itself on (latching), as in machine start/stop buttons. The first computers were built from relays!</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">3</span>How it works (and the water analogy)</h2>
+  <ul>
+    <li><b>COM</b> (common) is the moving arm. <b>NC</b> (normally closed) is touched by the arm at rest. <b>NO</b> (normally open) is touched only when the coil is powered.</li>
+    <li>The coil needs a minimum voltage to <b>pull in</b> (e.g. ~3.75 V for a 5 V relay). Once pulled in, it holds until the voltage drops much lower (<b>drop-out</b>, ~1 V). This gap makes it snap cleanly instead of chattering.</li>
+    <li><b>Water analogy:</b> a small pipe drives a little turbine that pulls a lever. The lever opens a valve on a <b>completely separate</b> big pipe. The two waters never mix.</li>
+  </ul>
+  <div class="controls"><label class="slider" style="flex:1">Coil voltage<input id="rlV" type="range" min="0" max="6" step="0.05" value="0" style="flex:1;width:auto"></label><b id="rlVt" style="min-width:60px"></b></div>
+  <canvas id="cRelay" width="800" height="320"></canvas>
+  <p class="hint">Slide up slowly: nothing until about 3.75 V, then <b>click</b>. Now slide back down: it stays on until about 1 V. The NC lamp (red) and NO lamp (green) swap.</p>
+</section>
+
+<section>
+  <h2><span class="num">4</span>Simple example circuits</h2>
+
+  <h3>A. A microcontroller switching a lamp through a relay</h3>
+  <p>The relay coil needs ~70 mA, too much for a pin (20 mA). So we use a <b>transistor</b> to drive the coil (see the <a data-page="transistor" class="navlink">transistor page</a>), plus a <b>flyback diode</b> across the coil because it's an inductor and kicks back when switched off. The lamp circuit is completely separate.</p>
+  <div class="controls"><button id="raPin">Pin: LOW</button><span id="raChoices"></span></div>
+  <canvas id="cRA" width="800" height="300"></canvas>
+  <p class="hint">Ready-made "relay modules" for Arduino contain exactly this: the transistor, the diode and an LED, all on one small board.</p>
+
+  <h3>B. Self-latching relay (start / stop)</h3>
+  <p>Press <b>START</b>: the coil is powered, and the relay's own NO contact closes a path that <b>keeps feeding its coil</b>. Release START: it stays on. Press <b>STOP</b> (a normally-closed button) to break the loop and it drops out. That's a 1-bit memory, used on machine tools and garage doors.</p>
+  <div class="controls"><button id="lbStart" style="background:#10b981;color:#fff">👆 START (hold)</button><button id="lbStop" style="background:#ef4444;color:#fff">👆 STOP (hold)</button></div>
+  <canvas id="cLatch" width="800" height="280"></canvas>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Relay or transistor?</h2>
+  <table>
+    <tr><td></td><td><b>Relay</b></td><td><b>Transistor / MOSFET</b></td></tr>
+    <tr><td>Isolation</td><td>✓ Full: the sides are not connected</td><td>✗ Shared ground</td></tr>
+    <tr><td>Switches AC (mains)</td><td>✓ Yes</td><td>✗ Not directly (DC only)</td></tr>
+    <tr><td>Speed</td><td>Slow (~10 ms), it clicks</td><td>Very fast (millions of times/s): PWM dimming</td></tr>
+    <tr><td>Lifetime</td><td>Contacts wear (~100,000 operations)</td><td>Practically unlimited</td></tr>
+    <tr><td>Drive</td><td>Needs ~70 mA plus a flyback diode</td><td>A few mA (BJT) or almost nothing (MOSFET)</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">6</span>Key facts</h2>
+  <table>
+    <tr><td>Coil voltage</td><td>5 V, 12 V, 24 V… Choose one that matches your control supply.</td></tr>
+    <tr><td>Coil current</td><td>Typically 30–100 mA, so drive it with a transistor.</td></tr>
+    <tr><td>Contact rating</td><td>Printed on top, e.g. <code>10A 250VAC / 10A 30VDC</code>: the maximum the switch side can carry.</td></tr>
+    <tr><td>Pins</td><td>2 coil pins + <b>COM</b>, <b>NO</b>, <b>NC</b>. SPDT = one changeover, DPDT = two at once.</td></tr>
+    <tr><td>Variants</td><td><b>Solid-state relay (SSR)</b>: no moving parts, silent, uses an LED + light-sensitive switch inside. <b>Reed relay</b>: tiny, for small signals.</td></tr>
+  </table>
+  <p class="warn" style="margin-top:16px"><b>⚠️ Mains safety:</b> 230 V can kill. Practise with a <b>12 V lamp and a 12 V supply</b>. If you ever switch mains, use an enclosed, certified relay module, keep the mains side fully insulated, and get help from an adult or an electrician.</p>
+</section>
+
+<section>
+  <h2><span class="num">7</span>Recap</h2>
+  <ul>
+    <li>A relay is a <b>switch moved by an electromagnet</b>.</li>
+    <li><b>COM</b> touches <b>NC</b> at rest and <b>NO</b> when the coil is powered.</li>
+    <li>The two sides are <b>isolated</b>, so low voltage can control high voltage and AC.</li>
+    <li>Drive the coil with a <b>transistor</b> and protect it with a <b>flyback diode</b>.</li>
+    <li>Slow and clicky, but simple and robust. Use a transistor/MOSFET when you need speed.</li>
+  </ul>
+</section>

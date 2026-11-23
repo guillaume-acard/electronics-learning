@@ -1,0 +1,118 @@
+<header>
+  <h1>The LED</h1>
+  <p>Light Emitting Diode: a one-way valve that glows</p>
+</header>
+<main>
+<nav style="margin:4px 0 0"><a data-page="hub" class="navlink">← All components</a></nav>
+
+<section>
+  <h2><span class="num">1</span>The short version</h2>
+  <p class="tldr">An LED is a <b>diode that gives off light</b> when current flows through it forwards. It only works one way round, and its <b>brightness depends on the current</b>, not the voltage.</p>
+  <p>The golden rule: <b>an LED always needs something to limit its current</b>, usually a resistor. Connect it straight to a battery and it burns out within a second. (Everything about one-way valves is on the <a data-page="diode" class="navlink">diode page</a>.)</p>
+</section>
+
+<section>
+  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <div class="cards">
+    <div class="card"><div class="ico">🔴</div><h3>Indicator lights</h3><p>"Power on", "charging", "recording". <b>Why:</b> tiny, cheap, uses very little power (a few mA) and lasts for years. Your Ruby amp has one!</p></div>
+    <div class="card"><div class="ico">💡</div><h3>Lighting</h3><p>Bulbs, torches, car lights. <b>Why:</b> roughly 5–10× more efficient than old filament bulbs, so less heat and more light.</p></div>
+    <div class="card"><div class="ico">📺</div><h3>Screens</h3><p>TVs, phones and big stadium displays are made of millions of tiny red, green and blue LEDs mixed together.</p></div>
+    <div class="card"><div class="ico">📡</div><h3>Remote controls</h3><p>An <b>infrared</b> LED (invisible to you) blinks a code to the TV. Look at it through a phone camera and you can see it flash!</p></div>
+    <div class="card"><div class="ico">🔌</div><h3>Optocouplers</h3><p>An LED shining on a light sensor inside one chip passes a signal across with <b>no electrical connection</b>. Used for safety in chargers.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">3</span>Water analogy, and why it needs a resistor</h2>
+  <p>Picture the diode's one-way valve, with a <b>little glowing paddle wheel</b> behind it. The more water flows, the faster it spins and the brighter it glows. But the valve opens very suddenly: below ~2 V almost nothing flows, and just a bit above, a <b>flood</b> rushes through.</p>
+  <ul>
+    <li><b>Directly on a voltage:</b> a tiny change in voltage makes a <b>huge</b> change in current. It's impossible to control, and the LED burns.</li>
+    <li><b>Through a resistor:</b> the resistor (a narrow pipe) limits the flood. Now the current rises <b>gently and predictably</b> with the voltage.</li>
+  </ul>
+  <div class="controls"><span id="ldChoices"></span><button id="ldNew">🔧 New LED</button></div>
+  <div class="controls"><label class="slider" style="flex:1">Supply voltage<input id="ldV" type="range" min="0" max="5" step="0.01" value="1.8" style="flex:1;width:auto"></label><b id="ldVt" style="min-width:60px"></b></div>
+  <canvas id="cLD" width="800" height="270"></canvas>
+  <p class="hint">Try "Directly": move from 1.8 V to 2.1 V, a tiny move, and watch the current explode past 20 mA. Then try "Through a 150 Ω resistor" and sweep the whole range.</p>
+</section>
+
+<section>
+  <h2><span class="num">4</span>Colours, forward voltage and the resistor calculator</h2>
+  <p>Each colour needs a different push to light up (the <b>forward voltage, Vf</b>). Bluer light carries more energy, so it needs more voltage:</p>
+  <table>
+    <tr><td>Infrared</td><td>≈ 1.2 V</td></tr><tr><td>🔴 Red</td><td>≈ 1.8–2.0 V</td></tr><tr><td>🟡 Yellow / 🟠 orange</td><td>≈ 2.0–2.1 V</td></tr>
+    <tr><td>🟢 Green</td><td>≈ 2.0–3.2 V (depends on type)</td></tr><tr><td>🔵 Blue / ⚪ white</td><td>≈ 3.0–3.3 V</td></tr>
+  </table>
+  <p style="margin-top:14px"><b>The formula:</b> the resistor takes whatever voltage the LED doesn't. <code>R = (Supply − Vf) ÷ Current</code></p>
+  <div class="card" style="padding:16px">
+    <div class="controls" style="margin-top:0">
+      <label class="slider">Supply (V) <input id="kV" type="number" value="9" step="0.1" min="0" style="width:70px;font:inherit;padding:5px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></label>
+      <label class="slider">LED colour <select id="kC" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></label>
+      <label class="slider">Current (mA) <input id="kI" type="number" value="10" step="1" min="1" max="30" style="width:70px;font:inherit;padding:5px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></label>
+      <button id="kRuby">🎸 Ruby amp power LED</button>
+    </div>
+    <canvas id="cCalc" width="800" height="150"></canvas>
+  </div>
+  <p class="hint">Standard resistors only come in certain values (1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2 × 10ⁿ), so pick the next value <b>up</b> to stay safe. For indicator lights, 2–10 mA is plenty: modern LEDs are bright.</p>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Which leg is which?</h2>
+  <canvas id="cLegs" width="800" height="230"></canvas>
+  <p class="hint">Long leg = <b>anode (+)</b>, which goes towards the positive supply. Short leg and flat edge = <b>cathode (−)</b>, towards ground. Inside, the bigger "anvil" piece is usually the cathode. If it doesn't light, try turning it round: backwards, it simply blocks (it won't get damaged at low voltages).</p>
+</section>
+
+<section>
+  <h2><span class="num">6</span>Simple example circuits</h2>
+
+  <h3>A. Several LEDs: one resistor each</h3>
+  <p>It's tempting to share one resistor between LEDs in parallel. But no two LEDs are identical, and because the current rises so steeply, the one with the slightly lowest Vf <b>hogs most of the current</b>. It overheats and dies, then the next one takes over. <b>Fix:</b> give each LED its own resistor.</p>
+  <div class="controls"><span id="mlChoices"></span></div>
+  <canvas id="cMulti" width="800" height="250"></canvas>
+
+  <h3>B. Dimming by blinking fast (PWM)</h3>
+  <p>To dim an LED, chips don't lower the voltage. They switch it <b>fully on and off very fast</b>. Your eye averages the flashes: on 25% of the time looks like 25% brightness. This is called <b>PWM</b> (pulse width modulation). <b>Why:</b> it's efficient and precise, and it's how phones dim screens and Arduinos fade LEDs.</p>
+  <div class="controls"><label class="slider" style="flex:1">On-time (duty)<input id="pwD" type="range" min="0" max="1" step="0.01" value="0.25" style="flex:1;width:auto"></label>
+    <label class="slider" style="flex:1">Blink speed<input id="pwF" type="range" min="-0.3" max="2.3" step="0.01" value="0" style="flex:1;width:auto"></label></div>
+  <canvas id="cPWM" width="800" height="230"></canvas>
+
+  <h3>C. RGB LED: mixing colours</h3>
+  <p>An RGB LED has a red, a green and a blue LED in one package. Dim each one with PWM and your eye mixes them into any colour. That's exactly what every pixel on a screen does.</p>
+  <div class="controls">
+    <label class="slider">🔴<input id="rgbR" type="range" min="0" max="255" value="255"></label>
+    <label class="slider">🟢<input id="rgbG" type="range" min="0" max="255" value="140"></label>
+    <label class="slider">🔵<input id="rgbB" type="range" min="0" max="255" value="0"></label>
+  </div>
+  <canvas id="cRGB" width="800" height="220"></canvas>
+</section>
+
+<section>
+  <h2><span class="num">7</span>Key facts</h2>
+  <table>
+    <tr><td>Symbol</td><td>A diode symbol with two little arrows pointing out (light leaving).</td></tr>
+    <tr><td>Forward voltage (Vf)</td><td>Red ≈ 2 V … blue/white ≈ 3.2 V</td></tr>
+    <tr><td>Max current</td><td>Standard 5 mm LED: <b>20 mA</b> max. Use 2–15 mA in practice.</td></tr>
+    <tr><td>Polarity</td><td>Long leg + (anode), short leg and flat side − (cathode).</td></tr>
+    <tr><td>Reverse voltage</td><td>Only ~5 V! LEDs are poor at blocking big backward voltages.</td></tr>
+    <tr><td>Always</td><td>Limit the current: resistor = (supply − Vf) ÷ current.</td></tr>
+  </table>
+  <h3>Common types</h3>
+  <table>
+    <tr><td>3 mm / 5 mm through-hole</td><td>The classic indicator LED, as in your Ruby amp.</td></tr>
+    <tr><td>SMD LEDs</td><td>Tiny surface-mount ones on modern boards.</td></tr>
+    <tr><td>High-power LEDs</td><td>1 W–100 W+ for lighting. They need a heatsink and a constant-current driver.</td></tr>
+    <tr><td>RGB / addressable (WS2812 "NeoPixel")</td><td>Colour mixing. Addressable ones have a tiny chip inside, controlled by one data wire.</td></tr>
+    <tr><td>Infrared</td><td>Remote controls, sensors.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">8</span>Recap</h2>
+  <ul>
+    <li>An LED is a <b>diode that glows</b>: one direction only, long leg to +.</li>
+    <li>Brightness follows the <b>current</b>, and the current rises extremely steeply with voltage.</li>
+    <li>So: <b>always use a resistor</b>. R = (supply − Vf) ÷ current.</li>
+    <li>Each colour has its own Vf (red ~2 V, blue/white ~3.2 V).</li>
+    <li>One resistor per LED. Dim with fast blinking (PWM). Mix red, green and blue to make any colour.</li>
+  </ul>
+</section>
+</main>
