@@ -25,7 +25,7 @@
   <p><b>Telling them apart:</b> the active one is often taller with its underside sealed in black resin, and its + leg is longer or marked. A passive one often shows a green circuit board underneath. Or test it: 5 V for a second. A continuous beep = active, a click = passive.</p>
   <p><b>Inside, two technologies:</b> a <b>piezo</b> buzzer is a thin ceramic disc that bends when you put a voltage on it (the same piezoelectric effect as a <a class="navlink" href="#s4060">quartz crystal</a>). It draws very little current and can be driven straight from a pin. A <b>magnetic</b> buzzer is a small coil pulling a metal disc, like a tiny speaker: it needs more current, a transistor, and a <b>flyback diode</b> (it's a coil!).</p>
   <p><b>Water analogy:</b> the active buzzer is a toy whistle with its own pump: open the tap and it whistles. The passive buzzer is a bare whistle: it only sings if <i>you</i> blow into it at the right rhythm.</p>
-  <div class="controls"><span id="bzKind"></span><button id="bzDC">⚡ Steady DC</button><button id="bzSQ" class="active">〰 Square wave</button><label class="slider" style="flex:1">Frequency<input id="bzF" type="range" min="200" max="4000" step="10" value="1000" style="flex:1;width:auto"></label><button id="bzPlay">🔊 Listen</button></div>
+  <div class="controls"><span id="bzKind"></span><button id="bzDC">⚡ Steady DC</button><button id="bzSQ" class="active">〰 Square wave</button><label class="slider grow">Frequency<input id="bzF" type="range" min="200" max="4000" step="10" value="1000"></label><button id="bzPlay">🔊 Listen</button></div>
   <canvas id="cBuzz" width="800" height="260"></canvas>
   <p class="hint">"Listen" plays the sound for one second through your computer (quietly). Try the passive buzzer at 300 Hz, then 3,000 Hz, and the active one on DC. Used in <a class="navlink" href="#p8">project 8</a>, <a class="navlink" href="#p11">project 11</a> and the <a class="navlink" href="#p22">IR alarm</a>.</p>
 </section>
@@ -39,7 +39,7 @@
     <li><b>0.5 W</b> (the HP508) is the most power it can take without damage. A bigger cone moves more air: more volume and deeper bass.</li>
   </ul>
   <p><b>Water analogy:</b> a rubber membrane in a pipe, pushed back and forth by the water. It can't let water through, but each push makes a wave on the other side.</p>
-  <div class="controls"><label class="slider" style="flex:1">Frequency<input id="spF" type="range" min="1" max="12" step="0.1" value="3" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Volume<input id="spV" type="range" min="0" max="1" step="0.01" value="0.6" style="flex:1;width:auto"></label><button id="spDC">⚡ Apply 9 V DC</button></div>
+  <div class="controls"><label class="slider grow">Frequency<input id="spF" type="range" min="1" max="12" step="0.1" value="3"></label><label class="slider grow">Volume<input id="spV" type="range" min="0" max="1" step="0.01" value="0.6"></label><button id="spDC">⚡ Apply 9 V DC</button></div>
   <canvas id="cSpk" width="800" height="270"></canvas>
   <p class="hint">The animation is slowed down enormously: real sound is 20 to 20,000 pushes per second. Used in <a class="navlink" href="#p10">project 10: mini amp</a> and <a class="navlink" href="#p17">project 17: police siren</a>.</p>
 </section>
@@ -55,7 +55,7 @@
     <li><b>Slowing it down:</b> not with a resistor (it wastes energy and kills the strength). Use <b>PWM</b>: full voltage switched on and off very fast (project 23), or a lower supply voltage (project 25).</li>
   </ul>
   <p><b>Water analogy:</b> a water wheel. More pressure (voltage) spins it faster. A free wheel lets little water through; block it with your hand and the full flow rushes through the pipe (the stall current).</p>
-  <div class="controls"><label class="slider" style="flex:1">Supply voltage<input id="moV" type="range" min="0" max="9" step="0.1" value="6" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Load (finger on the shaft)<input id="moL" type="range" min="0" max="1" step="0.01" value="0.1" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Supply voltage<input id="moV" type="range" min="0" max="9" step="0.1" value="6"></label><label class="slider grow">Load (finger on the shaft)<input id="moL" type="range" min="0" max="1" step="0.01" value="0.1"></label></div>
   <canvas id="cMotor" width="800" height="300"></canvas>
   <p class="hint">Push the load all the way: the motor stalls and the current jumps to its maximum. A stalled motor heats up fast, and that's the moment the battery, transistor or driver chip suffers most. The numbers are typical for a small RE140-type motor, not exact.</p>
 </section>

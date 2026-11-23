@@ -1,0 +1,10 @@
+/* shopping.html only */
+  .shop td{vertical-align:middle} .shop td:first-child{width:auto;font-weight:400}
+  .shop .grp td{background:var(--surface);font-weight:800;color:var(--accent);padding-top:16px}
+  .shop input[type=number]{width:52px;font:inherit;padding:4px;border-radius:6px;background:var(--control);color:var(--ink);border:1px solid var(--control)}
+  .shop tr.off td{opacity:.4}
+  .shop .code{font-family:ui-monospace,monospace;color:var(--yellow);white-space:nowrap}
+  .shop .used{color:var(--muted);font-size:.85rem;display:block} .shop .note{color:var(--link);font-size:.85rem;display:block}
+  .tot{position:sticky;bottom:0;background:rgba(11,17,32,.95);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between;z-index:5}
+  .tot b{font-size:1.4rem;color:var(--white)}
+  #copied{color:var(--good)}

@@ -102,8 +102,8 @@
   <p><b>How it works inside:</b> a big transistor acts as a valve between input and output. A <b>reference</b> (a precise Zener-like voltage) and a comparator constantly check the output: too high, close the valve a bit; too low, open it. The extra voltage is burned off as <b>heat</b>: power = (Vin − 5 V) × current.</p>
   <p><b>Water analogy:</b> a pressure-reducing valve on a house's water supply. Whatever the street pressure, the taps get the same gentle pressure, and the valve gets warm doing it.</p>
   <div class="controls">
-    <label class="slider" style="flex:1">Input voltage<input id="rgV" type="range" min="0" max="20" step="0.1" value="9" style="flex:1;width:auto"></label>
-    <label class="slider" style="flex:1">Current drawn by the circuit<input id="rgI" type="range" min="0" max="1" step="0.01" value="0.2" style="flex:1;width:auto"></label>
+    <label class="slider grow">Input voltage<input id="rgV" type="range" min="0" max="20" step="0.1" value="9"></label>
+    <label class="slider grow">Current drawn by the circuit<input id="rgI" type="range" min="0" max="1" step="0.01" value="0.2"></label>
     <span id="rgChoices"></span>
   </div>
   <canvas id="c7805" width="800" height="260"></canvas>
@@ -127,8 +127,8 @@
   </ul>
   <p><b>Water analogy:</b> a super-sensitive see-saw (the two inputs) connected to a powerful pump (the output). The slightest tilt drives the pump fully one way. With feedback, the pump's own pressure pushes the see-saw back level, so it settles at an exact amount.</p>
   <div class="controls"><span id="oaChoices"></span></div>
-  <div class="controls" id="oaCmp"><label class="slider" style="flex:1">+ input (sensor)<input id="oaP" type="range" min="0" max="5" step="0.01" value="2.2" style="flex:1;width:auto"></label><label class="slider" style="flex:1">− input (threshold knob)<input id="oaN" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label></div>
-  <div class="controls" id="oaAmp" style="display:none"><label class="slider" style="flex:1">Rf ÷ Rg (feedback ratio)<input id="oaG" type="range" min="0" max="20" step="0.5" value="4" style="flex:1;width:auto"></label></div>
+  <div class="controls" id="oaCmp"><label class="slider grow">+ input (sensor)<input id="oaP" type="range" min="0" max="5" step="0.01" value="2.2"></label><label class="slider grow">− input (threshold knob)<input id="oaN" type="range" min="0" max="5" step="0.01" value="2.5"></label></div>
+  <div class="controls" id="oaAmp" style="display:none"><label class="slider grow">Rf ÷ Rg (feedback ratio)<input id="oaG" type="range" min="0" max="20" step="0.5" value="4"></label></div>
   <canvas id="c358" width="800" height="270"></canvas>
 
   <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
@@ -145,7 +145,7 @@
   <p><b>How it works inside:</b> each comparator is a high-gain amplifier (like an op-amp) with no feedback: the tiniest difference between the inputs, a few millivolts, swings it fully one way or the other. Its output stage is a single transistor to ground, called an <b>open collector</b>. That is why every output needs a <b>pull-up resistor</b> to + (to give a clean "high" when the transistor is off), or an LED + resistor coming from + into the pin (it lights when the transistor switches on).</p>
   <p><b>Water analogy:</b> four lock-keepers, each watching two water levels. When the level on his − side gets higher than on his + side, he opens a drain to the ground. He never pumps water in, he can only drain it.</p>
   <p class="hint">Move the signal (on −) past the threshold (on +). Then switch the pull-up off: without it, a "no" answer leaves the output floating and nothing defines the voltage.</p>
-  <div class="controls"><label class="slider" style="flex:1">Signal on IN−<input id="c9sig" type="range" min="0" max="5" step="0.01" value="1.8" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Threshold on IN+<input id="c9thr" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label><label class="slider"><input type="checkbox" id="c9pu" checked> Pull-up 10 kΩ</label></div>
+  <div class="controls"><label class="slider grow">Signal on IN−<input id="c9sig" type="range" min="0" max="5" step="0.01" value="1.8"></label><label class="slider grow">Threshold on IN+<input id="c9thr" type="range" min="0" max="5" step="0.01" value="2.5"></label><label class="slider"><input type="checkbox" id="c9pu" checked> Pull-up 10 kΩ</label></div>
   <canvas id="c339" width="800" height="280"></canvas>
   <table>
     <tr><td></td><td><b>LM339</b> (comparator)</td><td><b>LM358</b> (op-amp)</td></tr>
@@ -169,8 +169,8 @@
   <p><b>How it works inside:</b> an input stage, a gain stage, then a <b>push-pull output</b>: two transistors, one that <b>pushes</b> the speaker out (from +9 V) and one that <b>pulls</b> it in (to ground). The gain is <b>20×</b> by default, and up to <b>200×</b> if you connect a capacitor between <b>pins 1 and 8</b>. In the Ruby, the 1 kΩ <b>gain knob</b> sits there, so you choose anywhere in between.</p>
   <p><b>Water analogy:</b> two pumps facing a flexible membrane (the speaker cone). One pushes, the other pulls, in time with the music.</p>
   <div class="controls">
-    <label class="slider" style="flex:1">🎸 Guitar signal<input id="laIn" type="range" min="0" max="1" step="0.01" value="0.4" style="flex:1;width:auto"></label>
-    <label class="slider" style="flex:1">Gain knob (pins 1–8)<input id="laG" type="range" min="0" max="1" step="0.01" value="0.2" style="flex:1;width:auto"></label>
+    <label class="slider grow">🎸 Guitar signal<input id="laIn" type="range" min="0" max="1" step="0.01" value="0.4"></label>
+    <label class="slider grow">Gain knob (pins 1–8)<input id="laG" type="range" min="0" max="1" step="0.01" value="0.2"></label>
   </div>
   <canvas id="c386" width="800" height="270"></canvas>
   <p class="hint">The output sits at half the supply (4.5 V) and swings up and down around it. That's why there's a big <b>220 µF capacitor</b> before the speaker: it blocks the 4.5 V DC and passes the music, exactly the coupling trick from the <a data-page="capacitor" class="navlink">capacitor page</a>. Push the gain too far and the swing hits 0 V / 9 V and clips, which is the Ruby's overdrive.</p>
@@ -188,7 +188,7 @@
   <p><b>What it does:</b> it lights <b>1 to 10 LEDs</b> depending on a voltage: a little voltage lights the first LED, the full-scale voltage lights all ten. It's a ready-made "level meter": battery gauges, VU-meters, thermometers (<a class="navlink" href="#p21">project 21</a> builds the same thing by hand with 3 × LM339, and lists the LM3914 as a variant), no microcontroller needed. It also <b>regulates the LED current itself</b>, so no resistor per LED.</p>
   <p><b>How it works inside:</b> a ladder of <b>10 equal resistors</b> between RLO and RHI makes 10 evenly spaced voltages. <b>10 comparators</b> (op-amps, see the <a class="navlink" href="#s358">LM358</a>) each compare the input with one rung: if the input is higher, that comparator turns its LED on. A built-in <b>1.25 V reference</b> lets you set the scale with a trimmer, and the current it supplies (× 10) sets the LED brightness. MODE chooses a <b>bar</b> (all LEDs up to the level) or a single moving <b>dot</b>.</p>
   <p><b>Water analogy:</b> a tall tank with 10 overflow holes at equal heights, each feeding a little light. The higher the water, the more holes spill.</p>
-  <div class="controls"><label class="slider" style="flex:1">Input (SIG)<input id="lm39In" type="range" min="0" max="1.3" step="0.005" value="0.3" style="flex:1;width:auto"></label><label class="slider" style="flex:1">RHI (top of scale)<input id="lm39Hi" type="range" min="0.2" max="1.25" step="0.01" value="0.5" style="flex:1;width:auto"></label><label class="slider"><input type="checkbox" id="lm39Dot"> dot mode</label></div>
+  <div class="controls"><label class="slider grow">Input (SIG)<input id="lm39In" type="range" min="0" max="1.3" step="0.005" value="0.3"></label><label class="slider grow">RHI (top of scale)<input id="lm39Hi" type="range" min="0.2" max="1.25" step="0.01" value="0.5"></label><label class="slider"><input type="checkbox" id="lm39Dot"> dot mode</label></div>
   <canvas id="c3914" width="800" height="280"></canvas>
   <p class="hint">Cousins: the <b>LM3915</b> (logarithmic steps of 3 dB, for audio) and <b>LM3916</b> (VU-meter scale). Chain two LM3914s for 20 LEDs. Gotronic: LM3914N, code 21122.</p>
   <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
@@ -204,9 +204,9 @@
   <p><b>How it works inside:</b> a chain of <b>flip-flops</b> (tiny 1-bit memories made of transistors) counts the pulses, and a <b>decoder</b> turns the count into "light output number N". Connect an output to the <b>reset</b> pin and it starts over early, so it counts to any number from 2 to 10.</p>
   <p><b>Water analogy:</b> a rotating distributor valve that sends water to the next of 10 pipes each time you push its lever. The classic pairing: a <b>555 provides the clock pulses</b> and the 4017 counts them.</p>
   <div class="controls">
-    <label class="slider" style="flex:1">Clock speed (from a 555)<input id="ctF" type="range" min="0" max="12" step="0.1" value="3" style="flex:1;width:auto"></label>
+    <label class="slider grow">Clock speed (from a 555)<input id="ctF" type="range" min="0" max="12" step="0.1" value="3"></label>
     <button id="ctStep">👆 One pulse</button>
-    <label class="slider">Count to <select id="ctN" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></label>
+    <label class="slider">Count to <select class="fsel" id="ctN"></select></label>
   </div>
   <canvas id="c4017" width="800" height="250"></canvas>
 
@@ -285,7 +285,7 @@
     <li><b>Elsewhere:</b> the Arduino's 16 MHz crystal (<a class="navlink" href="#s328">ATmega328P</a>), every computer, phone, radio and watch. Faster crystals are thicker slices, not forks.</li>
   </ul>
   <p class="hint">Push the quartz at different frequencies. Away from its own frequency, even by a few hertz, it barely moves. That razor-sharp response is why it's so precise.</p>
-  <div class="controls"><label class="slider" style="flex:1">Push frequency<input id="xtF" type="range" min="32740" max="32796" step="0.25" value="32760" style="flex:1;width:auto"></label><b id="xtFt" style="min-width:110px"></b></div>
+  <div class="controls"><label class="slider grow">Push frequency<input id="xtF" type="range" min="32740" max="32796" step="0.25" value="32760"></label><b id="xtFt" style="min-width:110px"></b></div>
   <canvas id="cXtal" width="800" height="260"></canvas>
   <p class="hint">Used in <a class="navlink" href="#p26">project 26: quartz stopwatch</a>. Keep the quartz legs short and don't touch it while it runs: your finger adds capacitance and can stop it.</p>
   <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
@@ -323,7 +323,7 @@
   <p><b>What it does:</b> it drives <b>two DC motors</b> in <b>both directions</b>, from logic signals (buttons, an Arduino). Up to <b>600 mA</b> per motor (1.2 A peaks), with a motor supply from 4.5 to 36 V on pin 8 and a separate logic supply on pin 16. The "D" means the <b>flyback diodes are built in</b>: no extra diodes for the motor's switch-off spikes.</p>
   <p><b>How it works inside: the H-bridge.</b> To reverse a DC motor, you reverse the current through it. An H-bridge is four switches arranged like the letter <b>H</b>, with the motor as the middle bar. Close top-left and bottom-right: current flows left → right. Close the other diagonal: right → left. The L293D has four "half-bridges" (1Y, 2Y, 3Y, 4Y): each output is switched either to + or to ground, copying its input. Two outputs make one H-bridge. Because each output is either + or −, never both, you can't make the deadly short circuit of closing both switches on one side.</p>
   <p><b>Water analogy:</b> a water wheel in a pipe between two tanks. Raise the left tank and lower the right: it turns one way. Swap them: it turns the other way. Same level on both sides: it stops. The L293D is the one lifting the tanks.</p>
-  <div class="controls"><button id="hbF">▶ Forward (1A=1, 2A=0)</button><button id="hbR">◀ Reverse (1A=0, 2A=1)</button><button id="hbB">■ Brake (1A=2A)</button><button id="hbC">○ Coast (EN=0)</button><label class="slider" style="flex:1">Speed (PWM on EN)<input id="hbS" type="range" min="0" max="100" step="1" value="100" style="flex:1;width:auto"></label></div>
+  <div class="controls"><button id="hbF">▶ Forward (1A=1, 2A=0)</button><button id="hbR">◀ Reverse (1A=0, 2A=1)</button><button id="hbB">■ Brake (1A=2A)</button><button id="hbC">○ Coast (EN=0)</button><label class="slider grow">Speed (PWM on EN)<input id="hbS" type="range" min="0" max="100" step="1" value="100"></label></div>
   <canvas id="c293" width="800" height="300"></canvas>
   <table>
     <tr><td>EN</td><td>1A</td><td>2A</td><td>Motor</td></tr>
@@ -347,7 +347,7 @@
   <p><b>What it does:</b> it charges a single <b>Li-ion / Li-po cell</b> (like an 18650) from 5 V USB, the safe way: first with a <b>constant current</b> (up to 1 A), then with a <b>constant voltage</b> of exactly <b>4.2 V</b> while the current fades, then it stops. Two pins drive a red "charging" and a green "done" LED. It's the chip on the charger module of <a class="navlink" href="#rl1">real-life build A</a>, a tiny 8-pin SOP soldered on the board.</p>
   <p><b>How it works inside:</b> a power transistor between VCC and BAT acts as an adjustable valve. A control loop watches the battery: below 4.2 V it regulates the <b>current</b> (set by the PROG resistor: I = 1200 ÷ R); at 4.2 V it switches to holding the <b>voltage</b>. When the current falls to a tenth of the setting, the cell is full: CHRG turns off, STDBY turns on. A thermal loop lowers the current if the chip gets too hot.</p>
   <p><b>Water analogy:</b> filling a bottle from a tap: full flow at first, then you slow down as you approach the brim, and stop exactly at the line. Over-filling a Li-ion cell (above ~4.25 V) is dangerous, hence the precise chip.</p>
-  <div class="controls"><button id="tpGo" class="active">▶ Charge (sped up)</button><label class="slider" style="flex:1">PROG resistor<input id="tpR" type="range" min="0" max="3" step="1" value="3" style="flex:1;width:auto"></label><span id="tpRl" class="hint"></span></div>
+  <div class="controls"><button id="tpGo" class="active">▶ Charge (sped up)</button><label class="slider grow">PROG resistor<input id="tpR" type="range" min="0" max="3" step="1" value="3"></label><span id="tpRl" class="hint"></span></div>
   <canvas id="c4056" width="800" height="280"></canvas>
   <p class="hint">The TP4056 does <b>not</b> protect against over-discharge or short circuits: that's the job of the separate protection chip (DW01A + dual MOSFET) on the BMS module, or on "protected" TP4056 boards (6 pins: IN+, IN−, B+, B−, OUT+, OUT−).</p>
   <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>
@@ -362,7 +362,7 @@
   <p><b>What it does:</b> it's a complete little <b>computer on one chip</b>: a processor, 32 KB of memory for your program, 2 KB of working memory, and 23 input/output pins that your code can switch, read, time and measure. The Arduino Uno (and the ONE-C, with its cousin the ATmega328P<b>B</b>) is just this chip plus USB, a 16 MHz crystal and a 5 V regulator. It runs the dice (<a class="navlink" href="#p12">project 12</a>) and the thermometer (<a class="navlink" href="#p20">project 20</a>).</p>
   <p><b>How it works inside:</b> a <b>CPU</b> reads your program from <b>Flash</b> memory and executes ~16 million simple instructions per second, ticking with the crystal. It talks to the outside through <b>ports</b> (B, C, D): each pin is a tiny switch to 5 V or 0 V (digitalWrite), or an input (digitalRead). Some pins have extras: an <b>ADC</b> (analogRead, 6 pins A0–A5, 10 bits = 0–1023), <b>timers</b> for PWM (analogWrite on 6 pins), serial (TX/RX to the PC).</p>
   <p><b>Water analogy:</b> a control room with 23 valves and gauges, and an operator (the CPU) who follows a written procedure (your program) 16 million steps per second.</p>
-  <div class="controls"><label class="slider" style="flex:1">Potentiometer on A0<input id="avA0" type="range" min="0" max="5" step="0.01" value="2.5" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Potentiometer on A0<input id="avA0" type="range" min="0" max="5" step="0.01" value="2.5"></label></div>
   <canvas id="c328" width="800" height="280"></canvas>
   <p class="hint">The demo runs a tiny program: <code>value = analogRead(A0); analogWrite(9, value / 4); digitalWrite(13, millis() / 500 % 2);</code>. Arduino pin names (D0–D13, A0–A5) are not the chip's pin numbers: D13 is chip pin 19, A0 is pin 23.</p>
   <h3 class="cx-h">🔌 Minimal circuit: every leg connected</h3>

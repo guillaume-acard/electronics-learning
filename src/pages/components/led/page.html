@@ -25,7 +25,7 @@
     <li><b>Through a resistor:</b> the resistor (a narrow pipe) limits the flood. Now the current rises <b>gently and predictably</b> with the voltage.</li>
   </ul>
   <div class="controls"><span id="ldChoices"></span><button id="ldNew">🔧 New LED</button></div>
-  <div class="controls"><label class="slider" style="flex:1">Supply voltage<input id="ldV" type="range" min="0" max="5" step="0.01" value="1.8" style="flex:1;width:auto"></label><b id="ldVt" style="min-width:60px"></b></div>
+  <div class="controls"><label class="slider grow">Supply voltage<input id="ldV" type="range" min="0" max="5" step="0.01" value="1.8"></label><b id="ldVt" class="val"></b></div>
   <canvas id="cLD" width="800" height="270"></canvas>
   <p class="hint">Try "Directly": move from 1.8 V to 2.1 V, a tiny move, and watch the current explode past 20 mA. Then try "Through a 150 Ω resistor" and sweep the whole range.</p>
 </section>
@@ -37,11 +37,11 @@
     <tr><td>Infrared</td><td>≈ 1.2 V</td></tr><tr><td>🔴 Red</td><td>≈ 1.8–2.0 V</td></tr><tr><td>🟡 Yellow / 🟠 orange</td><td>≈ 2.0–2.1 V</td></tr>
     <tr><td>🟢 Green</td><td>≈ 2.0–3.2 V (depends on type)</td></tr><tr><td>🔵 Blue / ⚪ white</td><td>≈ 3.0–3.3 V</td></tr>
   </table>
-  <p style="margin-top:14px"><b>The formula:</b> the resistor takes whatever voltage the LED doesn't. <code>R = (Supply − Vf) ÷ Current</code></p>
+  <p class="mt-m"><b>The formula:</b> the resistor takes whatever voltage the LED doesn't. <code>R = (Supply − Vf) ÷ Current</code></p>
   <div class="card" style="padding:16px">
-    <div class="controls" style="margin-top:0">
+    <div class="controls flush">
       <label class="slider">Supply (V) <input id="kV" type="number" value="9" step="0.1" min="0" style="width:70px;font:inherit;padding:5px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></label>
-      <label class="slider">LED colour <select id="kC" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></label>
+      <label class="slider">LED colour <select class="fsel" id="kC"></select></label>
       <label class="slider">Current (mA) <input id="kI" type="number" value="10" step="1" min="1" max="30" style="width:70px;font:inherit;padding:5px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></label>
       <button id="kRuby">🎸 Ruby amp power LED</button>
     </div>
@@ -66,8 +66,8 @@
 
   <h3>B. Dimming by blinking fast (PWM)</h3>
   <p>To dim an LED, chips don't lower the voltage. They switch it <b>fully on and off very fast</b>. Your eye averages the flashes: on 25% of the time looks like 25% brightness. This is called <b>PWM</b> (pulse width modulation). <b>Why:</b> it's efficient and precise, and it's how phones dim screens and Arduinos fade LEDs.</p>
-  <div class="controls"><label class="slider" style="flex:1">On-time (duty)<input id="pwD" type="range" min="0" max="1" step="0.01" value="0.25" style="flex:1;width:auto"></label>
-    <label class="slider" style="flex:1">Blink speed<input id="pwF" type="range" min="-0.3" max="2.3" step="0.01" value="0" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">On-time (duty)<input id="pwD" type="range" min="0" max="1" step="0.01" value="0.25"></label>
+    <label class="slider grow">Blink speed<input id="pwF" type="range" min="-0.3" max="2.3" step="0.01" value="0"></label></div>
   <canvas id="cPWM" width="800" height="230"></canvas>
 
   <h3>C. RGB LED: mixing colours</h3>

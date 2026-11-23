@@ -22,7 +22,7 @@
     <li>The coil needs a minimum voltage to <b>pull in</b> (e.g. ~3.75 V for a 5 V relay). Once pulled in, it holds until the voltage drops much lower (<b>drop-out</b>, ~1 V). This gap makes it snap cleanly instead of chattering.</li>
     <li><b>Water analogy:</b> a small pipe drives a little turbine that pulls a lever. The lever opens a valve on a <b>completely separate</b> big pipe. The two waters never mix.</li>
   </ul>
-  <div class="controls"><label class="slider" style="flex:1">Coil voltage<input id="rlV" type="range" min="0" max="6" step="0.05" value="0" style="flex:1;width:auto"></label><b id="rlVt" style="min-width:60px"></b></div>
+  <div class="controls"><label class="slider grow">Coil voltage<input id="rlV" type="range" min="0" max="6" step="0.05" value="0"></label><b id="rlVt" class="val"></b></div>
   <canvas id="cRelay" width="800" height="320"></canvas>
   <p class="hint">Slide up slowly: nothing until about 3.75 V, then <b>click</b>. Now slide back down: it stays on until about 1 V. The NC lamp (red) and NO lamp (green) swap.</p>
 </section>
@@ -38,7 +38,7 @@
 
   <h3>B. Self-latching relay (start / stop)</h3>
   <p>Press <b>START</b>: the coil is powered, and the relay's own NO contact closes a path that <b>keeps feeding its coil</b>. Release START: it stays on. Press <b>STOP</b> (a normally-closed button) to break the loop and it drops out. That's a 1-bit memory, used on machine tools and garage doors.</p>
-  <div class="controls"><button id="lbStart" style="background:#10b981;color:#fff">👆 START (hold)</button><button id="lbStop" style="background:#ef4444;color:#fff">👆 STOP (hold)</button></div>
+  <div class="controls"><button class="go" id="lbStart">👆 START (hold)</button><button class="stop" id="lbStop">👆 STOP (hold)</button></div>
   <canvas id="cLatch" width="800" height="280"></canvas>
 </section>
 

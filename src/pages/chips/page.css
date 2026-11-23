@@ -1,0 +1,25 @@
+/* chips page only */
+  .pnout{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:10px 16px}.pnname{font:800 2rem ui-monospace,monospace;letter-spacing:.04em;margin:4px 0 6px}.pnname span{margin-right:4px;padding-bottom:2px}
+  .cmfig{background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:6px;overflow-x:auto}.cmfig svg{min-width:640px}
+  .mrow{cursor:pointer}.mrow.sel>rect:first-child{fill:rgba(253,224,71,.10)}.mrow.sel line{stroke:var(--highlight)}
+  .cm-tab tr.sel td{background:var(--raised)}
+  .cx-h{margin-top:26px}
+  .cx-grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:12px}
+  @media(max-width:720px){.cx-grid{grid-template-columns:1fr}}
+  .cx-grid figure{margin:0;background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:8px}
+  .cx-grid figcaption{font-weight:700;font-size:.92rem;color:var(--muted);margin:2px 4px 6px}
+  .pinsvg{width:100%;height:auto;display:block}
+  .pinsvg .pp{cursor:pointer}
+  .pinsvg .pp.sel rect:first-child{stroke:var(--white);stroke-width:3}
+  .pinsvg .pp.sel text{fill:var(--white) !important}
+  .pinsvg polyline.wp.sel{stroke:var(--highlight);stroke-width:3.5}
+  .cx-leg{display:flex;flex-wrap:wrap;gap:14px;margin:10px 2px;font-size:.88rem;color:var(--muted)}
+  .cx-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .cx-det{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px;min-height:72px}
+  .cx-how{color:var(--link)}
+  .cx-tw{overflow-x:auto;margin-top:10px}
+  .cx-tab{font-size:.9rem}
+  .cx-tab tr[data-pin]{cursor:pointer}
+  .cx-tab tr.sel td{background:var(--raised)}
+  .cx-tab small{color:var(--muted)}
+  .cx-tab td:first-child{width:44px}.cx-tab td:nth-child(2){width:90px}

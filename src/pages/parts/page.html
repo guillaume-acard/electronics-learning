@@ -1,14 +1,14 @@
 <div class="cl-layout">
 <aside class="cl-menu" id="paMenu"><h4>Start</h4>
 <a href="#rpstart" data-pa="rpstart"><span class="n">★</span>The method: 6 questions</a>
-<h4>Example 1: 7-segment</h4>
+<h4 data-short="7-seg">Example 1: 7-segment</h4>
 <a href="#rpsheet" data-pa="rpsheet"><span class="n">1</span>Shop page &amp; datasheet</a>
 <a href="#rppins" data-pa="rppins"><span class="n">2</span>Pinout</a>
 <a href="#rptest" data-pa="rptest"><span class="n">3</span>Pin finder test</a>
 <a href="#rpres" data-pa="rpres"><span class="n">4</span>Resistors</a>
 <a href="#rpdrive" data-pa="rpdrive"><span class="n">5</span>How to drive it</a>
 <a href="#rplist" data-pa="rplist"><span class="n">6</span>Parts list</a>
-<h4>Example 2: DC10G bar graph</h4>
+<h4 data-short="DC10G">Example 2: DC10G bar graph</h4>
 <a href="#pbar" data-pa="pbar"><span class="n">7</span>Shop page &amp; datasheet</a>
 <a href="#rpbpins" data-pa="rpbpins"><span class="n">8</span>Pinout</a>
 <a href="#rpbtest" data-pa="rpbtest"><span class="n">9</span>Pin test</a>
@@ -64,8 +64,8 @@
   <h2><span class="num">4</span>Choose the resistors (and why one per segment)</h2>
   <p>Each segment is an LED, so it needs its own current-limiting resistor: <code>R = (Supply − 1.85 V) ÷ current</code>.</p>
   <div class="controls">
-    <label class="slider">Supply <select id="rcV" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
-    <label class="slider" style="flex:1">Current per segment<input id="rcI" type="range" min="2" max="25" step="1" value="10" style="flex:1;width:auto"></label><b id="rcIt" style="min-width:60px"></b>
+    <label class="slider">Supply <select class="fsel" id="rcV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <label class="slider grow">Current per segment<input id="rcI" type="range" min="2" max="25" step="1" value="10"></label><b id="rcIt" class="val"></b>
   </div>
   <canvas id="cRes" width="800" height="140"></canvas>
   <p><b>Why not a single resistor on the COM pin?</b> It's tempting (1 resistor instead of 8), but all lit segments then <b>share</b> one current. A "1" (2 segments) is bright and an "8" (7 segments) is dim, so the brightness changes with the number shown. Try it:</p>
@@ -77,7 +77,7 @@
   <h2><span class="num">5</span>How to drive it</h2>
   <h3>Option A: directly from an Arduino (8 pins)</h3>
   <p>Each segment's resistor goes to one Arduino pin, and COM goes to GND. Writing HIGH lights a segment. Simple, but it uses 8 pins for one digit.</p>
-<pre style="background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.9rem;line-height:1.45"><code>// SC39-11SURKWA (common cathode): segment a..g, dp → Arduino pins 2..9 (each via 330 Ω)
+<pre class="code"><code>// SC39-11SURKWA (common cathode): segment a..g, dp → Arduino pins 2..9 (each via 330 Ω)
 const byte SEG[8] = {2, 3, 4, 5, 6, 7, 8, 9};      // a b c d e f g dp
 const byte DIGITS[10] = {                            // bit 0 = a ... bit 6 = g
   0b0111111, 0b0000110, 0b1011011, 0b1001111, 0b1100110,
@@ -97,15 +97,15 @@ void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></
 
   <h3>Option C: several digits (multiplexing)</h3>
   <p>For a 4-digit clock you'd need 32 pins. The trick: connect the same segment of all digits together (8 wires), and give each digit's <b>COM</b> its own transistor. Light <b>one digit at a time</b>, very fast. Above ~50 refreshes per second your eye sees all four lit, the same persistence of vision as <a data-page="led" class="navlink">PWM</a>. (That's why the datasheet's <b>peak current</b> rating matters: each digit is only on ¼ of the time, so it's driven a little harder.)</p>
-  <div class="controls"><label class="slider" style="flex:1">Refresh speed<input id="mxF" type="range" min="0" max="2.2" step="0.01" value="0.2" style="flex:1;width:auto"></label><b id="mxFt" style="min-width:120px"></b></div>
+  <div class="controls"><label class="slider grow">Refresh speed<input id="mxF" type="range" min="0" max="2.2" step="0.01" value="0.2"></label><b id="mxFt" style="min-width:120px"></b></div>
   <canvas id="cMux" width="800" height="250"></canvas>
 </section>
 
 <section id="rplist">
   <h2><span class="num">6</span>Parts list for a first test</h2>
   <div class="grid2">
-    <div><h3 style="margin-top:0">🧰 You need</h3><ul><li>1 × SC39-11SURKWA (Gotronic 03099)</li><li>8 × 330 Ω resistors (for 5 V) or 680 Ω (for 9 V)</li><li>Breadboard + jumpers, and a 5 V supply or Arduino</li><li>(Option B) CD4511 + 4 switches or a DIP switch + 4 × 10 kΩ pull-downs</li></ul></div>
-    <div><h3 style="margin-top:0">🔧 Wiring check</h3><ol><li>Display across the breadboard centre gap.</li><li>Pin 3 or 8 (COM) → GND.</li><li>Each segment pin → its own resistor → its driver (Arduino pin, 4511 output, or a switch to +5 V).</li><li>Test one segment first, then all.</li></ol></div>
+    <div><h3 class="flush">🧰 You need</h3><ul><li>1 × SC39-11SURKWA (Gotronic 03099)</li><li>8 × 330 Ω resistors (for 5 V) or 680 Ω (for 9 V)</li><li>Breadboard + jumpers, and a 5 V supply or Arduino</li><li>(Option B) CD4511 + 4 switches or a DIP switch + 4 × 10 kΩ pull-downs</li></ul></div>
+    <div><h3 class="flush">🔧 Wiring check</h3><ol><li>Display across the breadboard centre gap.</li><li>Pin 3 or 8 (COM) → GND.</li><li>Each segment pin → its own resistor → its driver (Arduino pin, 4511 output, or a switch to +5 V).</li><li>Test one segment first, then all.</li></ol></div>
   </div>
 </section>
 
@@ -139,7 +139,7 @@ void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></
   <h2><span class="num">9</span>DC10G: test it before you wire it</h2>
   <p>Same tool as before: <b>9 V battery + 1 kΩ</b>, or a multimeter on diode test. + (through the resistor) on an anode, − on the cathode opposite it: one segment lights. If nothing lights, swap the probes: if it lights now, the bar is <b>turned round</b> (anodes and cathodes rows swapped). Turn it 180°.</p>
   <div class="controls"><span id="btRot"></span></div>
-  <div class="controls"><span class="hint">Red probe (+, through 1 kΩ) on the pin in position:</span><select id="btPlus" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select><span class="hint">Black probe (−) on position:</span><select id="btMinus" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"></select></div>
+  <div class="controls"><span class="hint">Red probe (+, through 1 kΩ) on the pin in position:</span><select class="fsel" id="btPlus"></select><span class="hint">Black probe (−) on position:</span><select class="fsel" id="btMinus"></select></div>
   <canvas id="cBarTest" width="800" height="270"></canvas>
 </section>
 
@@ -147,8 +147,8 @@ void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></
   <h2><span class="num">10</span>DC10G: the resistors</h2>
   <p>Ten LEDs, so <b>ten resistors</b>, one per LED, for the same reason as the 7-segment display: <code>R = (Supply − 2.1 V) ÷ current</code>. One shared resistor would make the bar dimmer as it grows.</p>
   <div class="controls">
-    <label class="slider">Supply <select id="brV" style="font:inherit;padding:6px;border-radius:6px;background:#2a3650;color:#e2e8f0;border:1px solid #2a3650"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
-    <label class="slider" style="flex:1">Current per LED<input id="brI" type="range" min="2" max="20" step="1" value="6" style="flex:1;width:auto"></label><b id="brIt" style="min-width:60px"></b>
+    <label class="slider">Supply <select class="fsel" id="brV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <label class="slider grow">Current per LED<input id="brI" type="range" min="2" max="20" step="1" value="6"></label><b id="brIt" class="val"></b>
   </div>
   <canvas id="cBarRes" width="800" height="150"></canvas>
   <p><b>Fewer parts: a resistor network.</b> Eight resistors in one flat SIL package. The "common point" kind (Gotronic 04482, 8 × 470 Ω) has all eight joined on one side (pin 1, marked with a dot): put that pin on <b>+5 V</b> and the other eight pins on the <b>anodes</b>. Then pull each cathode to ground to light its LED. That's exactly what project 21 does (with 2 single 470 Ω for the last two LEDs). Isolated networks (4 separate resistors, Gotronic 15864/15863) work on any side.</p>
@@ -166,9 +166,9 @@ void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></
     <tr><td><a class="navlink" href="#s4017">CD4017</a> + 555</td><td>Each output → resistor → anode, cathodes to GND. One LED at a time.</td><td>A running dot (the chaser of project 9, in one neat block)</td></tr>
   </table>
   <p>Try the Arduino version: a potentiometer on A0 sets how many segments light. Switch between a <b>bar</b> (all LEDs up to the level) and a <b>dot</b> (only the top one, which draws 10× less current).</p>
-  <div class="controls"><label class="slider" style="flex:1">Potentiometer on A0<input id="bdV" type="range" min="0" max="5" step="0.01" value="3.2" style="flex:1;width:auto"></label><span id="bdMode"></span></div>
+  <div class="controls"><label class="slider grow">Potentiometer on A0<input id="bdV" type="range" min="0" max="5" step="0.01" value="3.2"></label><span id="bdMode"></span></div>
   <canvas id="cBarDrive" width="800" height="250"></canvas>
-<pre style="background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.9rem;line-height:1.45"><code>// DC10G: anodes (pins 1–10) → 330 Ω → Arduino pins 2..11, cathodes (pins 11–20) → GND
+<pre class="code"><code>// DC10G: anodes (pins 1–10) → 330 Ω → Arduino pins 2..11, cathodes (pins 11–20) → GND
 const byte SEG[10] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};   // segment A (pin 1) ... J (pin 10)
 const bool DOT = false;                                   // true = dot mode
 
@@ -184,8 +184,8 @@ void loop() {
 <section id="rpblist">
   <h2><span class="num">12</span>DC10G: parts list for a first test</h2>
   <div class="grid2">
-    <div><h3 style="margin-top:0">🧰 You need</h3><ul><li>1 × DC10G bar graph (Gotronic 03142)</li><li>10 × 330 Ω (5 V, ≈ 9 mA) or 470 Ω (≈ 6 mA); or a 8 × 470 Ω common-point network (04482) + 2 × 470 Ω</li><li>Breadboard + jumpers, and the 5 V power module or an Arduino</li><li>(Optional) a 10 kΩ potentiometer for the A0 demo</li></ul></div>
-    <div><h3 style="margin-top:0">🔧 Wiring check</h3><ol><li>Bar graph across the centre gap, pin 1 (marked corner) bottom-left: bottom row = anodes 1–10, top row = cathodes 20–11.</li><li>Test segment A first: + through 330 Ω on pin 1, − on pin 20.</li><li>Cathodes 11–20 → GND (for the Arduino version).</li><li>Each anode → its own resistor → its Arduino pin.</li></ol></div>
+    <div><h3 class="flush">🧰 You need</h3><ul><li>1 × DC10G bar graph (Gotronic 03142)</li><li>10 × 330 Ω (5 V, ≈ 9 mA) or 470 Ω (≈ 6 mA); or a 8 × 470 Ω common-point network (04482) + 2 × 470 Ω</li><li>Breadboard + jumpers, and the 5 V power module or an Arduino</li><li>(Optional) a 10 kΩ potentiometer for the A0 demo</li></ul></div>
+    <div><h3 class="flush">🔧 Wiring check</h3><ol><li>Bar graph across the centre gap, pin 1 (marked corner) bottom-left: bottom row = anodes 1–10, top row = cathodes 20–11.</li><li>Test segment A first: + through 330 Ω on pin 1, − on pin 20.</li><li>Cathodes 11–20 → GND (for the Arduino version).</li><li>Each anode → its own resistor → its Arduino pin.</li></ol></div>
   </div>
 </section>
 

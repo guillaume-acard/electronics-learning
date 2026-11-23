@@ -26,7 +26,7 @@
     <li><b>Forward push below 0.7 V:</b> the spring keeps the flap shut. Nothing flows yet.</li>
     <li><b>Backward push:</b> the flap is pressed against its seat, so it's sealed and nothing flows.</li>
   </ul>
-  <div class="controls"><label class="slider" style="flex:1">Push (voltage across the diode)<input id="dV" type="range" min="-3" max="1.2" step="0.01" value="0.3" style="flex:1;width:auto"></label><b id="dVt" style="min-width:70px"></b></div>
+  <div class="controls"><label class="slider grow">Push (voltage across the diode)<input id="dV" type="range" min="-3" max="1.2" step="0.01" value="0.3"></label><b id="dVt" style="min-width:70px"></b></div>
   <canvas id="cValve" width="800" height="290"></canvas>
   <p class="hint">Right: the diode's "personality" graph. Nothing happens until about 0.6 V, then the current shoots up very steeply. That steepness is why diodes and LEDs need a resistor to limit the current.</p>
 </section>
@@ -47,12 +47,12 @@
   <h3>C. Flyback diode on a motor or relay</h3>
   <p>A motor or relay coil is like a <b>heavy water wheel</b>: once it's spinning, the water keeps pushing. Close the valve suddenly and you get a <b>water hammer</b>, a huge pressure spike. Electrically, switching off a coil creates a spike of <b>hundreds of volts</b> that can destroy the transistor or switch.
   A diode across the coil (pointing "backwards") gives the current a loop to fade out safely. <b>Why:</b> every relay and motor driver needs one.</p>
-  <div class="controls"><button id="fbSw" style="background:#10b981;color:#fff">👆 Hold to turn the motor on</button><span id="fbChoices"></span></div>
+  <div class="controls"><button class="go" id="fbSw">👆 Hold to turn the motor on</button><span id="fbChoices"></span></div>
   <canvas id="cFly" width="800" height="250"></canvas>
 
   <h3>D. Guitar distortion (clipping diodes)</h3>
   <p>Two diodes, pointing opposite ways, sit from the signal to ground. Small signals below 0.7 V pass untouched. Bigger signals get their tops <b>sliced off at ±0.7 V</b>, because the diodes open and drain the excess. The wave becomes squarer, which adds the harmonics we hear as <b>overdrive and fuzz</b>.</p>
-  <div class="controls"><label class="slider" style="flex:1">Guitar signal strength (play harder)<input id="clA" type="range" min="0.2" max="3" step="0.05" value="1.5" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Guitar signal strength (play harder)<input id="clA" type="range" min="0.2" max="3" step="0.05" value="1.5"></label></div>
   <canvas id="cClip" width="800" height="250"></canvas>
 </section>
 
@@ -60,7 +60,7 @@
   <h2><span class="num">5</span>Key facts</h2>
   <div class="grid2">
     <div><canvas id="cSymD" width="380" height="190"></canvas>
-    <p class="hint" style="text-align:center">Top: the symbol, where the arrow shows the current direction. Bottom: the real part, where the stripe is the cathode (−).</p></div>
+    <p class="hint center">Top: the symbol, where the arrow shows the current direction. Bottom: the real part, where the stripe is the cathode (−).</p></div>
     <table>
       <tr><td>Forward voltage</td><td>Silicon ≈ <b>0.7 V</b> · Schottky ≈ 0.3 V · LED ≈ 1.8–3.3 V</td></tr>
       <tr><td>Max current</td><td>How much it can carry forward, e.g. 1N4148: 0.2 A, 1N4007: 1 A.</td></tr>

@@ -65,7 +65,7 @@
   <p class="tldr"><b>Power = voltage × current</b>. Combined with Ohm's law it has two other forms: <b>P = I² × R</b> and <b>P = V² ÷ R</b>.</p>
   <p><b>Why it matters:</b> power in a resistor, a regulator or a transistor turns into <b>heat</b>. Every part has a limit: ¼ W for the small resistors, ~0.5 W for a BC547, ~1 W for a 7805 without heatsink.</p>
   <p><b>Water analogy:</b> a water wheel turns harder with more pressure <i>and</i> more flow: power is the product of both.</p>
-  <div class="controls"><label class="slider" style="flex:1">Voltage across the resistor<input id="pwV" type="range" min="0.5" max="12" step="0.1" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Resistance<input id="pwR" type="range" min="1" max="4" step="0.01" value="2.67" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Voltage across the resistor<input id="pwV" type="range" min="0.5" max="12" step="0.1" value="9"></label><label class="slider grow">Resistance<input id="pwR" type="range" min="1" max="4" step="0.01" value="2.67"></label></div>
   <canvas id="cfPow" width="800" height="230"></canvas>
   <h3>Examples from the projects</h3>
   <ul><li>LED + 470 Ω on 9 V: 7 V × 15 mA = <b>0.1 W</b> in the resistor: fine for ¼ W.</li><li>Siren speaker (project 17): 220 Ω on a 9 V square wave: 9² ÷ 228 × ½ ≈ <b>0.18 W</b>: that's why it's 220 Ω and not 100 Ω.</li><li>7805 with 12 V in, 5 V out, 300 mA: (12 − 5) × 0.3 = <b>2.1 W</b> of heat: it needs a heatsink.</li><li>LM3914 with 10 LEDs at 7 mA on 9 V: 10 × 0.007 × 7 V ≈ <b>0.5 W</b> inside the chip: warm but OK.</li></ul>
@@ -75,7 +75,7 @@
   <h2><span class="num">5</span>Series and parallel</h2>
   <p class="tldr"><b>Series</b> (one after the other): resistances <b>add up</b>: R = R1 + R2. <b>Parallel</b> (side by side): the total is <b>smaller than the smallest</b>: R = (R1 × R2) ÷ (R1 + R2).</p>
   <p><b>Water analogy:</b> two narrow pipes one after the other are harder to push through (series); two pipes side by side give the water two routes, so it flows more easily (parallel).</p>
-  <div class="controls"><button id="spS" class="active">Series</button><button id="spP">Parallel</button><label class="slider" style="flex:1">R1<input id="spR1" type="range" min="2" max="5" step="0.01" value="3" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R2<input id="spR2" type="range" min="2" max="5" step="0.01" value="3.67" style="flex:1;width:auto"></label></div>
+  <div class="controls"><button id="spS" class="active">Series</button><button id="spP">Parallel</button><label class="slider grow">R1<input id="spR1" type="range" min="2" max="5" step="0.01" value="3"></label><label class="slider grow">R2<input id="spR2" type="range" min="2" max="5" step="0.01" value="3.67"></label></div>
   <canvas id="cfSP" width="800" height="250"></canvas>
   <h3>The two rules behind it (Kirchhoff)</h3>
   <ul><li><b>Currents:</b> what flows into a junction flows out. In parallel, the battery current splits between the branches.</li><li><b>Voltages:</b> around a loop, the drops add up to the battery voltage. In series, the battery's 9 V is shared between the parts (e.g. 2 V + 2 V for two LEDs, 5 V left for the resistor).</li><li>Capacitors do the <b>opposite</b>: in parallel they add up (C = C1 + C2), in series they shrink.</li></ul>
@@ -85,7 +85,7 @@
   <h2><span class="num">6</span>The voltage divider</h2>
   <p class="tldr">Two resistors in series between Vin and 0 V: the middle point gives <b>Vout = Vin × R2 ÷ (R1 + R2)</b> (R2 is the bottom one).</p>
   <p>It's how you make a reference voltage, read a sensor (LDR, thermistor, potentiometer) or scale a voltage down for a chip. <b>Water analogy:</b> two taps in a row on a sloping pipe: the pressure halfway depends on how open each one is.</p>
-  <div class="controls"><label class="slider" style="flex:1">Vin<input id="dvV" type="range" min="1" max="12" step="0.1" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R1 (top)<input id="dvR1" type="range" min="2" max="6" step="0.01" value="4" style="flex:1;width:auto"></label><label class="slider" style="flex:1">R2 (bottom)<input id="dvR2" type="range" min="2" max="6" step="0.01" value="3.67" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Vin<input id="dvV" type="range" min="1" max="12" step="0.1" value="9"></label><label class="slider grow">R1 (top)<input id="dvR1" type="range" min="2" max="6" step="0.01" value="4"></label><label class="slider grow">R2 (bottom)<input id="dvR2" type="range" min="2" max="6" step="0.01" value="3.67"></label></div>
   <canvas id="cfDiv" width="800" height="250"></canvas>
   <p class="hint">⚠️ A divider is weak: if you draw current from the middle point (a load), the voltage sags. Use it to <i>feed an input</i> (a transistor base through a resistor, an op-amp, an Arduino pin), not to power something.</p>
 </section>
@@ -94,7 +94,7 @@
   <h2><span class="num">7</span>The LED resistor</h2>
   <p class="tldr"><b>R = (Vsupply − Vled) ÷ I</b>. The resistor takes whatever voltage the LED doesn't, and that sets the current.</p>
   <div class="controls"><span class="hint">LED colour:</span><span id="ledCol"></span></div>
-  <div class="controls"><label class="slider" style="flex:1">Supply<input id="lrV" type="range" min="3" max="12" step="0.5" value="9" style="flex:1;width:auto"></label><label class="slider" style="flex:1">Wanted current<input id="lrI" type="range" min="2" max="20" step="1" value="10" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Supply<input id="lrV" type="range" min="3" max="12" step="0.5" value="9"></label><label class="slider grow">Wanted current<input id="lrI" type="range" min="2" max="20" step="1" value="10"></label></div>
   <div id="lrOut" class="howbox"></div>
   <ul><li>Typical forward voltages: red ≈ 2 V, yellow/green ≈ 2.1 V, blue/white ≈ 3 V. 10 mA is bright enough for a 5 mm LED; 20 mA is the usual maximum.</li><li>Then pick the nearest <b>standard value</b> (E12 series: 1.0 1.2 1.5 1.8 2.2 2.7 3.3 3.9 4.7 5.6 6.8 8.2 × 10ⁿ), preferably the one just above.</li><li>Check the power: (Vsupply − Vled) × I. Under 0.1 W, any ¼ W resistor is fine.</li></ul>
 </section>
@@ -103,7 +103,7 @@
   <h2><span class="num">8</span>RC time and the 555</h2>
   <p class="tldr">A capacitor charging through a resistor follows a curve with a "time constant" <b>τ = R × C</b> (seconds = ohms × farads). After 1 τ it's 63 % full, after 5 τ it's practically full.</p>
   <p><b>Water analogy:</b> filling a tank through a thin pipe: fast at first, slower and slower as the tank's back-pressure grows. A thinner pipe (bigger R) or a bigger tank (bigger C) = slower.</p>
-  <div class="controls"><label class="slider" style="flex:1">R<input id="foRcR" type="range" min="2" max="6" step="0.01" value="4.67" style="flex:1;width:auto"></label><label class="slider" style="flex:1">C<select id="foRcC" class="fsel"><option value="1e-6">1 µF</option><option value="1e-5" selected>10 µF</option><option value="1e-4">100 µF</option><option value="1e-3">1000 µF</option></select></label></div>
+  <div class="controls"><label class="slider grow">R<input id="foRcR" type="range" min="2" max="6" step="0.01" value="4.67"></label><label class="slider" style="flex:1">C<select id="foRcC" class="fsel"><option value="1e-6">1 µF</option><option value="1e-5" selected>10 µF</option><option value="1e-4">100 µF</option><option value="1e-3">1000 µF</option></select></label></div>
   <canvas id="cfRC" width="800" height="240"></canvas>
   <h3>The 555 formulas (astable)</h3>
   <ul><li>Time ON (output high): <b>0.693 × (R1 + R2) × C</b></li><li>Time OFF: <b>0.693 × R2 × C</b></li><li>Frequency: <b>f = 1.44 ÷ ((R1 + 2 × R2) × C)</b>. Project 8: 1 kΩ, 47 kΩ, 10 µF → 1.5 Hz. Dice: same resistors, 10 nF → 1,500 Hz.</li><li>The flip-flop (project 16): each side ≈ <b>0.69 × R × C</b>.</li></ul>
@@ -112,7 +112,7 @@
 <section id="fobatt">
   <h2><span class="num">9</span>Battery life</h2>
   <p class="tldr"><b>Hours ≈ capacity (mAh) ÷ current (mA)</b>. A battery's mAh is its reservoir; the current is how fast you drain it.</p>
-  <div class="controls"><span class="hint">Battery:</span><span id="btType"></span><label class="slider" style="flex:1">Circuit current<input id="btI" type="range" min="0" max="3" step="0.01" value="1.3" style="flex:1;width:auto"></label></div>
+  <div class="controls"><span class="hint">Battery:</span><span id="btType"></span><label class="slider grow">Circuit current<input id="btI" type="range" min="0" max="3" step="0.01" value="1.3"></label></div>
   <div id="btOut" class="howbox"></div>
   <ul><li>Real life gives less, especially at high currents: count on ~70 % for a 9 V battery.</li><li>Energy (Wh) = V × Ah: a 3.6 V 3500 mAh 18650 cell holds 12.6 Wh, ~25 times a 9 V battery's ~0.5 Wh.</li><li>To save battery: higher LED resistors, "dot" mode on the LM3914, and switch off what you don't need.</li></ul>
 </section>

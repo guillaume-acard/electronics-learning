@@ -22,24 +22,55 @@ if(typeof gndSym==='function')gndSym=__wrap(gndSym,(ctx,x,y)=>__PR(ctx,{t:'gnd',
 if(typeof resBox==='function')resBox=__wrap(resBox,(ctx,x,y,w,h,t)=>{const hz=w>h;__PR(ctx,{t:'part',k:'res',a:hz?[x,y+h/2]:[x+w/2,y],b:hz?[x+w,y+h/2]:[x+w/2,y+h],o:{label:t}});});
 
 const requestAnimationFrame=cb=>window.requestAnimationFrame(function tick(t){if(PG.hidden)window.requestAnimationFrame(tick);else cb(t);});
+const PAL={bg:'#0b1120',canvas:'#0b1220',surface:'#101827',card:'#151e30',raised:'#1e293b',control:'#2a3650',line:'#2a3650',white:'#fff',ink:'#e2e8f0',ink2:'#cbd5e1',muted:'#94a3b8',muted2:'#64748b',link:'#93c5fd',water:'#3b82f6',waterLight:'#bcd6fb',waterBg:'#1b2e4f',warmBg:'#3a2c12',good:'#10b981',bad:'#ef4444',badBg:'#3a1a1d',yellow:'#fbbf24',amber:'#f59e0b',blue:'#60a5fa',highlight:'#fde047',accent:'#f59e0b',panel:'#111c2e',slate:'#475569',slateDark:'#334155',gray:'#9ca3af',grayLight:'#e5e7eb',chip:'#1f2937',chipDark:'#111827',chipLight:'#374151',redSoft:'#f87171',redLight:'#fca5a5',redDark:'#dc2626',green:'#22c55e',greenLight:'#86efac',greenDark:'#16a34a',tealDark:'#059669',blueDark:'#2563eb',sky:'#38bdf8',violet:'#a78bfa',purple:'#9333ea',pink:'#f472b6',orange:'#f97316',orangeSoft:'#fb923c',orangeDark:'#ea580c',gold:'#ca8a04',brown:'#b45309',yellowSoft:'#facc15'};
+// ===== Core helpers shared by every page (included first in each page bundle) =====
+// PAL (the colour palette from shared/css/tokens.css) is added just before this file by the build.
+
+// One animation loop per page: fn(dt seconds since last frame (max 0.05), now ms). Paused while the page is hidden.
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(0.05,(now-last)/1000);last=now;fn(dt,now);requestAnimationFrame(f);}requestAnimationFrame(f);}
+
+// Hold-to-press button: fn(true, event) on press, fn(false) on release (mouse, touch or pen).
+function hold(el,fn){el=typeof el==='string'?document.getElementById(el):el;el.style.touchAction='none';el.style.userSelect='none';
+  el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true,e);});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,()=>fn(false)));}
+
+// Swap the page's hero illustration (svg = null restores the original).
+function heroSwap(page,svg){const el=document.querySelector('#page-'+page+' .illus');if(!el)return;if(!el.dataset.orig)el.dataset.orig=el.innerHTML;const html=svg||el.dataset.orig;
+  if(el.innerHTML!==html){el.innerHTML=html;el.animate&&el.animate([{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'ease-out'});}}
+
+// Left menu that shows one section at a time (<aside class="cl-menu" id="..."> with links to the page's sections).
+// Adds "← previous / next →" links at the bottom of each section. opts.first: section shown by default;
+// opts.onSelect(id): called when a section is shown. An <h4 data-short="..."> prefixes repeated labels.
+function sectionMenu(menuId,opts={}){const menu=document.getElementById(menuId);if(!menu)return null;
+  const links=[...menu.querySelectorAll('a[href^="#"]')].filter(a=>document.getElementById(a.getAttribute('href').slice(1)));
+  const ids=links.map(a=>a.getAttribute('href').slice(1)),text=a=>a.lastChild.textContent.trim();
+  const label=a=>{const t=text(a);if(links.filter(b=>text(b)===t).length<2)return t;let h=a.previousElementSibling;while(h&&h.tagName!=='H4')h=h.previousElementSibling;return h?(h.dataset.short||h.textContent)+': '+t:t;};
+  function select(id){if(!ids.includes(id))return false;ids.forEach(k=>{document.getElementById(k).hidden=k!==id;});
+    links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id));const act=links[ids.indexOf(id)];
+    if(window.innerWidth<820)menu.scrollLeft=act.offsetLeft-menu.clientWidth/2+act.clientWidth/2;if(opts.onSelect)opts.onSelect(id);return true;}
+  function fromHash(){if(!select(location.hash.slice(1))&&!links.some(a=>a.classList.contains('active')))select(opts.first||ids[0]);}
+  ids.forEach((id,i)=>{const d=document.createElement('div');d.className='qnav';
+    d.innerHTML=(i>0?`<a class="navlink" href="#${ids[i-1]}">← ${label(links[i-1])}</a>`:'<span></span>')+(i<ids.length-1?`<a class="navlink" href="#${ids[i+1]}">${label(links[i+1])} →</a>`:'');
+    document.getElementById(id).appendChild(d);});
+  window.addEventListener('hashchange',fromHash);fromHash();return {select};}
+
 const $ = id => document.getElementById(id);
 function loopPath(ctx, x1, y1, x2, y2){ctx.beginPath(); ctx.moveTo(x1,(y1+y2)/2); ctx.lineTo(x1,y1); ctx.lineTo(x2,y1); ctx.lineTo(x2,y2); ctx.lineTo(x1,y2); ctx.closePath();}
-function arrowText(ctx, txt, x, y, color='#94a3b8', size=14, align='center'){ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);}
+function arrowText(ctx, txt, x, y, color=PAL.muted, size=14, align='center'){ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);}
 // ===== Helpers for schematics and plots =====
-function W(ctx,pts,col='#cbd5e1',lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
-function dot(ctx,x,y){ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
-function resV(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-24]]);ctx.beginPath();ctx.moveTo(x,m-24);for(let i=0;i<6;i++)ctx.lineTo(x+(i%2?-8:8),m-20+i*8);ctx.lineTo(x,m+24);ctx.stroke();W(ctx,[[x,m+24],[x,y2]]);if(label)arrowText(ctx,label,x+14,m+4,'#cbd5e1',12,'left');}
-function capV(ctx,x,y1,y2,label,faded){const m=(y1+y2)/2,col=faded?'#475569':'#cbd5e1';W(ctx,[[x,y1],[x,m-6]],col);W(ctx,[[x,m+6],[x,y2]],col);ctx.fillStyle=col;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-18,m+4,36,4);if(label)arrowText(ctx,label,x+24,m+4,faded?'#94a3b8':'#2563eb',12,'left');}
-function capH(ctx,x1,x2,y,label){const m=(x1+x2)/2;W(ctx,[[x1,y],[m-6,y]]);W(ctx,[[m+6,y],[x2,y]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(m-8,y-18,4,36);ctx.fillRect(m+4,y-18,4,36);if(label)arrowText(ctx,label,m,y-26,'#2563eb',12);}
-function batt(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-6]]);W(ctx,[[x,m+6],[x,y2]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-10,m+4,20,6);arrowText(ctx,'+',x+22,m-6,'#dc2626',14);if(label)arrowText(ctx,label,x-24,m+4,'#cbd5e1',12,'right');}
+function W(ctx,pts,col=PAL.ink2,lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
+function dot(ctx,x,y){ctx.fillStyle=PAL.ink2;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
+function resV(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-24]]);ctx.beginPath();ctx.moveTo(x,m-24);for(let i=0;i<6;i++)ctx.lineTo(x+(i%2?-8:8),m-20+i*8);ctx.lineTo(x,m+24);ctx.stroke();W(ctx,[[x,m+24],[x,y2]]);if(label)arrowText(ctx,label,x+14,m+4,PAL.ink2,12,'left');}
+function capV(ctx,x,y1,y2,label,faded){const m=(y1+y2)/2,col=faded?PAL.slate:PAL.ink2;W(ctx,[[x,y1],[x,m-6]],col);W(ctx,[[x,m+6],[x,y2]],col);ctx.fillStyle=col;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-18,m+4,36,4);if(label)arrowText(ctx,label,x+24,m+4,faded?PAL.muted:PAL.blueDark,12,'left');}
+function capH(ctx,x1,x2,y,label){const m=(x1+x2)/2;W(ctx,[[x1,y],[m-6,y]]);W(ctx,[[m+6,y],[x2,y]]);ctx.fillStyle=PAL.ink2;ctx.fillRect(m-8,y-18,4,36);ctx.fillRect(m+4,y-18,4,36);if(label)arrowText(ctx,label,m,y-26,PAL.blueDark,12);}
+function batt(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-6]]);W(ctx,[[x,m+6],[x,y2]]);ctx.fillStyle=PAL.ink2;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-10,m+4,20,6);arrowText(ctx,'+',x+22,m-6,PAL.redDark,14);if(label)arrowText(ctx,label,x-24,m+4,PAL.ink2,12,'right');}
 function glow(ctx,x,y,b,col='255,80,60'){if(b<=0.01)return;const g=ctx.createRadialGradient(x,y,2,x,y,46);g.addColorStop(0,`rgba(${col},${0.9*b})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,46,0,7);ctx.fill();}
-function ledV(ctx,x,y1,y2,b){const m=(y1+y2)/2;glow(ctx,x,m,b);W(ctx,[[x,y1],[x,m-10]]);W(ctx,[[x,m+10],[x,y2]]);ctx.fillStyle=b>0.05?`rgb(255,${Math.round(200-150*b)},${Math.round(200-160*b)})`:'#fff';ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-12,m-10);ctx.lineTo(x+12,m-10);ctx.lineTo(x,m+10);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[x-12,m+10],[x+12,m+10]]);arrowText(ctx,'LED',x+20,m+4,'#cbd5e1',12,'left');}
+function ledV(ctx,x,y1,y2,b){const m=(y1+y2)/2;glow(ctx,x,m,b);W(ctx,[[x,y1],[x,m-10]]);W(ctx,[[x,m+10],[x,y2]]);ctx.fillStyle=b>0.05?`rgb(255,${Math.round(200-150*b)},${Math.round(200-160*b)})`:PAL.white;ctx.strokeStyle=PAL.ink2;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-12,m-10);ctx.lineTo(x+12,m-10);ctx.lineTo(x,m+10);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[x-12,m+10],[x+12,m+10]]);arrowText(ctx,'LED',x+20,m+4,PAL.ink2,12,'left');}
 function gndSym(ctx,x,y){W(ctx,[[x-14,y],[x+14,y]]);W(ctx,[[x-9,y+6],[x+9,y+6]]);W(ctx,[[x-4,y+12],[x+4,y+12]]);}
 function plot(ctx,x,y,w,h,hist,tNow,span,series,min,max,title){
-  ctx.fillStyle='#1e293b';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#2a3650';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
-  if(title)arrowText(ctx,title,x+2,y-7,'#94a3b8',12,'left');
+  ctx.fillStyle=PAL.raised;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+  if(title)arrowText(ctx,title,x+2,y-7,PAL.muted,12,'left');
   const X=t=>x+w-(tNow-t)/span*w, Y=v=>y+h-(v-min)/(max-min)*h;
-  if(min<0&&max>0){ctx.setLineDash([4,4]);ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x+w,Y(0));ctx.stroke();ctx.setLineDash([]);arrowText(ctx,'0',x-6,Y(0)+4,'#94a3b8',11,'right');}
+  if(min<0&&max>0){ctx.setLineDash([4,4]);ctx.strokeStyle=PAL.muted;ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x+w,Y(0));ctx.stroke();ctx.setLineDash([]);arrowText(ctx,'0',x-6,Y(0)+4,PAL.muted,11,'right');}
   series.forEach(s=>{ctx.setLineDash(s.dash||[]);ctx.strokeStyle=s.col;ctx.lineWidth=s.lw||2.5;ctx.beginPath();let st=false;
     hist.forEach(p=>{if(p.t<tNow-span)return;const xx=X(p.t),yy=Y(Math.max(min,Math.min(max,p[s.k])));st?ctx.lineTo(xx,yy):(ctx.moveTo(xx,yy),st=true);});ctx.stroke();ctx.setLineDash([]);});
   let lx=x;series.forEach(s=>{if(!s.label)return;ctx.fillStyle=s.col;ctx.fillRect(lx,y+h+11,12,3);arrowText(ctx,s.label,lx+16,y+h+16,s.col,11,'left');lx+=ctx.measureText(s.label).width+32;});
@@ -50,12 +81,12 @@ function choices(id,labels,init,cb){const el=$(id);el.style.display='inline-flex
   bs[init].className='active';cb(init);}
 function prune(h,t,span){while(h.length&&h[0].t<t-span)h.shift();}
 
-function wrapText(ctx,txt,x,y,maxW,lh,color='#e2e8f0',size=13){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.fillStyle=color;ctx.textAlign='left';
+function wrapText(ctx,txt,x,y,maxW,lh,color=PAL.ink,size=13){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.fillStyle=color;ctx.textAlign='left';
   let line='';txt.split(' ').forEach(w=>{const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,x,y);y+=lh;line=w;}else line=t;});if(line)ctx.fillText(line,x,y);}
 
-const BG='#0b1220',WIRE='#cbd5e1',Y='#fbbf24';
+const BG=PAL.canvas,WIRE=PAL.ink2,Y=PAL.yellow;
 function glowAt(ctx,x,y,b,rgb='239,68,68',r=46){if(b<=0.02)return;const g=ctx.createRadialGradient(x,y,2,x,y,r);g.addColorStop(0,`rgba(${rgb},${Math.min(1,b)})`);g.addColorStop(1,`rgba(${rgb},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();}
-function txt(ctx,t,x,y,c='#94a3b8',s=12,a='center'){arrowText(ctx,t,x,y,c,s,a);}
+function txt(ctx,t,x,y,c=PAL.muted,s=12,a='center'){arrowText(ctx,t,x,y,c,s,a);}
 function wire(ctx,pts,c=WIRE){W(ctx,pts,c,3);}
 function dots(ctx,pts,off,c=Y){ctx.strokeStyle=c;ctx.lineWidth=7;ctx.lineCap='round';ctx.setLineDash([0,20]);ctx.lineDashOffset=-off;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.setLineDash([]);ctx.lineCap='butt';}
 // Generic two-terminal part between A and B
@@ -67,7 +98,7 @@ function part(ctx,k,ax,ay,bx,by,o={}){
   const lead=(x1,x2)=>{ctx.beginPath();ctx.moveTo(x1,0);ctx.lineTo(x2,0);ctx.stroke();};
   switch(k){
     case 'wire':lead(-L/2,L/2);break;
-    case 'empty':ctx.setLineDash([3,6]);ctx.strokeStyle='#475569';lead(-L/2,L/2);ctx.setLineDash([]);break;
+    case 'empty':ctx.setLineDash([3,6]);ctx.strokeStyle=PAL.slate;lead(-L/2,L/2);ctx.setLineDash([]);break;
     case 'res':case 'ldr':lead(-L/2,-22);lead(22,L/2);ctx.fillRect(-22,-9,44,18);ctx.strokeRect(-22,-9,44,18);
       if(k==='ldr'){ctx.strokeStyle=Y;ctx.lineWidth=1.8;[[-10,0],[2,0]].forEach(([dx])=>{ctx.beginPath();ctx.moveTo(dx-12,-28);ctx.lineTo(dx,-14);ctx.stroke();ctx.beginPath();ctx.moveTo(dx,-14);ctx.lineTo(dx-6,-15);ctx.lineTo(dx-2,-20);ctx.closePath();ctx.fillStyle=Y;ctx.fill();});}break;
     case 'cap':lead(-L/2,-5);lead(5,L/2);ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-5,-16);ctx.lineTo(-5,16);ctx.moveTo(5,-16);ctx.lineTo(5,16);ctx.stroke();break;
@@ -76,7 +107,7 @@ function part(ctx,k,ax,ay,bx,by,o={}){
       if(k==='led'){ctx.strokeStyle=Y;ctx.lineWidth=1.5;[[0],[8]].forEach(([d])=>{ctx.beginPath();ctx.moveTo(d-2,-16);ctx.lineTo(d+6,-26);ctx.stroke();});}break;
     case 'gap':ctx.setLineDash([5,4]);ctx.strokeStyle=Y;ctx.lineWidth=2;lead(-L/2,-28);lead(28,L/2);ctx.strokeRect(-28,-20,56,40);ctx.setLineDash([]);break;
     case 'switch':lead(-L/2,-16);lead(16,L/2);ctx.fillStyle=col;[-16,16].forEach(x=>{ctx.beginPath();ctx.arc(x,0,4,0,7);ctx.fill();});ctx.beginPath();ctx.moveTo(-16,0);o.closed?ctx.lineTo(16,0):ctx.lineTo(13,-15);ctx.stroke();break;
-    case 'motor':lead(-L/2,-20);lead(20,L/2);ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();ctx.stroke();ctx.save();ctx.rotate(o.spin||0);ctx.strokeStyle='#60a5fa';ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.rotate(2.09);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(14,0);ctx.stroke();}ctx.restore();break;
+    case 'motor':lead(-L/2,-20);lead(20,L/2);ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();ctx.stroke();ctx.save();ctx.rotate(o.spin||0);ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.rotate(2.09);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(14,0);ctx.stroke();}ctx.restore();break;
     case 'lamp':lead(-L/2,-16);lead(16,L/2);ctx.beginPath();ctx.arc(0,0,16,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(-11,-11);ctx.lineTo(11,11);ctx.moveTo(11,-11);ctx.lineTo(-11,11);ctx.stroke();break;
     case 'batt':lead(-L/2,-6);lead(6,L/2);ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-6,-18);ctx.lineTo(-6,18);ctx.stroke();ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(6,-9);ctx.lineTo(6,9);ctx.stroke();break;
     case 'coil':lead(-L/2,-28);lead(28,L/2);ctx.beginPath();for(let i=0;i<4;i++){ctx.arc(-21+i*14,0,7,Math.PI,0);}ctx.stroke();if(o.core){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-28,-12);ctx.lineTo(28,-12);ctx.moveTo(-28,-16);ctx.lineTo(28,-16);ctx.stroke();}break;
@@ -85,37 +116,39 @@ function part(ctx,k,ax,ay,bx,by,o={}){
   }
   ctx.restore();
   if(k==='gap')txt(ctx,o.slot?o.slot:'?',mx,my+7,Y,20);
-  if(k==='motor')txt(ctx,'M',mx,my+5,'#e2e8f0',13);
-  if(k==='batt'){const px=ax+(bx-ax)*0.5,py=ay+(by-ay)*0.5;txt(ctx,'+',hor?px-14:px+16,hor?py-22:py-12+(o.flip?28:0),'#f87171',15);}
-  if(k==='led'&&o.burnt)txt(ctx,'💥',mx+(hor?0:26),my+(hor?-26:6),'#fff',16);
-  if(o.label){if(hor)txt(ctx,o.label,mx,my-28,o.lc||'#e2e8f0',12);else txt(ctx,o.label,mx+(o.left?-30:30),my+4,o.lc||'#e2e8f0',12,o.left?'right':'left');}
+  if(k==='motor')txt(ctx,'M',mx,my+5,PAL.ink,13);
+  if(k==='batt'){const px=ax+(bx-ax)*0.5,py=ay+(by-ay)*0.5;txt(ctx,'+',hor?px-14:px+16,hor?py-22:py-12+(o.flip?28:0),PAL.redSoft,15);}
+  if(k==='led'&&o.burnt)txt(ctx,'💥',mx+(hor?0:26),my+(hor?-26:6),PAL.white,16);
+  if(o.label){if(hor)txt(ctx,o.label,mx,my-28,o.lc||PAL.ink,12);else txt(ctx,o.label,mx+(o.left?-30:30),my+4,o.lc||PAL.ink,12,o.left?'right':'left');}
 }
-function chipBox(ctx,x,y,w,h,l1,l2,hot=0){ctx.fillStyle=hot>0.3?`rgb(${Math.round(71+160*hot)},60,60)`:'#475569';ctx.fillRect(x,y,w,h);txt(ctx,l1,x+w/2,y+h/2-2,'#fff',13);if(l2)txt(ctx,l2,x+w/2,y+h/2+16,'#fff',13);}
-function npnQ(ctx,x,y,on){const c=on?'#10b981':WIRE;ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.stroke();
+function chipBox(ctx,x,y,w,h,l1,l2,hot=0){ctx.fillStyle=hot>0.3?`rgb(${Math.round(71+160*hot)},60,60)`:PAL.slate;ctx.fillRect(x,y,w,h);txt(ctx,l1,x+w/2,y+h/2-2,PAL.white,13);if(l2)txt(ctx,l2,x+w/2,y+h/2+16,PAL.white,13);}
+function npnQ(ctx,x,y,on){const c=on?PAL.good:WIRE;ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.stroke();
   W(ctx,[[x-34,y],[x-8,y]],c);W(ctx,[[x-8,y-14],[x-8,y+14]],c,4);W(ctx,[[x-8,y-6],[x+10,y-18],[x+10,y-34]],c);W(ctx,[[x-8,y+6],[x+10,y+18],[x+10,y+34]],c);
   ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+10,y+18);ctx.lineTo(x,y+17);ctx.lineTo(x+5,y+9);ctx.fill();}
-function miniGraph(ctx,x,y,w,h,fn,t0,t1,col,min,max,label){ctx.fillStyle='#1e293b';ctx.fillRect(x,y,w,h);ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
-  for(let px=0;px<=w;px++){const t=t0+(t1-t0)*px/w,v=fn(t);if(v===null)continue;const yy=y+h-(Math.max(min,Math.min(max,v))-min)/(max-min)*h;px?ctx.lineTo(x+px,yy):ctx.moveTo(x+px,yy);}ctx.stroke();if(label)txt(ctx,label,x+4,y-6,'#94a3b8',11,'left');}
+function miniGraph(ctx,x,y,w,h,fn,t0,t1,col,min,max,label){ctx.fillStyle=PAL.raised;ctx.fillRect(x,y,w,h);ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let px=0;px<=w;px++){const t=t0+(t1-t0)*px/w,v=fn(t);if(v===null)continue;const yy=y+h-(Math.max(min,Math.min(max,v))-min)/(max-min)*h;px?ctx.lineTo(x+px,yy):ctx.moveTo(x+px,yy);}ctx.stroke();if(label)txt(ctx,label,x+4,y-6,PAL.muted,11,'left');}
 const fmtOhm=r=>r>=1e6?+(r/1e6).toFixed(2)+' MΩ':r>=1000?+(r/1000).toFixed(r<10000?2:1)+' kΩ':Math.round(r)+' Ω';
 const E12=[1,1.2,1.5,1.8,2.2,2.7,3.3,3.9,4.7,5.6,6.8,8.2];
 const snapE12=v=>{const d=Math.pow(10,Math.floor(Math.log10(v)));let best=d;E12.forEach(e=>{if(Math.abs(Math.log(e*d/v))<Math.abs(Math.log(best/v)))best=e*d;});if(Math.abs(Math.log(10*d/v))<Math.abs(Math.log(best/v)))best=10*d;return best;};
-
+// round indicator light (an LED seen from the front): on 0..1, rgb "r,g,b"
+function lamp(ctx,x,y,on,rgb='34,197,94',r=9){if(on>0.02){const gr=ctx.createRadialGradient(x,y,1,x,y,r*3.2);gr.addColorStop(0,`rgba(${rgb},${on})`);gr.addColorStop(1,`rgba(${rgb},0)`);ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r*3.2,0,7);ctx.fill();}
+  ctx.fillStyle=on>0.02?`rgba(${rgb},${0.35+0.65*on})`:PAL.raised;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.strokeStyle=PAL.slate;ctx.lineWidth=1.5;ctx.stroke();}
+// ===== 7-segment digits =====
+// Lit segments of each digit, and the rectangle layout of a 60 x 106 digit.
+const DIGITS={0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg'};
+const SEG7={a:[10,0,40,8],g:[10,49,40,8],d:[10,98,40,8],f:[2,8,8,41],b:[50,8,8,41],e:[2,57,8,41],c:[50,57,8,41]};
+// One digit at (x,y), scale sc. on: lit segments ('abc' or DIGITS[n]). o.pad: black margin, o.glow: glow of lit segments, o.col: lit colour.
+function drawDigit(ctx,x,y,sc,on,o={}){const pad=o.pad??10,glow=o.glow||0,col=o.col||PAL.bad;
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(x-pad,y-pad,60*sc+2*pad,106*sc+2*pad);ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);
+  Object.entries(SEG7).forEach(([k,[a,b,w,h]])=>{const l=on.includes(k);ctx.shadowBlur=l?glow:0;ctx.shadowColor=col;ctx.fillStyle=l?col:'#2a1416';ctx.fillRect(a,b,w,h);});ctx.restore();ctx.shadowBlur=0;}
 
 const cv=id=>{const c=$(id),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);return ctx;};
 // ===== left menu: one section at a time =====
-const PA_LINKS=[...document.querySelectorAll('#paMenu [data-pa]')];const PA_IDS=PA_LINKS.map(a=>a.dataset.pa);
-const paLabel=id=>{const a=PA_LINKS.find(x=>x.dataset.pa===id);if(!a)return id;const g=PA_IDS.indexOf(id)>=7&&id!=='rprecap'?'DC10G: ':PA_IDS.indexOf(id)>=1&&id!=='rprecap'?'7-seg: ':'';return g+a.lastChild.textContent.trim();};
-function paSelect(id){if(!PA_IDS.includes(id))return false;PA_IDS.forEach(k=>{const s=document.getElementById(k);if(s)s.hidden=k!==id;});
-  PA_LINKS.forEach(a=>a.classList.toggle('active',a.dataset.pa===id));const act=PA_LINKS.find(a=>a.dataset.pa===id);if(act&&window.innerWidth<820){const m=act.parentElement;m.scrollLeft=act.offsetLeft-m.clientWidth/2+act.clientWidth/2;}return true;}
-function paFromHash(){const h=location.hash.slice(1);if(!paSelect(h)&&!PA_LINKS.some(a=>a.classList.contains('active')))paSelect('rpstart');}
-PA_IDS.forEach((id,i)=>{const s=document.getElementById(id);if(!s)return;const d=document.createElement('div');d.className='qnav';
-  d.innerHTML=(i>0?`<a class="navlink" href="#${PA_IDS[i-1]}">← ${paLabel(PA_IDS[i-1])}</a>`:'<span></span>')+(i<PA_IDS.length-1?`<a class="navlink" href="#${PA_IDS[i+1]}">${paLabel(PA_IDS[i+1])} →</a>`:'');s.appendChild(d);});
-window.addEventListener('hashchange',paFromHash);paFromHash();
+sectionMenu('paMenu',{first:'rpstart'});
 
 // ===== 7-segment helpers =====
 const PINS={1:'e',2:'d',3:'COM',4:'c',5:'dp',6:'b',7:'a',8:'COM',9:'f',10:'g'};
 const SEG2PIN={};Object.entries(PINS).forEach(([p,s])=>{if(s!=='COM')SEG2PIN[s]=+p;});
-const DIG={0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg'};
 const GEO={a:['h',10,50,6],g:['h',10,50,55],d:['h',10,50,104],f:['v',6,10,51],b:['v',54,10,51],e:['v',6,59,100],c:['v',54,59,100]};
 function segPath(ctx,k){const [t,p1,p2,p3]=GEO[k];ctx.beginPath();
   if(t==='h'){const x1=p1,x2=p2,y=p3;ctx.moveTo(x1,y);ctx.lineTo(x1+5,y-5);ctx.lineTo(x2-5,y-5);ctx.lineTo(x2,y);ctx.lineTo(x2-5,y+5);ctx.lineTo(x1+5,y+5);}
@@ -123,7 +156,7 @@ function segPath(ctx,k){const [t,p1,p2,p3]=GEO[k];ctx.beginPath();
 // lvl: function(seg)->0..1 brightness
 function digit7(ctx,x,y,s,lvl,hl){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   ctx.fillStyle='#111';ctx.fillRect(-10,-8,90,126);
-  Object.keys(GEO).concat(['dp']).forEach(k=>{const b=lvl(k);ctx.shadowBlur=b>0.05?14*b:0;ctx.shadowColor='#ef4444';
+  Object.keys(GEO).concat(['dp']).forEach(k=>{const b=lvl(k);ctx.shadowBlur=b>0.05?14*b:0;ctx.shadowColor=PAL.bad;
     ctx.fillStyle=b>0.02?`rgba(239,68,68,${0.25+0.75*b})`:'#2a1416';
     if(k==='dp'){ctx.beginPath();ctx.arc(68,104,5,0,7);}else segPath(ctx,k);ctx.fill();ctx.shadowBlur=0;
     if(hl===k){ctx.strokeStyle=Y;ctx.lineWidth=2/s*1.5;ctx.stroke();}});
@@ -131,30 +164,30 @@ function digit7(ctx,x,y,s,lvl,hl){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
 function hitSeg(ux,uy){if(Math.hypot(ux-68,uy-104)<8)return 'dp';for(const k in GEO){const [t,p1,p2,p3]=GEO[k];if(t==='h'){if(ux>=p1-2&&ux<=p2+2&&Math.abs(uy-p3)<8)return k;}else{if(Math.abs(ux-p1)<8&&uy>=p2&&uy<=p3)return k;}}return null;}
 function canvasXY(c,e){const r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];}
 // package drawing with pins; returns pin positions
-function pkg(ctx,x,y,lvl,pinHl){const w=150,h=180;ctx.fillStyle='#1f2937';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#475569';ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);
+function pkg(ctx,x,y,lvl,pinHl){const w=150,h=180;ctx.fillStyle=PAL.chip;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.slate;ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);
   digit7(ctx,x+38,y+30,1.1,lvl,null);const pos={};
   for(let i=0;i<5;i++){const px=x+15+i*30;// bottom pins 1..5 left→right
     pos[i+1]=[px,y+h+30];pos[10-i]=[px,y-30];}
-  Object.entries(pos).forEach(([p,[px,py]])=>{const top=py<y,hl=pinHl&&pinHl.includes(+p);ctx.fillStyle=hl?Y:'#cbd5e1';ctx.fillRect(px-3,top?py:y+h,6,30);
-    txt(ctx,p,px,top?py-6:py+14,hl?Y:'#94a3b8',11);const s=PINS[p];txt(ctx,s,px,top?py-20:py+28,s==='COM'?'#60a5fa':hl?Y:'#e2e8f0',11);});
+  Object.entries(pos).forEach(([p,[px,py]])=>{const top=py<y,hl=pinHl&&pinHl.includes(+p);ctx.fillStyle=hl?Y:PAL.ink2;ctx.fillRect(px-3,top?py:y+h,6,30);
+    txt(ctx,p,px,top?py-6:py+14,hl?Y:PAL.muted,11);const s=PINS[p];txt(ctx,s,px,top?py-20:py+28,s==='COM'?PAL.blue:hl?Y:PAL.ink,11);});
   return pos;}
 
 // ===== 2. Pinout =====
 const PD={d:8,dp:false,hl:null};
 choices('pdDigits',['0','1','2','3','4','5','6','7','8','9'],8,i=>{PD.d=i;PD.hl=null;drawPin();});
 $('pdDp').onclick=()=>{PD.dp=!PD.dp;$('pdDp').className=PD.dp?'active':'';drawPin();};
-function onSegs(){return DIG[PD.d]+(PD.dp?'p':'');}
-function drawPin(){const ctx=cv('cPin');const segs=DIG[PD.d].split('').concat(PD.dp?['dp']:[]);const lvl=k=>segs.includes(k)?1:0;
-  digit7(ctx,40,40,2.2,lvl,PD.hl);txt(ctx,'front view',115,325,'#94a3b8',11);
+function onSegs(){return DIGITS[PD.d]+(PD.dp?'p':'');}
+function drawPin(){const ctx=cv('cPin');const segs=DIGITS[PD.d].split('').concat(PD.dp?['dp']:[]);const lvl=k=>segs.includes(k)?1:0;
+  digit7(ctx,40,40,2.2,lvl,PD.hl);txt(ctx,'front view',115,325,PAL.muted,11);
   // segment letters
-  const L={a:[30,0],b:[62,30],c:[62,80],d:[30,118],e:[-4,80],f:[-4,30],g:[30,46],dp:[74,118]};Object.entries(L).forEach(([k,[ux,uy]])=>txt(ctx,k,40+ux*2.2,40+uy*2.2+4,PD.hl===k?Y:'#94a3b8',13));
+  const L={a:[30,0],b:[62,30],c:[62,80],d:[30,118],e:[-4,80],f:[-4,30],g:[30,46],dp:[74,118]};Object.entries(L).forEach(([k,[ux,uy]])=>txt(ctx,k,40+ux*2.2,40+uy*2.2+4,PD.hl===k?Y:PAL.muted,13));
   const pinHl=segs.map(s=>SEG2PIN[s]);if(PD.hl)pinHl.push(SEG2PIN[PD.hl]);
   const pos=pkg(ctx,300,58,lvl,PD.hl?[SEG2PIN[PD.hl]]:pinHl);PD.pos=pos;
-  txt(ctx,'COM (pins 3 & 8) → GND',375,322,'#60a5fa',11);
+  txt(ctx,'COM (pins 3 & 8) → GND',375,322,PAL.blue,11);
   // table
-  const tx=540;txt(ctx,'To show "'+PD.d+(PD.dp?'.':'')+'": put + on',tx,40,'#e2e8f0',14,'left');
-  segs.forEach((s,i)=>{txt(ctx,'pin '+SEG2PIN[s],tx+(i%2)*120,72+Math.floor(i/2)*24,Y,14,'left');txt(ctx,'→ '+s,tx+52+(i%2)*120,72+Math.floor(i/2)*24,'#e2e8f0',14,'left');});
-  txt(ctx,'and connect pin 3 or 8 to GND.',tx,72+Math.ceil(segs.length/2)*24+10,'#60a5fa',13,'left');
+  const tx=540;txt(ctx,'To show "'+PD.d+(PD.dp?'.':'')+'": put + on',tx,40,PAL.ink,14,'left');
+  segs.forEach((s,i)=>{txt(ctx,'pin '+SEG2PIN[s],tx+(i%2)*120,72+Math.floor(i/2)*24,Y,14,'left');txt(ctx,'→ '+s,tx+52+(i%2)*120,72+Math.floor(i/2)*24,PAL.ink,14,'left');});
+  txt(ctx,'and connect pin 3 or 8 to GND.',tx,72+Math.ceil(segs.length/2)*24+10,PAL.blue,13,'left');
   if(PD.hl)txt(ctx,'Segment '+PD.hl+' ↔ pin '+SEG2PIN[PD.hl],tx,300,Y,15,'left');}
 $('cPin').addEventListener('click',e=>{const c=$('cPin'),[cx,cy]=canvasXY(c,e);const k=hitSeg((cx-40)/2.2,(cy-40)/2.2);
   if(k){PD.hl=PD.hl===k?null:k;drawPin();return;}
@@ -169,69 +202,67 @@ choices('ptMinus',Array.from({length:10},(_,i)=>String(i+1)),2,i=>{PT.minus=i+1;
 function drawTest(){const ctx=cv('cTest');let lit=null;const P=PINS[PT.plus],M=PINS[PT.minus];
   if(!PT.ca){if(M==='COM'&&P!=='COM')lit=P;}else{if(P==='COM'&&M!=='COM')lit=M;}
   const pos=pkg(ctx,320,60,k=>k===lit?1:0,[PT.plus,PT.minus]);
-  part(ctx,'batt',80,60,80,200,{label:'9 V',left:true});wire(ctx,[[80,60],[150,60]],'#f87171');part(ctx,'res',150,60,230,60,{label:'1 kΩ'});
+  part(ctx,'batt',80,60,80,200,{label:'9 V',left:true});wire(ctx,[[80,60],[150,60]],PAL.redSoft);part(ctx,'res',150,60,230,60,{label:'1 kΩ'});
   const [px,py]=pos[PT.plus],[mx,my]=pos[PT.minus];
-  const ry=py<100?6:306,by2=my<100?14:316;W(ctx,[[230,60],[260,60],[260,ry],[px,ry],[px,py<100?py-22:py+22]],'#f87171',2.5);
-  W(ctx,[[80,200],[120,200],[120,by2],[mx+6,by2],[mx+6,my<100?my-22:my+22]],'#94a3b8',2.5);
+  const ry=py<100?6:306,by2=my<100?14:316;W(ctx,[[230,60],[260,60],[260,ry],[px,ry],[px,py<100?py-22:py+22]],PAL.redSoft,2.5);
+  W(ctx,[[80,200],[120,200],[120,by2],[mx+6,by2],[mx+6,my<100?my-22:my+22]],PAL.muted,2.5);
   let msg,col;
-  if(PT.plus===PT.minus){msg='Both probes on the same pin: nothing.';col='#94a3b8';}
-  else if(lit){msg='Segment "'+lit+'" lights → pin '+(PT.ca?PT.minus:PT.plus)+' = '+lit;col='#10b981';}
+  if(PT.plus===PT.minus){msg='Both probes on the same pin: nothing.';col=PAL.muted;}
+  else if(lit){msg='Segment "'+lit+'" lights → pin '+(PT.ca?PT.minus:PT.plus)+' = '+lit;col=PAL.good;}
   else if(!PT.ca&&P==='COM'&&M!=='COM'){msg='Nothing: + on COM drives the LEDs backwards. For common cathode, put − on COM.';col=Y;}
   else if(PT.ca&&M==='COM'&&P!=='COM'){msg='Nothing: for common anode, + must go on COM.';col=Y;}
-  else {msg='Nothing: one probe must be on a COM pin (3 or 8).';col='#94a3b8';}
+  else {msg='Nothing: one probe must be on a COM pin (3 or 8).';col=PAL.muted;}
   wrapText(ctx,msg,540,90,250,20,col,14);}
 drawTest();
 
 // ===== 4. Resistor calc + sharing =====
 function drawRes(){const V=+$('rcV').value,I=+$('rcI').value/1000;$('rcIt').textContent=(I*1000)+' mA';const ctx=cv('cRes');
   const R=(V-1.85)/I,Rs=snapUp(R),Ia=(V-1.85)/Rs*1000;
-  txt(ctx,'R = ('+V+' V − 1.85 V) ÷ '+(I*1000)+' mA = '+Math.round(R)+' Ω',20,35,'#e2e8f0',15,'left');
+  txt(ctx,'R = ('+V+' V − 1.85 V) ÷ '+(I*1000)+' mA = '+Math.round(R)+' Ω',20,35,PAL.ink,15,'left');
   txt(ctx,'→ use '+fmtOhm(Rs)+' per segment (×8)',20,70,Y,20,'left');
-  txt(ctx,'actual ≈ '+Ia.toFixed(1)+' mA per segment · "8." draws ≈ '+(Ia*8).toFixed(0)+' mA in total'+(Ia*8>160?' (too much for one Arduino!)':''),20,102,'#94a3b8',13,'left');
-  if(I*1000>20)txt(ctx,'⚠ over 20 mA: shortens its life (30 mA absolute max)',20,128,'#f87171',13,'left');}
+  txt(ctx,'actual ≈ '+Ia.toFixed(1)+' mA per segment · "8." draws ≈ '+(Ia*8).toFixed(0)+' mA in total'+(Ia*8>160?' (too much for one Arduino!)':''),20,102,PAL.muted,13,'left');
+  if(I*1000>20)txt(ctx,'⚠ over 20 mA: shortens its life (30 mA absolute max)',20,128,PAL.redSoft,13,'left');}
 function snapUp(r){const d=Math.pow(10,Math.floor(Math.log10(r)));for(let k=0;k<2;k++){for(const e of E12){if(e*d*(k?10:1)>=r-1e-9)return e*d*(k?10:1);}}return r;}
 ['rcV','rcI'].forEach(id=>$(id).addEventListener('input',drawRes));drawRes();
 const SH={shared:0,d:1};const shD=[1,7,4,8];
 choices('shMode',['One resistor per segment','One shared resistor on COM'],0,i=>{SH.shared=i;drawShare();});
 choices('shDigits',['1','7','4','8'],0,i=>{SH.d=shD[i];drawShare();});
-function drawShare(){const ctx=cv('cShare');const segs=DIG[SH.d],n=segs.length,each=SH.shared?10/n:10;
+function drawShare(){const ctx=cv('cShare');const segs=DIGITS[SH.d],n=segs.length,each=SH.shared?10/n:10;
   digit7(ctx,90,20,1.7,k=>segs.includes(k)?Math.min(1,each/10):0);
   // schematic sketch
-  const sx=330;txt(ctx,SH.shared?'one 330 Ω on COM, shared':'8 × 330 Ω, one per segment',sx+140,30,'#e2e8f0',13);
-  for(let i=0;i<7;i++){const x=sx+20+i*40,on=segs.includes('abcdefg'[i]);W(ctx,[[x,50],[x,70]],on?'#f87171':'#475569',2);
-    if(!SH.shared){ctx.fillStyle=BG;ctx.strokeStyle=on?'#cbd5e1':'#475569';ctx.lineWidth=2;ctx.fillRect(x-6,70,12,30);ctx.strokeRect(x-6,70,12,30);}else W(ctx,[[x,70],[x,100]],on?'#f87171':'#475569',2);
-    W(ctx,[[x,100],[x,120]],on?'#f87171':'#475569',2);ctx.fillStyle=on?`rgba(239,68,68,${0.3+0.7*Math.min(1,each/10)})`:'#2a1416';ctx.beginPath();ctx.moveTo(x-8,120);ctx.lineTo(x+8,120);ctx.lineTo(x,134);ctx.closePath();ctx.fill();txt(ctx,'abcdefg'[i],x,152,'#94a3b8',11);}
-  W(ctx,[[sx+12,160],[sx+268,160]],'#60a5fa',2);for(let i=0;i<7;i++)W(ctx,[[sx+20+i*40,134],[sx+20+i*40,160]],'#475569',1.5);
-  if(SH.shared){ctx.fillStyle=BG;ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;W(ctx,[[sx+140,160],[sx+140,172]],'#60a5fa',2);ctx.fillRect(sx+130,172,20,30);ctx.strokeRect(sx+130,172,20,30);W(ctx,[[sx+140,202],[sx+140,215]],'#60a5fa',2);}
-  else W(ctx,[[sx+140,160],[sx+140,215]],'#60a5fa',2);txt(ctx,'GND',sx+140,230,'#60a5fa',11);
-  txt(ctx,'each lit segment: '+each.toFixed(1)+' mA',690,110,SH.shared&&n>2?Y:'#10b981',15);
-  txt(ctx,SH.shared?(n>2?'dimmer with more segments ✗':'bright (few segments)'):'same brightness for every digit ✓',690,138,SH.shared&&n>2?'#f87171':'#10b981',12);}
+  const sx=330;txt(ctx,SH.shared?'one 330 Ω on COM, shared':'8 × 330 Ω, one per segment',sx+140,30,PAL.ink,13);
+  for(let i=0;i<7;i++){const x=sx+20+i*40,on=segs.includes('abcdefg'[i]);W(ctx,[[x,50],[x,70]],on?PAL.redSoft:PAL.slate,2);
+    if(!SH.shared){ctx.fillStyle=BG;ctx.strokeStyle=on?PAL.ink2:PAL.slate;ctx.lineWidth=2;ctx.fillRect(x-6,70,12,30);ctx.strokeRect(x-6,70,12,30);}else W(ctx,[[x,70],[x,100]],on?PAL.redSoft:PAL.slate,2);
+    W(ctx,[[x,100],[x,120]],on?PAL.redSoft:PAL.slate,2);ctx.fillStyle=on?`rgba(239,68,68,${0.3+0.7*Math.min(1,each/10)})`:'#2a1416';ctx.beginPath();ctx.moveTo(x-8,120);ctx.lineTo(x+8,120);ctx.lineTo(x,134);ctx.closePath();ctx.fill();txt(ctx,'abcdefg'[i],x,152,PAL.muted,11);}
+  W(ctx,[[sx+12,160],[sx+268,160]],PAL.blue,2);for(let i=0;i<7;i++)W(ctx,[[sx+20+i*40,134],[sx+20+i*40,160]],PAL.slate,1.5);
+  if(SH.shared){ctx.fillStyle=BG;ctx.strokeStyle=PAL.ink2;ctx.lineWidth=2;W(ctx,[[sx+140,160],[sx+140,172]],PAL.blue,2);ctx.fillRect(sx+130,172,20,30);ctx.strokeRect(sx+130,172,20,30);W(ctx,[[sx+140,202],[sx+140,215]],PAL.blue,2);}
+  else W(ctx,[[sx+140,160],[sx+140,215]],PAL.blue,2);txt(ctx,'GND',sx+140,230,PAL.blue,11);
+  txt(ctx,'each lit segment: '+each.toFixed(1)+' mA',690,110,SH.shared&&n>2?Y:PAL.good,15);
+  txt(ctx,SH.shared?(n>2?'dimmer with more segments ✗':'bright (few segments)'):'same brightness for every digit ✓',690,138,SH.shared&&n>2?PAL.redSoft:PAL.good,12);}
 drawShare();
 
 // ===== 5B. CD4511 =====
 const BCD=[0,1,0,1];// D C B A
 (function(){const el=$('bcdSw');['D (8)','C (4)','B (2)','A (1)'].forEach((l,i)=>{const b=document.createElement('button');const upd=()=>{b.textContent=l+': '+BCD[i];b.className=BCD[i]?'active':'';};upd();b.onclick=()=>{BCD[i]^=1;upd();drawBcd();};el.appendChild(b);});})();
-function drawBcd(){const ctx=cv('cBcd'),n=BCD[0]*8+BCD[1]*4+BCD[2]*2+BCD[3],segs=n<10?DIG[n]:'';
-  ['D','C','B','A'].forEach((l,i)=>{const y=50+i*40,on=BCD[i];ctx.fillStyle=on?'#10b981':'#334155';ctx.beginPath();ctx.roundRect(40,y-12,50,24,12);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(on?78:52,y,9,0,7);ctx.fill();
-    txt(ctx,l+' = '+[8,4,2,1][i],100,y+4,on?'#10b981':'#94a3b8',12,'left');W(ctx,[[150,y],[230,y]],on?'#10b981':'#475569',2);});
-  ctx.fillStyle='#1f2937';ctx.fillRect(230,30,110,170);ctx.strokeStyle='#475569';ctx.strokeRect(230,30,110,170);txt(ctx,'CD4511',285,118,'#e2e8f0',14);txt(ctx,'BCD → 7-seg',285,138,'#94a3b8',10);
-  for(let i=0;i<7;i++){const y=45+i*22,on=segs.includes('abcdefg'[i]);W(ctx,[[340,y],[370,y]],on?'#f87171':'#475569',2);ctx.fillStyle=BG;ctx.strokeStyle=on?'#cbd5e1':'#475569';ctx.lineWidth=1.5;ctx.fillRect(370,y-5,30,10);ctx.strokeRect(370,y-5,30,10);W(ctx,[[400,y],[440,y]],on?'#f87171':'#475569',2);txt(ctx,'abcdefg'[i],446,y+4,'#94a3b8',10,'left');}
+function drawBcd(){const ctx=cv('cBcd'),n=BCD[0]*8+BCD[1]*4+BCD[2]*2+BCD[3],segs=n<10?DIGITS[n]:'';
+  ['D','C','B','A'].forEach((l,i)=>{const y=50+i*40,on=BCD[i];ctx.fillStyle=on?PAL.good:PAL.slateDark;ctx.beginPath();ctx.roundRect(40,y-12,50,24,12);ctx.fill();ctx.fillStyle=PAL.white;ctx.beginPath();ctx.arc(on?78:52,y,9,0,7);ctx.fill();
+    txt(ctx,l+' = '+[8,4,2,1][i],100,y+4,on?PAL.good:PAL.muted,12,'left');W(ctx,[[150,y],[230,y]],on?PAL.good:PAL.slate,2);});
+  ctx.fillStyle=PAL.chip;ctx.fillRect(230,30,110,170);ctx.strokeStyle=PAL.slate;ctx.strokeRect(230,30,110,170);txt(ctx,'CD4511',285,118,PAL.ink,14);txt(ctx,'BCD → 7-seg',285,138,PAL.muted,10);
+  for(let i=0;i<7;i++){const y=45+i*22,on=segs.includes('abcdefg'[i]);W(ctx,[[340,y],[370,y]],on?PAL.redSoft:PAL.slate,2);ctx.fillStyle=BG;ctx.strokeStyle=on?PAL.ink2:PAL.slate;ctx.lineWidth=1.5;ctx.fillRect(370,y-5,30,10);ctx.strokeRect(370,y-5,30,10);W(ctx,[[400,y],[440,y]],on?PAL.redSoft:PAL.slate,2);txt(ctx,'abcdefg'[i],446,y+4,PAL.muted,10,'left');}
   digit7(ctx,480,40,1.5,k=>segs.includes(k)?1:0);
-  txt(ctx,'binary '+BCD.join('')+' = '+n,690,100,'#e2e8f0',16);txt(ctx,n<10?'shows "'+n+'"':'10–15: the 4511 blanks the display',690,128,n<10?'#10b981':Y,12);}
+  txt(ctx,'binary '+BCD.join('')+' = '+n,690,100,PAL.ink,16);txt(ctx,n<10?'shows "'+n+'"':'10–15: the 4511 blanks the display',690,128,n<10?PAL.good:Y,12);}
 drawBcd();
 
 // ===== 5C. Multiplexing =====
 const MX={t:0};const MXD=[1,2,3,4];
 function drawMux(dt){MX.t+=dt;const fr=Math.pow(10,+$('mxF').value),fast=fr>25;$('mxFt').textContent=(fr<10?fr.toFixed(1):Math.round(fr))+' scans/s';
   const act=Math.floor(MX.t*fr*4)%4;const ctx=cv('cMux');
-  MXD.forEach((d,i)=>{const on=fast||i===act;digit7(ctx,90+i*120,20,1.25,k=>on&&DIG[d].includes(k)?(fast?0.75:1):0);
-    npnQ(ctx,140+i*120,200,!fast&&i===act);txt(ctx,'digit '+(i+1),130+i*120,246,'#94a3b8',10);});
-  W(ctx,[[60,175],[560,175]],'#475569',1.5);txt(ctx,'shared segment lines a–g',580,170,'#94a3b8',11,'left');
-  txt(ctx,fast?'Too fast for your eye: all 4 digits look lit ✓':'Slow: you can see one digit at a time',640,90,fast?'#10b981':Y,13);}
+  MXD.forEach((d,i)=>{const on=fast||i===act;digit7(ctx,90+i*120,20,1.25,k=>on&&DIGITS[d].includes(k)?(fast?0.75:1):0);
+    npnQ(ctx,140+i*120,200,!fast&&i===act);txt(ctx,'digit '+(i+1),130+i*120,246,PAL.muted,10);});
+  W(ctx,[[60,175],[560,175]],PAL.slate,1.5);txt(ctx,'shared segment lines a–g',580,170,PAL.muted,11,'left');
+  txt(ctx,fast?'Too fast for your eye: all 4 digits look lit ✓':'Slow: you can see one digit at a time',640,90,fast?PAL.good:Y,13);}
 
-let lastP=performance.now();
-function frameP(now){const dt=Math.min(0.05,(now-lastP)/1000);lastP=now;drawMux(dt);requestAnimationFrame(frameP);}
-requestAnimationFrame(frameP);
+loop((dt,now)=>{drawMux(dt);});
 
 // ===== Example 2: DC10G bar graph =====
 // real pin numbers: anode of segment i (0=A..9=J) = i+1, cathode = 20-i
@@ -240,24 +271,24 @@ const bgRole=p=>p<=10?{seg:p-1,an:true}:{seg:20-p,an:false};
 const bgReal=(pos,rot)=>rot?((pos-1+10)%20)+1:pos;   // turning a DIL-20 by 180° moves pin n to n+10
 // draws the package; lvl(i)->0..1 for segment slot i; returns {pos:{position:[x,y]}, seg:[[x,y,w,h]]}
 function bgPkg(ctx,x,y,lvl,hl,rot,labels){const P=34,w=10*P+16,h=96,pos={},seg=[];
-  ctx.fillStyle='#1f2937';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#475569';ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);
-  const cx=rot?x+w-6:x+6,cy=rot?y+6:y+h-6;ctx.fillStyle='#64748b';ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+(rot?-14:14),cy);ctx.lineTo(cx,cy+(rot?14:-14));ctx.fill();
+  ctx.fillStyle=PAL.chip;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.slate;ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);
+  const cx=rot?x+w-6:x+6,cy=rot?y+6:y+h-6;ctx.fillStyle=PAL.muted2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+(rot?-14:14),cy);ctx.lineTo(cx,cy+(rot?14:-14));ctx.fill();
   for(let i=0;i<10;i++){const sx=x+14+i*P,b=lvl(i);seg.push([sx,y+20,22,56]);
-    if(b>0.02){ctx.shadowBlur=16*b;ctx.shadowColor='#22c55e';}ctx.fillStyle=b>0.02?`rgba(34,197,94,${0.3+0.7*b})`:'#11261a';ctx.fillRect(sx,y+20,22,56);ctx.shadowBlur=0;}
+    if(b>0.02){ctx.shadowBlur=16*b;ctx.shadowColor=PAL.green;}ctx.fillStyle=b>0.02?`rgba(34,197,94,${0.3+0.7*b})`:'#11261a';ctx.fillRect(sx,y+20,22,56);ctx.shadowBlur=0;}
   for(let k=1;k<=20;k++){const bottom=k<=10,px=x+25+(bottom?k-1:20-k)*P,py=bottom?y+h:y-26;pos[k]=[px,bottom?y+h+26:y-26];
-    const on=hl&&hl.includes(k);ctx.fillStyle=on?Y:'#cbd5e1';ctx.fillRect(px-3,py,6,26);
-    txt(ctx,String(k),px,bottom?py+40:py-6,on?Y:'#94a3b8',11);
-    if(labels){const r=bgRole(bgReal(k,rot));txt(ctx,BG_SEG[r.seg]+(r.an?'+':'−'),px,bottom?py+56:py-20,r.an?'#f87171':'#60a5fa',11);}}
+    const on=hl&&hl.includes(k);ctx.fillStyle=on?Y:PAL.ink2;ctx.fillRect(px-3,py,6,26);
+    txt(ctx,String(k),px,bottom?py+40:py-6,on?Y:PAL.muted,11);
+    if(labels){const r=bgRole(bgReal(k,rot));txt(ctx,BG_SEG[r.seg]+(r.an?'+':'−'),px,bottom?py+56:py-20,r.an?PAL.redSoft:PAL.blue,11);}}
   return {pos,seg};}
 
 // ---- pinout ----
 const BGP={hl:0};
 function drawBarPin(){const ctx=cv('cBarPin');const s=BGP.hl,lit=i=>i===s?1:0;
   const g=bgPkg(ctx,30,96,lit,[s+1,20-s],false,true);BGP.g=g;
-  txt(ctx,'top row: cathodes (−) 20 → 11',210,26,'#60a5fa',12);txt(ctx,'bottom row: anodes (+) 1 → 10',210,292,'#f87171',12);
+  txt(ctx,'top row: cathodes (−) 20 → 11',210,26,PAL.blue,12);txt(ctx,'bottom row: anodes (+) 1 → 10',210,292,PAL.redSoft,12);
   const tx=470;txt(ctx,'Segment '+BG_SEG[s]+': + on pin '+(s+1)+', − on pin '+(20-s),tx,40,Y,15,'left');
-  for(let i=0;i<10;i++){const yy=78+i*20,c=i===s?Y:'#cbd5e1';txt(ctx,BG_SEG[i],tx,yy,c,13,'left');txt(ctx,'anode pin '+(i+1),tx+26,yy,i===s?Y:'#f87171',13,'left');txt(ctx,'↔  cathode pin '+(20-i),tx+130,yy,i===s?Y:'#60a5fa',13,'left');}
-  txt(ctx,'rule: anode n ↔ cathode 21 − n',tx,292,'#94a3b8',12,'left');}
+  for(let i=0;i<10;i++){const yy=78+i*20,c=i===s?Y:PAL.ink2;txt(ctx,BG_SEG[i],tx,yy,c,13,'left');txt(ctx,'anode pin '+(i+1),tx+26,yy,i===s?Y:PAL.redSoft,13,'left');txt(ctx,'↔  cathode pin '+(20-i),tx+130,yy,i===s?Y:PAL.blue,13,'left');}
+  txt(ctx,'rule: anode n ↔ cathode 21 − n',tx,292,PAL.muted,12,'left');}
 $('cBarPin').addEventListener('click',e=>{const c=$('cBarPin'),[cx,cy]=canvasXY(c,e),g=BGP.g;if(!g)return;
   g.seg.forEach(([sx,sy,w,h],i)=>{if(cx>=sx-4&&cx<=sx+w+4&&cy>=sy&&cy<=sy+h){BGP.hl=i;}});
   Object.entries(g.pos).forEach(([k,[px,py]])=>{if(Math.abs(cx-px)<14&&Math.abs(cy-py)<22)BGP.hl=bgRole(+k).seg;});drawBarPin();});
@@ -274,14 +305,14 @@ function drawBarTest(){const ctx=cv('cBarTest'),pl=+$('btPlus').value,mi=+$('btM
   const slot=i=>rot?9-i:i;const g=bgPkg(ctx,380,80,i=>litSeg>=0&&slot(litSeg)===i?1:0,[pl,mi],rot,false);
   part(ctx,'batt',60,60,60,200,{label:'9 V',left:true});part(ctx,'res',60,60,170,60,{label:'1 kΩ'});
   const [px,py]=g.pos[pl],[mx,my]=g.pos[mi];
-  W(ctx,[[170,60],[200,60],[200,py<120?py-30:py+30],[px,py<120?py-30:py+30],[px,py<120?py-12:py+12]],'#f87171',2.5);
-  W(ctx,[[60,200],[140,200],[140,my<120?my-36:my+36],[mx+5,my<120?my-36:my+36],[mx+5,my<120?my-12:my+12]],'#94a3b8',2.5);
+  W(ctx,[[170,60],[200,60],[200,py<120?py-30:py+30],[px,py<120?py-30:py+30],[px,py<120?py-12:py+12]],PAL.redSoft,2.5);
+  W(ctx,[[60,200],[140,200],[140,my<120?my-36:my+36],[mx+5,my<120?my-36:my+36],[mx+5,my<120?my-12:my+12]],PAL.muted,2.5);
   bgPkg(ctx,380,80,i=>litSeg>=0&&slot(litSeg)===i?1:0,[pl,mi],rot,false);// redraw on top of the wires
   let msg,col;
-  if(pl===mi){msg='Both probes on the same pin: nothing.';col='#94a3b8';}
-  else if(litSeg>=0){msg='Segment '+BG_SEG[litSeg]+' lights. '+(rot?'It lights, but at the wrong end: the bar is turned round. Pin 1 is really in position '+bgReal(1,true)+'.':'Pin '+pl+' = anode, pin '+mi+' = cathode ✓');col='#10b981';}
+  if(pl===mi){msg='Both probes on the same pin: nothing.';col=PAL.muted;}
+  else if(litSeg>=0){msg='Segment '+BG_SEG[litSeg]+' lights. '+(rot?'It lights, but at the wrong end: the bar is turned round. Pin 1 is really in position '+bgReal(1,true)+'.':'Pin '+pl+' = anode, pin '+mi+' = cathode ✓');col=PAL.good;}
   else if(rev){msg='Nothing: this LED is connected backwards. Swap the probes'+(rot?': the bar is turned round, the anodes are on the top row.':'.');col=Y;}
-  else{msg='Nothing: these two pins are not the two ends of the same LED. Opposite pins in the two rows belong together.';col='#94a3b8';}
+  else{msg='Nothing: these two pins are not the two ends of the same LED. Opposite pins in the two rows belong together.';col=PAL.muted;}
   wrapText(ctx,msg,20,252,760,18,col,13);}
 drawBarTest();
 
@@ -289,10 +320,10 @@ drawBarTest();
 function drawBarRes(){const V=+$('brV').value,I=+$('brI').value/1000;$('brIt').textContent=(I*1000)+' mA';const ctx=cv('cBarRes');
   if(V<=2.6){txt(ctx,V+' V is too close to the LED\'s 2.1–2.6 V: no room left for a resistor. Use 5 V.',400,70,Y,14);return;}
   const R=(V-2.1)/I,Rs=snapUp(R),Ia=(V-2.1)/Rs,P=Ia*Ia*Rs;
-  txt(ctx,`R = (${V} V − 2.1 V) ÷ ${(I*1000)} mA = ${Math.round(R)} Ω  →  next standard value up: ${fmtOhm(Rs)}`,400,36,'#e2e8f0',15);
-  txt(ctx,`real current ${(Ia*1000).toFixed(1)} mA per LED · ${(P*1000).toFixed(0)} mW in each resistor (a ¼ W one is plenty)`,400,70,'#94a3b8',13);
-  const tot=Ia*10*1000;txt(ctx,`Whole bar lit: 10 × ${(Ia*1000).toFixed(1)} mA = ${tot.toFixed(0)} mA`+(tot>150?'  ⚠️ a lot for an Arduino (≈ 200 mA max in total)':''),400,104,tot>150?Y:'#10b981',13);
-  txt(ctx,'max 25 mA per LED (datasheet)',400,136,'#64748b',11);}
+  txt(ctx,`R = (${V} V − 2.1 V) ÷ ${(I*1000)} mA = ${Math.round(R)} Ω  →  next standard value up: ${fmtOhm(Rs)}`,400,36,PAL.ink,15);
+  txt(ctx,`real current ${(Ia*1000).toFixed(1)} mA per LED · ${(P*1000).toFixed(0)} mW in each resistor (a ¼ W one is plenty)`,400,70,PAL.muted,13);
+  const tot=Ia*10*1000;txt(ctx,`Whole bar lit: 10 × ${(Ia*1000).toFixed(1)} mA = ${tot.toFixed(0)} mA`+(tot>150?'  ⚠️ a lot for an Arduino (≈ 200 mA max in total)':''),400,104,tot>150?Y:PAL.good,13);
+  txt(ctx,'max 25 mA per LED (datasheet)',400,136,PAL.muted2,11);}
 ['brV','brI'].forEach(id=>$(id).addEventListener('input',drawBarRes));drawBarRes();
 
 // ---- driving from an Arduino ----
@@ -301,11 +332,11 @@ choices('bdMode',['Bar','Dot'],0,i=>{BGD.dot=i;drawBarDrive();});
 function drawBarDrive(){const ctx=cv('cBarDrive'),V=+$('bdV').value,adc=Math.round(V/5*1023),n=Math.floor(adc*10/1023);
   const on=i=>BGD.dot?(i+1===n):(i<n);
   bgPkg(ctx,30,70,i=>on(i)?1:0,null,false,false);
-  const tx=440;txt(ctx,`analogRead(A0) = ${adc}`,tx,60,'#e2e8f0',14,'left');txt(ctx,`n = map(${adc}, 0, 1023, 0, 10) = ${n}`,tx,86,Y,14,'left');
+  const tx=440;txt(ctx,`analogRead(A0) = ${adc}`,tx,60,PAL.ink,14,'left');txt(ctx,`n = map(${adc}, 0, 1023, 0, 10) = ${n}`,tx,86,Y,14,'left');
   const hi=[];for(let i=0;i<10;i++)if(on(i))hi.push('D'+(i+2));
-  wrapText(ctx,'HIGH: '+(hi.length?hi.join(' '):'none'),tx,118,340,18,'#10b981',13);
-  const mA=hi.length*9;txt(ctx,`current ≈ ${hi.length} × 9 mA = ${mA} mA`,tx,180,mA>150?Y:'#94a3b8',13,'left');
-  txt(ctx,BGD.dot?'Dot mode: only the top LED, so 10× less current':'Bar mode: every LED up to the level',tx,206,'#64748b',12,'left');}
+  wrapText(ctx,'HIGH: '+(hi.length?hi.join(' '):'none'),tx,118,340,18,PAL.good,13);
+  const mA=hi.length*9;txt(ctx,`current ≈ ${hi.length} × 9 mA = ${mA} mA`,tx,180,mA>150?Y:PAL.muted,13,'left');
+  txt(ctx,BGD.dot?'Dot mode: only the top LED, so 10× less current':'Bar mode: every LED up to the level',tx,206,PAL.muted2,12,'left');}
 $('bdV').addEventListener('input',drawBarDrive);drawBarDrive();
 
 })();

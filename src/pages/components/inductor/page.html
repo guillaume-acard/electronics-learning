@@ -24,7 +24,7 @@
     <li><b>Steady flow:</b> once spinning, the wheel turns freely. For steady DC an inductor is just a wire.</li>
     <li><b>Switch off suddenly:</b> the wheel keeps spinning and slams water against the closed valve. That's a <b>water hammer</b>, a huge pressure spike. Electrically: hundreds of volts, and sparks.</li>
   </ul>
-  <div class="controls"><button id="inSw">Switch: OFF</button><span id="inChoices"></span><label class="slider" style="flex:1">Inductance (heavier wheel)<input id="inL" type="range" min="0.2" max="3" step="0.1" value="1.2" style="flex:1;width:auto"></label></div>
+  <div class="controls"><button id="inSw">Switch: OFF</button><span id="inChoices"></span><label class="slider grow">Inductance (heavier wheel)<input id="inL" type="range" min="0.2" max="3" step="0.1" value="1.2"></label></div>
   <canvas id="cInd" width="800" height="330"></canvas>
   <p class="hint">Turn it ON and watch the current climb slowly. Turn it OFF without the diode: spike and sparks. Add the flyback diode, and the current circles through the diode and fades gently, just like on the <a data-page="diode" class="navlink">diode page</a>.</p>
 </section>
@@ -47,7 +47,7 @@
 
   <h3>A. Boost converter: 1.5 V lights a 3 V LED</h3>
   <p>A single AA battery (1.5 V) can't light a white LED (needs ~3 V). But a coil can: a transistor <b>shorts the coil to ground</b> for a moment (the current builds up), then <b>lets go</b>. The coil's "water hammer" adds its push on top of the battery, through the diode into the LED. Repeat thousands of times per second and the LED glows. This is the famous <b>"Joule thief"</b>, and the same idea is inside every power bank.</p>
-  <div class="controls"><label class="slider" style="flex:1">Switching speed<input id="bsF" type="range" min="0.3" max="3" step="0.05" value="0.6" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Switching speed<input id="bsF" type="range" min="0.3" max="3" step="0.05" value="0.6"></label></div>
   <canvas id="cBoost" width="800" height="300"></canvas>
 
   <h3>B. Filtering noise (LC filter)</h3>
@@ -57,14 +57,14 @@
 
   <h3>C. Transformer: changing AC voltage</h3>
   <p>Two coils on one iron core. AC in the first coil makes a changing magnetic field, which pushes AC into the second coil. <b>Voltage ratio = turns ratio</b>: 10× fewer turns on the output gives 10× less voltage. With DC the field doesn't change, so <b>nothing comes out</b>.</p>
-  <div class="controls"><label class="slider" style="flex:1">Output turns<input id="trN" type="range" min="10" max="400" step="10" value="50" style="flex:1;width:auto"></label><span id="trChoices"></span></div>
+  <div class="controls"><label class="slider grow">Output turns<input id="trN" type="range" min="10" max="400" step="10" value="50"></label><span id="trChoices"></span></div>
   <canvas id="cTr" width="800" height="270"></canvas>
 </section>
 
 <section>
   <h2><span class="num">6</span>Key facts</h2>
   <div class="grid2">
-    <div><canvas id="cSymI" width="380" height="160"></canvas><p class="hint" style="text-align:center">Top: air-core inductor. Bottom: with an iron/ferrite core (two lines).</p></div>
+    <div><canvas id="cSymI" width="380" height="160"></canvas><p class="hint center">Top: air-core inductor. Bottom: with an iron/ferrite core (two lines).</p></div>
     <table>
       <tr><td>Unit</td><td>Henry (H). Usually <b>µH</b> (power converters, radio) or <b>mH</b> (audio filters).</td></tr>
       <tr><td>Fill time</td><td>Current builds up with time constant L ÷ R.</td></tr>

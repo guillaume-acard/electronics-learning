@@ -45,7 +45,7 @@
   <div class="controls" id="ohmBtns">
     <button data-k="V" class="active">Find the voltage</button><button data-k="I">Find the current</button><button data-k="R">Find the resistance</button>
   </div>
-  <div id="ohmOut" class="card" style="font-size:1.05rem"></div>
+  <div id="ohmOut" class="card big"></div>
 </section>
 
 <section>
@@ -69,7 +69,7 @@
   <p>Like the capacitor's voltage rating, a resistor has a limit, but this one is about <b>heat</b>. The heat produced is <b>P = V × I</b>, in watts. Most small resistors are rated <b>¼ W (0.25 W)</b>. Go above it and the resistor gets too hot: it discolours, smokes, and finally burns open, breaking the circuit.</p>
   <p>Here is a <b>100 Ω, ¼ W</b> resistor. Increase the voltage across it:</p>
   <div class="controls">
-    <label class="slider" style="flex:1">Voltage across it<input id="hV" type="range" min="0" max="12" step="0.5" value="3" style="flex:1;width:auto"></label>
+    <label class="slider grow">Voltage across it<input id="hV" type="range" min="0" max="12" step="0.5" value="3"></label>
     <b id="hVt" style="min-width:50px"></b><button id="hNew">🔧 Replace resistor</button>
   </div>
   <div class="readout"><span>Current: <b id="hI"></b></span><span>Heat (power): <b id="hP"></b></span><span>Status: <b id="hS"></b></span></div>
@@ -90,20 +90,20 @@
   <h3>B. Voltage divider and the volume knob (potentiometer)</h3>
   <p>Two resistors in a row split the voltage: <code>Vout = Vin × R2 ÷ (R1 + R2)</code>. A <b>potentiometer</b> is one long resistor with a sliding contact, so turning it moves the split point.
   <b>Why:</b> volume and tone knobs (including on a guitar), sensor readings, and setting reference levels.</p>
-  <div class="controls"><label class="slider" style="flex:1">Turn the knob<input id="pot" type="range" min="0" max="1" step="0.01" value="0.5" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Turn the knob<input id="pot" type="range" min="0" max="1" step="0.01" value="0.5"></label></div>
   <canvas id="cDiv" width="800" height="260"></canvas>
 
   <h3>C. Pull-up resistor (giving a chip a default value)</h3>
   <p>A button connects a chip's input to ground (0 V) when pressed. But when it's <i>not</i> pressed, the input is connected to <b>nothing</b>. It "floats" and picks up electrical noise, so the chip reads random HIGH/LOW values.
   A <b>10 kΩ pull-up</b> to +5 V gently holds the input HIGH. Pressing the button wins easily, because the button is a direct path while the resistor only pulls gently.
   <b>Why:</b> it's on almost every button, switch and data line connected to a microcontroller.</p>
-  <div class="controls"><button id="pullBtn" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="pullChoices"></span></div>
+  <div class="controls"><button class="go" id="pullBtn">👆 Hold to press button</button><span id="pullChoices"></span></div>
   <canvas id="cPull" width="800" height="260"></canvas>
 
   <h3>D. Timing with a capacitor (the blinker)</h3>
   <p>A resistor controls how fast a capacitor fills (see the <a data-page="capacitor" class="navlink">capacitor page</a>). Here a 100 µF capacitor fills through the resistor. When it reaches ⅔ full, the LED flashes and it empties back to ⅓.
   The time scales with <b>R × C</b>, so a bigger resistor gives slower blinking. <b>Why:</b> blinkers, delays, oscillators and the classic 555 timer chip.</p>
-  <div class="controls"><label class="slider" style="flex:1">Resistor<input id="rcR" type="range" min="0" max="1.7" step="0.01" value="0.7" style="flex:1;width:auto"></label><b id="rcRt" style="min-width:150px"></b></div>
+  <div class="controls"><label class="slider grow">Resistor<input id="rcR" type="range" min="0" max="1.7" step="0.01" value="0.7"></label><b id="rcRt" style="min-width:150px"></b></div>
   <canvas id="cRC" width="800" height="230"></canvas>
 </section>
 
@@ -120,7 +120,7 @@
   <div class="grid2">
     <div>
       <canvas id="cSymR" width="380" height="150"></canvas>
-      <p class="hint" style="text-align:center">Left: European/IEC symbol (used in France). Right: American symbol. They mean the same thing.</p>
+      <p class="hint center">Left: European/IEC symbol (used in France). Right: American symbol. They mean the same thing.</p>
     </div>
     <table>
       <tr><td>Unit</td><td>Ohm (Ω). <b>kΩ</b> = thousand, <b>MΩ</b> = million. 4k7 means 4.7 kΩ.</td></tr>

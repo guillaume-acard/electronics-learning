@@ -20,7 +20,7 @@
     <div class="card"><div class="ico">🔇</div><h3>4. Filtering noise and tone</h3><p><b>Why:</b> capacitors let fast wiggles through more easily than slow ones. Used cleverly, they dump hiss and buzz to ground, or cut treble (your guitar's tone knob).<br><i>Water:</i> a side drain that only swallows quick ripples.</p></div>
     <div class="card"><div class="ico">⏱️</div><h3>5. Timing</h3><p><b>Why:</b> filling through a resistor always takes the same time, so circuits use it as a clock: blinking LEDs, delays, and the "hold" before lights turn off.<br><i>Water:</i> an hourglass that always takes the same time to fill.</p></div>
   </div>
-  <p style="margin-top:14px"><b>In one sentence:</b> capacitors are used wherever a circuit needs to <b>store a little energy for a moment</b>,
+  <p class="mt-m"><b>In one sentence:</b> capacitors are used wherever a circuit needs to <b>store a little energy for a moment</b>,
   <b>steady</b> a voltage, <b>separate</b> signals from DC, or <b>measure time</b>. That's why almost every electronic device contains dozens of them.</p>
 </section>
 
@@ -50,7 +50,7 @@
   <canvas id="cWater" width="800" height="300"></canvas>
 
   <h3 style="margin-bottom:4px">The same thing as a real circuit</h3>
-  <p class="hint" style="margin-top:0">The yellow dots are electrons. The <b>+</b> and <b>−</b> signs are charge piling up on the plates. Not a single electron crosses the gap.</p>
+  <p class="hint flush">The yellow dots are electrons. The <b>+</b> and <b>−</b> signs are charge piling up on the plates. Not a single electron crosses the gap.</p>
   <canvas id="cCirc" width="800" height="300"></canvas>
 
   <h3 style="margin-bottom:4px">What it looks like over time</h3>
@@ -71,7 +71,7 @@
     <div class="w">How much the sheet is stretched</div><div class="arrow">→</div><div class="e">Charge stored (Q)</div>
     <div class="w">Size / softness of the sheet</div><div class="arrow">→</div><div class="e">Capacitance (F, farads)</div>
   </div>
-  <p style="margin-top:14px">The key formula is <code>Q = C × V</code>: <b>charge stored = capacitance × voltage</b>.
+  <p class="mt-m">The key formula is <code>Q = C × V</code>: <b>charge stored = capacitance × voltage</b>.
   In water terms, a bigger, softer sheet (more C) holds more water at the same pressure (V).</p>
 </section>
 
@@ -121,10 +121,10 @@
   <p class="tldr" style="font-size:1rem"><b>Rule of thumb:</b> <b>small</b> capacitors fill and empty in a flash, so they deal with <b>fast</b> things like high frequencies and noise.
   <b>Big</b> capacitors hold more energy and react slowly, so they deal with <b>slow</b> things like power, smoothing and long delays.</p>
   <p class="hint">Drag the slider to see how size changes the job. The fill time assumes the capacitor fills through the same 1 kΩ resistor every time.</p>
-  <div class="controls"><label class="slider" style="flex:1">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7"></label></div>
   <canvas id="cSize" width="800" height="230"></canvas>
 
-  <table style="margin-top:14px">
+  <table class="mt-m">
     <tr><td>🥄 <b>pF</b> (picofarads)<br><span class="hint">a thimble</span></td><td>Radio tuning, high-frequency filters, and the two little 22 pF caps beside a microcontroller's crystal.</td></tr>
     <tr><td>☕ <b>nF</b> (nanofarads)<br><span class="hint">a cup</span></td><td>The famous <b>100 nF</b> "decoupling" cap next to every chip, guitar tone controls (22–47 nF), and noise filters.</td></tr>
     <tr><td>🪣 <b>1–100 µF</b><br><span class="hint">a bucket</span></td><td>Passing audio between stages (coupling), timing and blinking circuits, and LED fade-outs.</td></tr>
@@ -148,7 +148,7 @@
     <li><b>Above 16 V:</b> the sheet is overstretched. After a moment it <b>tears</b>, and water then flows straight through the hole <i>non-stop</i>. That isn't charging, it's a broken capacitor acting like a short circuit.</li>
   </ul>
   <div class="controls">
-    <label class="slider" style="flex:1">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9" style="flex:1;width:auto"></label>
+    <label class="slider grow">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9"></label>
     <b id="bVlab" style="min-width:52px">9 V</b>
     <button id="bNew">🔧 Replace capacitor</button>
   </div>
@@ -170,7 +170,7 @@
   <p>A battery, a push button, and an LED with its resistor. A capacitor sits beside the LED. Pressing the button lights the LED and fills the capacitor.
   When you let go, the capacitor <b>keeps feeding the LED</b> for a while, so it fades instead of snapping off.
   <b>Why:</b> this is the "dim slowly" effect in car interior lights and the glow that lingers on a charger after you unplug it.</p>
-  <div class="controls"><button id="fPress" style="background:#10b981;color:#fff">👆 Hold to press button</button><span id="fChoices"></span></div>
+  <div class="controls"><button class="go" id="fPress">👆 Hold to press button</button><span id="fChoices"></span></div>
   <canvas id="cFade" width="800" height="260"></canvas>
   <p class="hint">Bigger capacitor = bigger reserve = longer fade. 10 µF is gone almost instantly, while 1000 µF glows for seconds.</p>
 
@@ -189,9 +189,9 @@
   <div class="controls"><span id="kChoices"></span></div>
   <canvas id="cCouple" width="800" height="270"></canvas>
   <p class="hint">Size matters here too. A capacitor that is <b>too small</b> only lets fast wiggles (treble) through, so the bass disappears and the sound gets thin. That's also how a <b>tone control</b> works on purpose.</p>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <div class="box">
   <h4 style="margin:0 0 8px;font-size:1.1rem">🔍 Why does the output end up centred on 0?</h4>
-  <p style="margin-top:0">The signal is made of <b>two parts</b>: a <b>steady 4.5 V</b> (DC) plus a <b>wiggle of ±0.5 V</b> (the music), so it moves between 4 V and 5 V.</p>
+  <p class="flush">The signal is made of <b>two parts</b>: a <b>steady 4.5 V</b> (DC) plus a <b>wiggle of ±0.5 V</b> (the music), so it moves between 4 V and 5 V.</p>
   <ol>
     <li><b>The steady 4.5 V stretches the rubber sheet once and it stays stretched.</b> The capacitor is now charged to 4.5 V. A steady push causes no more flow, so the sheet <i>absorbs</i> it.</li>
     <li><b>The wiggle makes the sheet flex</b> a bit more, then a bit less. Each flex pushes water back and forth on the other side, so the wiggle gets through.</li>
@@ -208,11 +208,11 @@
   Both graphs use the <b>same scale</b>, so you can see the shift.</p>
   <div class="controls"><button id="zPlug">🔌 Plug in (empty capacitor)</button><button id="zSettled">Skip to settled</button></div>
   <canvas id="cCenter" width="800" height="360"></canvas>
-  <p class="hint" style="margin-bottom:0">🚤 <b>Boat analogy:</b> you hold a rope tied to a boat on a lake. You feel the <b>waves</b> tugging back and forth, but never the <b>height</b> of the lake. The capacitor is the rope: it passes the movement on and ignores the level.</p>
+  <p class="hint mb0">🚤 <b>Boat analogy:</b> you hold a rope tied to a boat on a lake. You feel the <b>waves</b> tugging back and forth, but never the <b>height</b> of the lake. The capacitor is the rope: it passes the movement on and ignores the level.</p>
   </div>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <div class="box">
   <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 But I thought a full capacitor blocks current?</h4>
-  <p style="margin-top:0">"Full" doesn't mean closed for good. It means <b>in balance</b>: the capacitor pushes back exactly as hard as the input pushes, so nothing flows.</p>
+  <p class="flush">"Full" doesn't mean closed for good. It means <b>in balance</b>: the capacitor pushes back exactly as hard as the input pushes, so nothing flows.</p>
   <ul>
     <li><b>Steady push (DC):</b> the push never changes, so once balanced it <b>stays</b> balanced, and the current stops for good. That's how DC gets blocked.</li>
     <li><b>Changing push (music):</b> the balance keeps breaking. When the input rises above what the capacitor holds, a little charge flows <b>in</b>. When it drops below, a little flows <b>back out</b>. Current keeps sloshing back and forth.</li>
@@ -221,12 +221,12 @@
   <p><b>The wobble doesn't wait for the capacitor to fill.</b> The capacitor does two jobs at the same time: it <b>slowly absorbs</b> the steady part and <b>immediately passes</b> the changes. (Don't confuse the capacitor's voltage, which is what it currently holds, with its <i>voltage rating</i>, which is its burst limit.)</p>
   <div class="controls"><span id="eChoices"></span></div>
   <canvas id="cElec" width="800" height="270"></canvas>
-  <p class="hint" style="margin-bottom:0">Watch the two bars. When they're equal, nothing moves. With the steady push they become equal and stay that way. With music they never stay equal for long, so the charges keep moving on <b>both</b> sides of the gap.</p>
+  <p class="hint mb0">Watch the two bars. When they're equal, nothing moves. With the steady push they become equal and stay that way. With music they never stay equal for long, so the charges keep moving on <b>both</b> sides of the gap.</p>
   </div>
 
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <div class="box">
   <h4 style="margin:0 0 8px;font-size:1.1rem">📏 Why does the size (pF, nF, 100 nF) change the sound?</h4>
-  <p style="margin-top:0"><b>Rule: a capacitor blocks any change slow enough for it to catch up with.</b>
+  <p class="flush"><b>Rule: a capacitor blocks any change slow enough for it to catch up with.</b>
   The capacitor always tries to <b>match</b> the input. When it matches, nothing gets through. So the question is: <i>can it catch up before the wiggle turns around?</i></p>
   <ul>
     <li><b>Small capacitor</b> (a thimble): fills almost instantly. It keeps up with slow wiggles (bass) and cancels them. Only fast wiggles (treble) escape. Result: a <b>thin, tinny</b> sound.</li>
@@ -243,7 +243,7 @@
     <tr><td>1 nF</td><td>1 ms</td><td>partly caught: <b>reduced</b></td><td>too fast: <b>passes</b></td><td>thin</td></tr>
     <tr><td>100 nF</td><td>100 ms</td><td>too fast: <b>passes</b></td><td><b>passes</b></td><td>full</td></tr>
   </table>
-  <p class="hint" style="margin-bottom:0">🚪 <b>Door analogy:</b> you push and pull a door, and someone on the other side tries to match you. If they're <b>quick</b> (small capacitor), they cancel your slow pushes and only your fast jabs get through. If they're <b>slow</b> (big capacitor), every push gets through. A guitar's <b>tone knob</b> uses this on purpose to separate bass from treble.</p>
+  <p class="hint mb0">🚪 <b>Door analogy:</b> you push and pull a door, and someone on the other side tries to match you. If they're <b>quick</b> (small capacitor), they cancel your slow pushes and only your fast jabs get through. If they're <b>slow</b> (big capacitor), every push gets through. A guitar's <b>tone knob</b> uses this on purpose to separate bass from treble.</p>
   </div>
 
 
@@ -254,9 +254,9 @@
   <b>Why:</b> it's a cheap fix for random crashes, so every chip's datasheet asks for one.</p>
   <div class="controls"><button id="dToggle">Add the 100 nF capacitor</button></div>
   <canvas id="cDecouple" width="800" height="260"></canvas>
-  <div style="border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:#101827">
+  <div class="box">
   <h4 style="margin:0 0 8px;font-size:1.1rem">🤔 Why does a long wire make the voltage sag?</h4>
-  <p style="margin-top:0">It's not mainly because the wire is "far". It's because <b>the current in a wire has inertia</b>, like the water in a long pipe.</p>
+  <p class="flush">It's not mainly because the wire is "far". It's because <b>the current in a wire has inertia</b>, like the water in a long pipe.</p>
   <ul>
     <li><b>Small reason: resistance.</b> Every wire loses a little voltage (current × resistance). On a circuit board that's only a few millivolts, so it's not the real problem.</li>
     <li><b>Big reason: inertia (called <i>inductance</i>).</b> Picture a long pipe full of still water with a tap at the end. When the tap suddenly opens, the whole column of water has to <b>speed up</b> first. During that moment the <b>pressure at the tap drops</b>: it wants water now, but the pipe can't deliver it yet. It's like your shower going weak when someone opens another tap. A wire resists sudden changes in current in the same way, and the longer the wire, the more "water" there is to get moving.</li>
@@ -265,7 +265,7 @@
   <p><b>The fix:</b> a small <b>tank right next to the tap</b>. When the tap opens suddenly, the tank supplies the water instantly while the long pipe catches up, then the pipe refills it calmly. That's why the 100 nF capacitor must sit <b>right beside</b> the chip's power pin. If it's far away, there's still a stretch of pipe between the tank and the tap, and the problem is only partly fixed.</p>
   <div class="controls"><span id="lChoices"></span></div>
   <canvas id="cPipe" width="800" height="350"></canvas>
-  <p class="hint" style="margin-bottom:0">Watch the dashes in the long pipe. They speed up <b>slowly</b> after each gulp, which is the inertia. Compare the dip on the pressure gauge and the graph with no tank, with a tank far away, and with a tank right beside the chip.</p>
+  <p class="hint mb0">Watch the dashes in the long pipe. They speed up <b>slowly</b> after each gulp, which is the inertia. Compare the dip on the pressure gauge and the graph with no tank, with a tank far away, and with a tank right beside the chip.</p>
   </div>
 
 </section>
@@ -275,7 +275,7 @@
   <div class="grid2">
     <div>
       <canvas id="cSym" width="380" height="170"></canvas>
-      <p class="hint" style="text-align:center">Left: normal (ceramic/film). Right: polarized (electrolytic). The curved or marked plate is −.</p>
+      <p class="hint center">Left: normal (ceramic/film). Right: polarized (electrolytic). The curved or marked plate is −.</p>
     </div>
     <table>
       <tr><td>Unit</td><td>Farad (F). 1 F is huge, so you'll usually see <b>µF</b> (micro, millionth), <b>nF</b> (nano), <b>pF</b> (pico).</td></tr>

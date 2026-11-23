@@ -1,10 +1,11 @@
 """Assembles the single-page site (build/index.html, build/js/*.js, build/css/style.css) from site.py + pages/."""
-import importlib.util, json, os, re
+import glob, importlib.util, json, os, re
 from paths import SITE
 import components
 
 JS_SHARED = {'@helpers': 'shared/js/helpers.js', '@helpers2': 'shared/js/helpers2.js'}
-CSS_FILES = ['shared/css/base.css', 'shared/css/layout.css', 'shared/css/types.css']
+CSS_FILES = ['shared/css/tokens.css', 'shared/css/base.css', 'shared/css/layout.css', 'shared/css/components.css', 'shared/css/probe.css']
+# + every pages/**/page.css (CSS used by one page only)
 
 
 def rd(p): return open(p).read()
@@ -66,11 +67,19 @@ def renumber(html):
     return re.sub(r'<span class="num">\d+</span>', f, html)
 
 
+def palette_js():
+    """const PAL={bg:'#0b1120',ink2:'#cbd5e1',...}: the colour tokens of shared/css/tokens.css, for canvas code."""
+    css = rd('shared/css/tokens.css')
+    pairs = re.findall(r'--([\w-]+):\s*(#[0-9a-fA-F]{3,6})', css)
+    key = lambda n: re.sub(r'-(\w)', lambda m: m.group(1).upper(), n)
+    return 'const PAL={' + ','.join(f"{key(n)}:'{v}'" for n, v in pairs) + '};\n'
+
+
 def page_js(p):
     files = [JS_SHARED.get(f, f'pages/{p["dir"]}/{f}') for f in p['js']]
     if not files:
         return None
-    js = '\n'.join(rd(f) for f in files)
+    js = palette_js() + rd('shared/js/core.js') + '\n' + '\n'.join(rd(f) for f in files)
     return f'''
 // ================= {p["id"]} =================
 (function(){{
@@ -86,7 +95,6 @@ const requestAnimationFrame=cb=>window.requestAnimationFrame(function tick(t){{i
 
 def build_site(site):
     pages, links = site.PAGES, getattr(site, 'LINKS', {})
-    groups = sorted({p['group'] for p in pages if p.get('group')})
     pages_html, files = '', {}
     for i, p in enumerate(pages):
         ctx = {'page': p['id'], 'site': pages, 'links': links}
@@ -95,7 +103,8 @@ def build_site(site):
             k = main.rfind('<section')
             main = renumber(main[:k] + types_section(p) + main[k:])
             main = f'<div class="cl-layout">{group_menu(pages, p)}<div class="cl-content">{main}</div></div>'
-        pages_html += f'\n<div class="page" id="page-{p["id"]}" style="--accent:{p["accent"]}" hidden>\n{hero(p)}\n<main>\n{main}\n{pager(pages, i)}\n</main>\n</div>\n'
+        wide = ' wide' if 'class="cl-layout"' in main else ''      # pages with a left menu get a wider column
+        pages_html += f'\n<div class="page{wide}" id="page-{p["id"]}" style="--accent:{p["accent"]}" hidden>\n{hero(p)}\n<main>\n{main}\n{pager(pages, i)}\n</main>\n</div>\n'
         js = page_js(p)
         if js:
             files[p['id']] = js
@@ -116,7 +125,8 @@ def build_site(site):
         open(SITE + f'js/{n}.js', 'w').write(js)
     open(SITE + 'js/app.js', 'w').write(router)
     open(SITE + 'js/probe.js', 'w').write(rd('shared/js/probe.js'))
-    open(SITE + 'css/style.css', 'w').write(''.join(rd(f) for f in CSS_FILES))
+    page_css = sorted(glob.glob('pages/**/page.css', recursive=True))
+    open(SITE + 'css/style.css', 'w').write('\n'.join(rd(f) for f in CSS_FILES + page_css))
     tags = ''.join(f'<script src="js/{n}.js"></script>\n' for n in files) + '<script src="js/app.js"></script>\n<script src="js/probe.js"></script>'
     html = rd('shared/index.html').replace('{{nav}}', nav).replace('{{pages}}', pages_html).replace('{{scripts}}', tags)
     open(SITE + 'index.html', 'w').write(html)

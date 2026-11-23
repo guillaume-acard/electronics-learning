@@ -1,0 +1,5 @@
+/* The circuit probe panel (click a wire) */
+  #probePanel{position:fixed;right:16px;bottom:16px;width:390px;max-height:calc(100vh - 90px);overflow:auto;max-width:calc(100vw - 32px);z-index:60;background:#0f172a;border:1px solid var(--highlight);border-radius:12px;padding:10px 14px 8px;box-shadow:0 8px 30px rgba(0,0,0,.6);font-size:.9rem}
+  #probePanel h4{margin:2px 0 8px;font-size:1rem;padding-right:24px}#probePanel table{margin:0 0 6px;font-size:.88rem}#probePanel td{padding:3px 6px}#probePanel td:first-child{width:52%;color:var(--muted)}
+  #probePanel canvas{width:100%;height:auto;display:block;border-radius:6px;margin-top:6px}#probePanel .pbleg{font-size:.75rem;color:var(--muted);margin:2px 0 6px}#probePanel .pbflow{display:block;font-size:.82rem;color:var(--ink-2);margin:4px 0}
+  #probePanel .pclose{position:absolute;right:8px;top:6px;padding:2px 8px;background:transparent;color:var(--muted)}#probePanel .pn{color:var(--muted);font-size:.8rem;margin:4px 0}#probePanel .pq{color:#f59e0b}#probePanel .pa{color:var(--highlight);font-size:.8rem}

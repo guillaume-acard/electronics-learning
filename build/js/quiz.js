@@ -22,24 +22,55 @@ if(typeof gndSym==='function')gndSym=__wrap(gndSym,(ctx,x,y)=>__PR(ctx,{t:'gnd',
 if(typeof resBox==='function')resBox=__wrap(resBox,(ctx,x,y,w,h,t)=>{const hz=w>h;__PR(ctx,{t:'part',k:'res',a:hz?[x,y+h/2]:[x+w/2,y],b:hz?[x+w,y+h/2]:[x+w/2,y+h],o:{label:t}});});
 
 const requestAnimationFrame=cb=>window.requestAnimationFrame(function tick(t){if(PG.hidden)window.requestAnimationFrame(tick);else cb(t);});
+const PAL={bg:'#0b1120',canvas:'#0b1220',surface:'#101827',card:'#151e30',raised:'#1e293b',control:'#2a3650',line:'#2a3650',white:'#fff',ink:'#e2e8f0',ink2:'#cbd5e1',muted:'#94a3b8',muted2:'#64748b',link:'#93c5fd',water:'#3b82f6',waterLight:'#bcd6fb',waterBg:'#1b2e4f',warmBg:'#3a2c12',good:'#10b981',bad:'#ef4444',badBg:'#3a1a1d',yellow:'#fbbf24',amber:'#f59e0b',blue:'#60a5fa',highlight:'#fde047',accent:'#f59e0b',panel:'#111c2e',slate:'#475569',slateDark:'#334155',gray:'#9ca3af',grayLight:'#e5e7eb',chip:'#1f2937',chipDark:'#111827',chipLight:'#374151',redSoft:'#f87171',redLight:'#fca5a5',redDark:'#dc2626',green:'#22c55e',greenLight:'#86efac',greenDark:'#16a34a',tealDark:'#059669',blueDark:'#2563eb',sky:'#38bdf8',violet:'#a78bfa',purple:'#9333ea',pink:'#f472b6',orange:'#f97316',orangeSoft:'#fb923c',orangeDark:'#ea580c',gold:'#ca8a04',brown:'#b45309',yellowSoft:'#facc15'};
+// ===== Core helpers shared by every page (included first in each page bundle) =====
+// PAL (the colour palette from shared/css/tokens.css) is added just before this file by the build.
+
+// One animation loop per page: fn(dt seconds since last frame (max 0.05), now ms). Paused while the page is hidden.
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(0.05,(now-last)/1000);last=now;fn(dt,now);requestAnimationFrame(f);}requestAnimationFrame(f);}
+
+// Hold-to-press button: fn(true, event) on press, fn(false) on release (mouse, touch or pen).
+function hold(el,fn){el=typeof el==='string'?document.getElementById(el):el;el.style.touchAction='none';el.style.userSelect='none';
+  el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true,e);});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,()=>fn(false)));}
+
+// Swap the page's hero illustration (svg = null restores the original).
+function heroSwap(page,svg){const el=document.querySelector('#page-'+page+' .illus');if(!el)return;if(!el.dataset.orig)el.dataset.orig=el.innerHTML;const html=svg||el.dataset.orig;
+  if(el.innerHTML!==html){el.innerHTML=html;el.animate&&el.animate([{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'ease-out'});}}
+
+// Left menu that shows one section at a time (<aside class="cl-menu" id="..."> with links to the page's sections).
+// Adds "← previous / next →" links at the bottom of each section. opts.first: section shown by default;
+// opts.onSelect(id): called when a section is shown. An <h4 data-short="..."> prefixes repeated labels.
+function sectionMenu(menuId,opts={}){const menu=document.getElementById(menuId);if(!menu)return null;
+  const links=[...menu.querySelectorAll('a[href^="#"]')].filter(a=>document.getElementById(a.getAttribute('href').slice(1)));
+  const ids=links.map(a=>a.getAttribute('href').slice(1)),text=a=>a.lastChild.textContent.trim();
+  const label=a=>{const t=text(a);if(links.filter(b=>text(b)===t).length<2)return t;let h=a.previousElementSibling;while(h&&h.tagName!=='H4')h=h.previousElementSibling;return h?(h.dataset.short||h.textContent)+': '+t:t;};
+  function select(id){if(!ids.includes(id))return false;ids.forEach(k=>{document.getElementById(k).hidden=k!==id;});
+    links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id));const act=links[ids.indexOf(id)];
+    if(window.innerWidth<820)menu.scrollLeft=act.offsetLeft-menu.clientWidth/2+act.clientWidth/2;if(opts.onSelect)opts.onSelect(id);return true;}
+  function fromHash(){if(!select(location.hash.slice(1))&&!links.some(a=>a.classList.contains('active')))select(opts.first||ids[0]);}
+  ids.forEach((id,i)=>{const d=document.createElement('div');d.className='qnav';
+    d.innerHTML=(i>0?`<a class="navlink" href="#${ids[i-1]}">← ${label(links[i-1])}</a>`:'<span></span>')+(i<ids.length-1?`<a class="navlink" href="#${ids[i+1]}">${label(links[i+1])} →</a>`:'');
+    document.getElementById(id).appendChild(d);});
+  window.addEventListener('hashchange',fromHash);fromHash();return {select};}
+
 const $ = id => document.getElementById(id);
 function loopPath(ctx, x1, y1, x2, y2){ctx.beginPath(); ctx.moveTo(x1,(y1+y2)/2); ctx.lineTo(x1,y1); ctx.lineTo(x2,y1); ctx.lineTo(x2,y2); ctx.lineTo(x1,y2); ctx.closePath();}
-function arrowText(ctx, txt, x, y, color='#94a3b8', size=14, align='center'){ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);}
+function arrowText(ctx, txt, x, y, color=PAL.muted, size=14, align='center'){ctx.fillStyle=color; ctx.font=`600 ${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(txt,x,y);}
 // ===== Helpers for schematics and plots =====
-function W(ctx,pts,col='#cbd5e1',lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
-function dot(ctx,x,y){ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
-function resV(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-24]]);ctx.beginPath();ctx.moveTo(x,m-24);for(let i=0;i<6;i++)ctx.lineTo(x+(i%2?-8:8),m-20+i*8);ctx.lineTo(x,m+24);ctx.stroke();W(ctx,[[x,m+24],[x,y2]]);if(label)arrowText(ctx,label,x+14,m+4,'#cbd5e1',12,'left');}
-function capV(ctx,x,y1,y2,label,faded){const m=(y1+y2)/2,col=faded?'#475569':'#cbd5e1';W(ctx,[[x,y1],[x,m-6]],col);W(ctx,[[x,m+6],[x,y2]],col);ctx.fillStyle=col;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-18,m+4,36,4);if(label)arrowText(ctx,label,x+24,m+4,faded?'#94a3b8':'#2563eb',12,'left');}
-function capH(ctx,x1,x2,y,label){const m=(x1+x2)/2;W(ctx,[[x1,y],[m-6,y]]);W(ctx,[[m+6,y],[x2,y]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(m-8,y-18,4,36);ctx.fillRect(m+4,y-18,4,36);if(label)arrowText(ctx,label,m,y-26,'#2563eb',12);}
-function batt(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-6]]);W(ctx,[[x,m+6],[x,y2]]);ctx.fillStyle='#cbd5e1';ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-10,m+4,20,6);arrowText(ctx,'+',x+22,m-6,'#dc2626',14);if(label)arrowText(ctx,label,x-24,m+4,'#cbd5e1',12,'right');}
+function W(ctx,pts,col=PAL.ink2,lw=3){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();}
+function dot(ctx,x,y){ctx.fillStyle=PAL.ink2;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
+function resV(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-24]]);ctx.beginPath();ctx.moveTo(x,m-24);for(let i=0;i<6;i++)ctx.lineTo(x+(i%2?-8:8),m-20+i*8);ctx.lineTo(x,m+24);ctx.stroke();W(ctx,[[x,m+24],[x,y2]]);if(label)arrowText(ctx,label,x+14,m+4,PAL.ink2,12,'left');}
+function capV(ctx,x,y1,y2,label,faded){const m=(y1+y2)/2,col=faded?PAL.slate:PAL.ink2;W(ctx,[[x,y1],[x,m-6]],col);W(ctx,[[x,m+6],[x,y2]],col);ctx.fillStyle=col;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-18,m+4,36,4);if(label)arrowText(ctx,label,x+24,m+4,faded?PAL.muted:PAL.blueDark,12,'left');}
+function capH(ctx,x1,x2,y,label){const m=(x1+x2)/2;W(ctx,[[x1,y],[m-6,y]]);W(ctx,[[m+6,y],[x2,y]]);ctx.fillStyle=PAL.ink2;ctx.fillRect(m-8,y-18,4,36);ctx.fillRect(m+4,y-18,4,36);if(label)arrowText(ctx,label,m,y-26,PAL.blueDark,12);}
+function batt(ctx,x,y1,y2,label){const m=(y1+y2)/2;W(ctx,[[x,y1],[x,m-6]]);W(ctx,[[x,m+6],[x,y2]]);ctx.fillStyle=PAL.ink2;ctx.fillRect(x-18,m-8,36,4);ctx.fillRect(x-10,m+4,20,6);arrowText(ctx,'+',x+22,m-6,PAL.redDark,14);if(label)arrowText(ctx,label,x-24,m+4,PAL.ink2,12,'right');}
 function glow(ctx,x,y,b,col='255,80,60'){if(b<=0.01)return;const g=ctx.createRadialGradient(x,y,2,x,y,46);g.addColorStop(0,`rgba(${col},${0.9*b})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,46,0,7);ctx.fill();}
-function ledV(ctx,x,y1,y2,b){const m=(y1+y2)/2;glow(ctx,x,m,b);W(ctx,[[x,y1],[x,m-10]]);W(ctx,[[x,m+10],[x,y2]]);ctx.fillStyle=b>0.05?`rgb(255,${Math.round(200-150*b)},${Math.round(200-160*b)})`:'#fff';ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-12,m-10);ctx.lineTo(x+12,m-10);ctx.lineTo(x,m+10);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[x-12,m+10],[x+12,m+10]]);arrowText(ctx,'LED',x+20,m+4,'#cbd5e1',12,'left');}
+function ledV(ctx,x,y1,y2,b){const m=(y1+y2)/2;glow(ctx,x,m,b);W(ctx,[[x,y1],[x,m-10]]);W(ctx,[[x,m+10],[x,y2]]);ctx.fillStyle=b>0.05?`rgb(255,${Math.round(200-150*b)},${Math.round(200-160*b)})`:PAL.white;ctx.strokeStyle=PAL.ink2;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x-12,m-10);ctx.lineTo(x+12,m-10);ctx.lineTo(x,m+10);ctx.closePath();ctx.fill();ctx.stroke();W(ctx,[[x-12,m+10],[x+12,m+10]]);arrowText(ctx,'LED',x+20,m+4,PAL.ink2,12,'left');}
 function gndSym(ctx,x,y){W(ctx,[[x-14,y],[x+14,y]]);W(ctx,[[x-9,y+6],[x+9,y+6]]);W(ctx,[[x-4,y+12],[x+4,y+12]]);}
 function plot(ctx,x,y,w,h,hist,tNow,span,series,min,max,title){
-  ctx.fillStyle='#1e293b';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#2a3650';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
-  if(title)arrowText(ctx,title,x+2,y-7,'#94a3b8',12,'left');
+  ctx.fillStyle=PAL.raised;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+  if(title)arrowText(ctx,title,x+2,y-7,PAL.muted,12,'left');
   const X=t=>x+w-(tNow-t)/span*w, Y=v=>y+h-(v-min)/(max-min)*h;
-  if(min<0&&max>0){ctx.setLineDash([4,4]);ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x+w,Y(0));ctx.stroke();ctx.setLineDash([]);arrowText(ctx,'0',x-6,Y(0)+4,'#94a3b8',11,'right');}
+  if(min<0&&max>0){ctx.setLineDash([4,4]);ctx.strokeStyle=PAL.muted;ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x+w,Y(0));ctx.stroke();ctx.setLineDash([]);arrowText(ctx,'0',x-6,Y(0)+4,PAL.muted,11,'right');}
   series.forEach(s=>{ctx.setLineDash(s.dash||[]);ctx.strokeStyle=s.col;ctx.lineWidth=s.lw||2.5;ctx.beginPath();let st=false;
     hist.forEach(p=>{if(p.t<tNow-span)return;const xx=X(p.t),yy=Y(Math.max(min,Math.min(max,p[s.k])));st?ctx.lineTo(xx,yy):(ctx.moveTo(xx,yy),st=true);});ctx.stroke();ctx.setLineDash([]);});
   let lx=x;series.forEach(s=>{if(!s.label)return;ctx.fillStyle=s.col;ctx.fillRect(lx,y+h+11,12,3);arrowText(ctx,s.label,lx+16,y+h+16,s.col,11,'left');lx+=ctx.measureText(s.label).width+32;});
@@ -50,12 +81,12 @@ function choices(id,labels,init,cb){const el=$(id);el.style.display='inline-flex
   bs[init].className='active';cb(init);}
 function prune(h,t,span){while(h.length&&h[0].t<t-span)h.shift();}
 
-function wrapText(ctx,txt,x,y,maxW,lh,color='#e2e8f0',size=13){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.fillStyle=color;ctx.textAlign='left';
+function wrapText(ctx,txt,x,y,maxW,lh,color=PAL.ink,size=13){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.fillStyle=color;ctx.textAlign='left';
   let line='';txt.split(' ').forEach(w=>{const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,x,y);y+=lh;line=w;}else line=t;});if(line)ctx.fillText(line,x,y);}
 
-const BG='#0b1220',WIRE='#cbd5e1',Y='#fbbf24';
+const BG=PAL.canvas,WIRE=PAL.ink2,Y=PAL.yellow;
 function glowAt(ctx,x,y,b,rgb='239,68,68',r=46){if(b<=0.02)return;const g=ctx.createRadialGradient(x,y,2,x,y,r);g.addColorStop(0,`rgba(${rgb},${Math.min(1,b)})`);g.addColorStop(1,`rgba(${rgb},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();}
-function txt(ctx,t,x,y,c='#94a3b8',s=12,a='center'){arrowText(ctx,t,x,y,c,s,a);}
+function txt(ctx,t,x,y,c=PAL.muted,s=12,a='center'){arrowText(ctx,t,x,y,c,s,a);}
 function wire(ctx,pts,c=WIRE){W(ctx,pts,c,3);}
 function dots(ctx,pts,off,c=Y){ctx.strokeStyle=c;ctx.lineWidth=7;ctx.lineCap='round';ctx.setLineDash([0,20]);ctx.lineDashOffset=-off;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.setLineDash([]);ctx.lineCap='butt';}
 // Generic two-terminal part between A and B
@@ -67,7 +98,7 @@ function part(ctx,k,ax,ay,bx,by,o={}){
   const lead=(x1,x2)=>{ctx.beginPath();ctx.moveTo(x1,0);ctx.lineTo(x2,0);ctx.stroke();};
   switch(k){
     case 'wire':lead(-L/2,L/2);break;
-    case 'empty':ctx.setLineDash([3,6]);ctx.strokeStyle='#475569';lead(-L/2,L/2);ctx.setLineDash([]);break;
+    case 'empty':ctx.setLineDash([3,6]);ctx.strokeStyle=PAL.slate;lead(-L/2,L/2);ctx.setLineDash([]);break;
     case 'res':case 'ldr':lead(-L/2,-22);lead(22,L/2);ctx.fillRect(-22,-9,44,18);ctx.strokeRect(-22,-9,44,18);
       if(k==='ldr'){ctx.strokeStyle=Y;ctx.lineWidth=1.8;[[-10,0],[2,0]].forEach(([dx])=>{ctx.beginPath();ctx.moveTo(dx-12,-28);ctx.lineTo(dx,-14);ctx.stroke();ctx.beginPath();ctx.moveTo(dx,-14);ctx.lineTo(dx-6,-15);ctx.lineTo(dx-2,-20);ctx.closePath();ctx.fillStyle=Y;ctx.fill();});}break;
     case 'cap':lead(-L/2,-5);lead(5,L/2);ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-5,-16);ctx.lineTo(-5,16);ctx.moveTo(5,-16);ctx.lineTo(5,16);ctx.stroke();break;
@@ -76,7 +107,7 @@ function part(ctx,k,ax,ay,bx,by,o={}){
       if(k==='led'){ctx.strokeStyle=Y;ctx.lineWidth=1.5;[[0],[8]].forEach(([d])=>{ctx.beginPath();ctx.moveTo(d-2,-16);ctx.lineTo(d+6,-26);ctx.stroke();});}break;
     case 'gap':ctx.setLineDash([5,4]);ctx.strokeStyle=Y;ctx.lineWidth=2;lead(-L/2,-28);lead(28,L/2);ctx.strokeRect(-28,-20,56,40);ctx.setLineDash([]);break;
     case 'switch':lead(-L/2,-16);lead(16,L/2);ctx.fillStyle=col;[-16,16].forEach(x=>{ctx.beginPath();ctx.arc(x,0,4,0,7);ctx.fill();});ctx.beginPath();ctx.moveTo(-16,0);o.closed?ctx.lineTo(16,0):ctx.lineTo(13,-15);ctx.stroke();break;
-    case 'motor':lead(-L/2,-20);lead(20,L/2);ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();ctx.stroke();ctx.save();ctx.rotate(o.spin||0);ctx.strokeStyle='#60a5fa';ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.rotate(2.09);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(14,0);ctx.stroke();}ctx.restore();break;
+    case 'motor':lead(-L/2,-20);lead(20,L/2);ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();ctx.stroke();ctx.save();ctx.rotate(o.spin||0);ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.rotate(2.09);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(14,0);ctx.stroke();}ctx.restore();break;
     case 'lamp':lead(-L/2,-16);lead(16,L/2);ctx.beginPath();ctx.arc(0,0,16,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(-11,-11);ctx.lineTo(11,11);ctx.moveTo(11,-11);ctx.lineTo(-11,11);ctx.stroke();break;
     case 'batt':lead(-L/2,-6);lead(6,L/2);ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-6,-18);ctx.lineTo(-6,18);ctx.stroke();ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(6,-9);ctx.lineTo(6,9);ctx.stroke();break;
     case 'coil':lead(-L/2,-28);lead(28,L/2);ctx.beginPath();for(let i=0;i<4;i++){ctx.arc(-21+i*14,0,7,Math.PI,0);}ctx.stroke();if(o.core){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-28,-12);ctx.lineTo(28,-12);ctx.moveTo(-28,-16);ctx.lineTo(28,-16);ctx.stroke();}break;
@@ -85,21 +116,31 @@ function part(ctx,k,ax,ay,bx,by,o={}){
   }
   ctx.restore();
   if(k==='gap')txt(ctx,o.slot?o.slot:'?',mx,my+7,Y,20);
-  if(k==='motor')txt(ctx,'M',mx,my+5,'#e2e8f0',13);
-  if(k==='batt'){const px=ax+(bx-ax)*0.5,py=ay+(by-ay)*0.5;txt(ctx,'+',hor?px-14:px+16,hor?py-22:py-12+(o.flip?28:0),'#f87171',15);}
-  if(k==='led'&&o.burnt)txt(ctx,'💥',mx+(hor?0:26),my+(hor?-26:6),'#fff',16);
-  if(o.label){if(hor)txt(ctx,o.label,mx,my-28,o.lc||'#e2e8f0',12);else txt(ctx,o.label,mx+(o.left?-30:30),my+4,o.lc||'#e2e8f0',12,o.left?'right':'left');}
+  if(k==='motor')txt(ctx,'M',mx,my+5,PAL.ink,13);
+  if(k==='batt'){const px=ax+(bx-ax)*0.5,py=ay+(by-ay)*0.5;txt(ctx,'+',hor?px-14:px+16,hor?py-22:py-12+(o.flip?28:0),PAL.redSoft,15);}
+  if(k==='led'&&o.burnt)txt(ctx,'💥',mx+(hor?0:26),my+(hor?-26:6),PAL.white,16);
+  if(o.label){if(hor)txt(ctx,o.label,mx,my-28,o.lc||PAL.ink,12);else txt(ctx,o.label,mx+(o.left?-30:30),my+4,o.lc||PAL.ink,12,o.left?'right':'left');}
 }
-function chipBox(ctx,x,y,w,h,l1,l2,hot=0){ctx.fillStyle=hot>0.3?`rgb(${Math.round(71+160*hot)},60,60)`:'#475569';ctx.fillRect(x,y,w,h);txt(ctx,l1,x+w/2,y+h/2-2,'#fff',13);if(l2)txt(ctx,l2,x+w/2,y+h/2+16,'#fff',13);}
-function npnQ(ctx,x,y,on){const c=on?'#10b981':WIRE;ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.stroke();
+function chipBox(ctx,x,y,w,h,l1,l2,hot=0){ctx.fillStyle=hot>0.3?`rgb(${Math.round(71+160*hot)},60,60)`:PAL.slate;ctx.fillRect(x,y,w,h);txt(ctx,l1,x+w/2,y+h/2-2,PAL.white,13);if(l2)txt(ctx,l2,x+w/2,y+h/2+16,PAL.white,13);}
+function npnQ(ctx,x,y,on){const c=on?PAL.good:WIRE;ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x,y,24,0,7);ctx.stroke();
   W(ctx,[[x-34,y],[x-8,y]],c);W(ctx,[[x-8,y-14],[x-8,y+14]],c,4);W(ctx,[[x-8,y-6],[x+10,y-18],[x+10,y-34]],c);W(ctx,[[x-8,y+6],[x+10,y+18],[x+10,y+34]],c);
   ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+10,y+18);ctx.lineTo(x,y+17);ctx.lineTo(x+5,y+9);ctx.fill();}
-function miniGraph(ctx,x,y,w,h,fn,t0,t1,col,min,max,label){ctx.fillStyle='#1e293b';ctx.fillRect(x,y,w,h);ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
-  for(let px=0;px<=w;px++){const t=t0+(t1-t0)*px/w,v=fn(t);if(v===null)continue;const yy=y+h-(Math.max(min,Math.min(max,v))-min)/(max-min)*h;px?ctx.lineTo(x+px,yy):ctx.moveTo(x+px,yy);}ctx.stroke();if(label)txt(ctx,label,x+4,y-6,'#94a3b8',11,'left');}
+function miniGraph(ctx,x,y,w,h,fn,t0,t1,col,min,max,label){ctx.fillStyle=PAL.raised;ctx.fillRect(x,y,w,h);ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();
+  for(let px=0;px<=w;px++){const t=t0+(t1-t0)*px/w,v=fn(t);if(v===null)continue;const yy=y+h-(Math.max(min,Math.min(max,v))-min)/(max-min)*h;px?ctx.lineTo(x+px,yy):ctx.moveTo(x+px,yy);}ctx.stroke();if(label)txt(ctx,label,x+4,y-6,PAL.muted,11,'left');}
 const fmtOhm=r=>r>=1e6?+(r/1e6).toFixed(2)+' MΩ':r>=1000?+(r/1000).toFixed(r<10000?2:1)+' kΩ':Math.round(r)+' Ω';
 const E12=[1,1.2,1.5,1.8,2.2,2.7,3.3,3.9,4.7,5.6,6.8,8.2];
 const snapE12=v=>{const d=Math.pow(10,Math.floor(Math.log10(v)));let best=d;E12.forEach(e=>{if(Math.abs(Math.log(e*d/v))<Math.abs(Math.log(best/v)))best=e*d;});if(Math.abs(Math.log(10*d/v))<Math.abs(Math.log(best/v)))best=10*d;return best;};
-
+// round indicator light (an LED seen from the front): on 0..1, rgb "r,g,b"
+function lamp(ctx,x,y,on,rgb='34,197,94',r=9){if(on>0.02){const gr=ctx.createRadialGradient(x,y,1,x,y,r*3.2);gr.addColorStop(0,`rgba(${rgb},${on})`);gr.addColorStop(1,`rgba(${rgb},0)`);ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r*3.2,0,7);ctx.fill();}
+  ctx.fillStyle=on>0.02?`rgba(${rgb},${0.35+0.65*on})`:PAL.raised;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.strokeStyle=PAL.slate;ctx.lineWidth=1.5;ctx.stroke();}
+// ===== 7-segment digits =====
+// Lit segments of each digit, and the rectangle layout of a 60 x 106 digit.
+const DIGITS={0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg'};
+const SEG7={a:[10,0,40,8],g:[10,49,40,8],d:[10,98,40,8],f:[2,8,8,41],b:[50,8,8,41],e:[2,57,8,41],c:[50,57,8,41]};
+// One digit at (x,y), scale sc. on: lit segments ('abc' or DIGITS[n]). o.pad: black margin, o.glow: glow of lit segments, o.col: lit colour.
+function drawDigit(ctx,x,y,sc,on,o={}){const pad=o.pad??10,glow=o.glow||0,col=o.col||PAL.bad;
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(x-pad,y-pad,60*sc+2*pad,106*sc+2*pad);ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);
+  Object.entries(SEG7).forEach(([k,[a,b,w,h]])=>{const l=on.includes(k);ctx.shadowBlur=l?glow:0;ctx.shadowColor=col;ctx.fillStyle=l?col:'#2a1416';ctx.fillRect(a,b,w,h);});ctx.restore();ctx.shadowBlur=0;}
 
 
 // ================= Quiz engine =================
@@ -118,7 +159,7 @@ Q.push({topic:'LED',link:'led',type:'pick',title:'An LED on a 9 V battery',promp
   part(ctx,a===null?'gap':['res','cap','diode','wire'][a],300,T,400,T,{label:a===0?'470 Ω':''});
   wire(ctx,[[400,T],[R,T],[R,150]]);part(ctx,'led',R,150,R,230,{glow,burnt,label:'red LED'});wire(ctx,[[R,230],[R,B],[L,B]]);
   if(flow>0.05)dots(ctx,[[L,B-20],[L,T],[R,T],[R,B],[L,B]],S.off);
-  if(burnt)txt(ctx,'LED burnt out!',R,B+30,'#ef4444',14);},
+  if(burnt)txt(ctx,'LED burnt out!',R,B+30,PAL.bad,14);},
  explain:['✓ The resistor limits the current. Here (9 − 2) V ÷ 470 Ω ≈ 15 mA, so the LED is safe and bright.',
   'A capacitor in series only lets current flow while it fills, so the LED flashes once and then stays dark. Steady DC is blocked.',
   'A diode only drops 0.7 V and does nothing to limit the current, so the LED still burns.',
@@ -135,16 +176,16 @@ Q.push({topic:'LED',link:'led',type:'value',title:'Choose the LED resistor',prom
   part(ctx,Rv?'res':'gap',300,T,400,T,{label:Rv?fmtOhm(Rv):''});wire(ctx,[[400,T],[R,T],[R,150]]);
   part(ctx,'led',R,150,R,230,{glow,burnt,label:'red, 2 V'});wire(ctx,[[R,230],[R,B],[L,B]]);
   if(Rv&&!burnt)dots(ctx,[[L,B-20],[L,T],[R,T],[R,B],[L,B]],S.off);
-  if(Rv)txt(ctx,'current = (9 − 2) V ÷ '+fmtOhm(Rv)+' = '+(I<10?I.toFixed(1):I.toFixed(0))+' mA',350,B+40,I>20?'#ef4444':I<5?Y:'#10b981',14);},
+  if(Rv)txt(ctx,'current = (9 − 2) V ÷ '+fmtOhm(Rv)+' = '+(I<10?I.toFixed(1):I.toFixed(0))+' mA',350,B+40,I>20?PAL.bad:I<5?Y:PAL.good,14);},
  explain:S=>'R = (9 V − 2 V) ÷ 0.010 A = <b>700 Ω</b>, so the nearest standard values are <b>680 Ω or 820 Ω</b>. Anything from about 470 Ω to 1.2 kΩ (6–15 mA) is fine. Below ~350 Ω you go over 20 mA and the LED burns.'});
 
 // 3. Reverse battery with diode
 Q.push({topic:'Diode',link:'diode',type:'mc',title:'Battery in backwards',prompt:'Someone put the battery in <b>backwards</b>. There is a diode in series with it. What happens?',
  options:['The LED lights normally','Nothing lights up, and nothing is damaged','The LED lights dimly','The diode explodes'],correct:1,
  draw(ctx,S){const {T,B,L,R}=LOOP;
-  part(ctx,'batt',L,B,L,T,{label:'9 V',left:true,flip:true});txt(ctx,'battery reversed!',L+14,B+26,'#f87171',13,'left');wire(ctx,[[L,T],[230,T]]);part(ctx,'diode',230,T,330,T,{label:'protection diode',col:S.ans!==null?'#f87171':WIRE});
+  part(ctx,'batt',L,B,L,T,{label:'9 V',left:true,flip:true});txt(ctx,'battery reversed!',L+14,B+26,PAL.redSoft,13,'left');wire(ctx,[[L,T],[230,T]]);part(ctx,'diode',230,T,330,T,{label:'protection diode',col:S.ans!==null?PAL.redSoft:WIRE});
   wire(ctx,[[330,T],[400,T]]);part(ctx,'res',400,T,500,T,{label:'470 Ω'});wire(ctx,[[500,T],[R,T],[R,150]]);part(ctx,'led',R,150,R,230,{glow:0});wire(ctx,[[R,230],[R,B],[L,B]]);
-  if(S.ans!==null){txt(ctx,'⛔ blocked: the valve is shut',280,T+46,'#f87171',14);txt(ctx,'No current flows, so the circuit is safe',350,B+40,'#10b981',14);}},
+  if(S.ans!==null){txt(ctx,'⛔ blocked: the valve is shut',280,T+46,PAL.redSoft,14);txt(ctx,'No current flows, so the circuit is safe',350,B+40,PAL.good,14);}},
  explain:['The battery pushes backwards, and the diode is a one-way valve that refuses that direction. No current flows, so the LED stays off.',
   '✓ The diode blocks the backward push like a closed valve. No current flows, so nothing lights and nothing is harmed. That\'s why toys and pedals have this diode.',
   'No current can flow at all backwards through the diode, not even a little.',
@@ -158,8 +199,8 @@ Q.push({topic:'Capacitor',link:'capacitor',type:'mc',title:'Closing the switch',
   part(ctx,'batt',L,T,L,B,{label:'9 V',left:true});wire(ctx,[[L,T],[180,T]]);part(ctx,'switch',180,T,260,T,{closed:on});wire(ctx,[[260,T],[290,T]]);
   part(ctx,'res',290,T,390,T,{label:'10 kΩ'});wire(ctx,[[390,T],[R,T],[R,140]]);part(ctx,'cap',R,140,R,220,{label:'1000 µF'});wire(ctx,[[R,220],[R,B],[L,B]]);
   if(I>0.03)dots(ctx,[[L,B-20],[L,T],[R,T],[R,B],[L,B]],S.off);
-  ctx.fillStyle='#1e293b';ctx.fillRect(R-50,150,12,60);ctx.fillStyle='#60a5fa';ctx.fillRect(R-50,150+60*(1-q),12,60*q);txt(ctx,'charge',R-44,226,'#60a5fa',10);
-  if(on){const t1=Math.max(6,ta);miniGraph(ctx,540,50,240,90,t=>t<=ta?Math.exp(-t/tau):null,0,t1,Y,0,1.05,'current');miniGraph(ctx,540,190,240,90,t=>t<=ta?1-Math.exp(-t/tau):null,0,t1,'#60a5fa',0,1.05,'capacitor charge');}},
+  ctx.fillStyle=PAL.raised;ctx.fillRect(R-50,150,12,60);ctx.fillStyle=PAL.blue;ctx.fillRect(R-50,150+60*(1-q),12,60*q);txt(ctx,'charge',R-44,226,PAL.blue,10);
+  if(on){const t1=Math.max(6,ta);miniGraph(ctx,540,50,240,90,t=>t<=ta?Math.exp(-t/tau):null,0,t1,Y,0,1.05,'current');miniGraph(ctx,540,190,240,90,t=>t<=ta?1-Math.exp(-t/tau):null,0,t1,PAL.blue,0,1.05,'capacitor charge');}},
  explain:['The current can\'t stay constant: as the capacitor fills it pushes back, so the flow slows down.',
   '✓ At first the empty capacitor doesn\'t push back, so the current is big. As it fills, it pushes back harder and the current fades to zero. "Full" means it is balanced with the battery.',
   'It\'s the reverse: the biggest current is at the very start, when the capacitor is empty.',
@@ -174,8 +215,8 @@ Q.push({topic:'Capacitor',link:'capacitor',type:'pick',title:'Stop the flicker',
   part(ctx,'ac',L,B,L,T,{label:'AC in',left:true});wire(ctx,[[L,T],[180,T]]);part(ctx,'diode',180,T,260,T);wire(ctx,[[260,T],[470,T]]);
   part(ctx,a===null?'gap':['cap','res','diode','wire'][a],340,T,340,B,{label:a===0?'1000 µF':a===1?'1 kΩ':''});dot(ctx,340,T);dot(ctx,340,B);
   wire(ctx,[[470,T],[470,150]]);part(ctx,'lamp',470,150,470,210,{glow:v});wire(ctx,[[470,210],[470,B],[L,B]]);
-  if(a===3){txt(ctx,'💥 short circuit: everything flows through the wire!',300,B+40,'#ef4444',14);}
-  miniGraph(ctx,540,80,240,150,tt=>a===null?ripple(tt,0):a===0?ripple(tt,8):a===3?0:ripple(tt,0)*(a===1?0.8:1),t-4,t,'#10b981',-0.05,1.1,'voltage at the lamp');},
+  if(a===3){txt(ctx,'💥 short circuit: everything flows through the wire!',300,B+40,PAL.bad,14);}
+  miniGraph(ctx,540,80,240,150,tt=>a===null?ripple(tt,0):a===0?ripple(tt,8):a===3?0:ripple(tt,0)*(a===1?0.8:1),t-4,t,PAL.good,-0.05,1.1,'voltage at the lamp');},
  explain:['✓ The capacitor is a water tower: it fills at each bump and tops up the gaps, so the lamp stays steady.',
   'A resistor just wastes some current. It can\'t store energy to fill the gaps, so the lamp still flickers.',
   'Another diode can\'t store anything either: the gaps stay empty.',
@@ -188,7 +229,7 @@ Q.push({topic:'Capacitor',link:'capacitor',type:'mc',title:'How big should it be
   part(ctx,'ac',L,B,L,T,{label:'AC in',left:true});wire(ctx,[[L,T],[180,T]]);part(ctx,'diode',180,T,260,T);wire(ctx,[[260,T],[470,T]]);
   part(ctx,a===null?'gap':'cap',340,T,340,B,{label:a===null?'':['10 nF','1 µF','1000 µF'][a]});dot(ctx,340,T);dot(ctx,340,B);
   wire(ctx,[[470,T],[470,150]]);part(ctx,'lamp',470,150,470,210,{glow:v});wire(ctx,[[470,210],[470,B],[L,B]]);
-  miniGraph(ctx,540,80,240,150,tt=>ripple(tt,tau),t-4,t,'#10b981',-0.05,1.1,'voltage at the lamp');},
+  miniGraph(ctx,540,80,240,150,tt=>ripple(tt,tau),t-4,t,PAL.good,-0.05,1.1,'voltage at the lamp');},
  explain:['10 nF is a thimble: it empties almost instantly between bumps, so the flicker barely changes. Small caps are for fast things (noise, high frequencies).',
   '1 µF is still a cup: it helps a little, but the dips are still deep.',
   '✓ Power smoothing needs a bathtub: hundreds to thousands of µF. It holds enough charge to keep the lamp fed between bumps.']});
@@ -198,9 +239,9 @@ Q.push({topic:'Diode',link:'diode',type:'mc',title:'Switching off a motor',promp
  options:['The motor stops gently','A big voltage spike appears that can destroy the transistor','The motor spins backwards','The battery gets recharged'],correct:1,
  draw(ctx,S){const {T,B,L}=LOOP;const on=S.ans===null?((S.time%3)<2):false,ta=S.ans!==null?S.ta:0;S.spin=(S.spin||0)+(on?1:Math.max(0,1-ta))*S.dt*14;
   part(ctx,'batt',L,T,L,B,{label:'12 V',left:true});wire(ctx,[[L,T],[400,T],[400,110]]);part(ctx,'motor',400,110,400,170,{spin:S.spin});wire(ctx,[[400,170],[400,186]]);
-  npnQ(ctx,390,220,on);wire(ctx,[[400,254],[400,B],[L,B]]);wire(ctx,[[300,220],[356,220]]);txt(ctx,on?'ON':'OFF',290,224,on?'#10b981':'#94a3b8',13,'right');
-  if(S.ans!==null){const sp=ta<0.6;if(sp){ctx.strokeStyle='#fde047';ctx.lineWidth=2;for(let i=0;i<7;i++){const a=Math.random()*6.28,r=10+Math.random()*20;ctx.beginPath();ctx.moveTo(410,200);ctx.lineTo(410+r*Math.cos(a),200+r*Math.sin(a));ctx.stroke();}}
-    miniGraph(ctx,540,70,240,170,tt=>tt<0?12*0+0:12+300*Math.exp(-tt/0.08),-0.3,2,'#f87171',0,60,'voltage across the transistor');txt(ctx,'spike ≈ 300 V!',700,110,'#ef4444',14);}},
+  npnQ(ctx,390,220,on);wire(ctx,[[400,254],[400,B],[L,B]]);wire(ctx,[[300,220],[356,220]]);txt(ctx,on?'ON':'OFF',290,224,on?PAL.good:PAL.muted,13,'right');
+  if(S.ans!==null){const sp=ta<0.6;if(sp){ctx.strokeStyle=PAL.highlight;ctx.lineWidth=2;for(let i=0;i<7;i++){const a=Math.random()*6.28,r=10+Math.random()*20;ctx.beginPath();ctx.moveTo(410,200);ctx.lineTo(410+r*Math.cos(a),200+r*Math.sin(a));ctx.stroke();}}
+    miniGraph(ctx,540,70,240,170,tt=>tt<0?12*0+0:12+300*Math.exp(-tt/0.08),-0.3,2,PAL.redSoft,0,60,'voltage across the transistor');txt(ctx,'spike ≈ 300 V!',700,110,PAL.bad,14);}},
  explain:['A motor coil acts like a heavy spinning water wheel: its current can\'t stop instantly, so it doesn\'t stop gently on its own.',
   '✓ The coil\'s current has inertia. When it is cut suddenly, it forces a huge voltage spike (a "water hammer") across the transistor. A flyback diode gives the current a safe loop to fade out.',
   'The motor keeps turning the same way for a moment. The danger is the electrical spike, not the direction.',
@@ -217,8 +258,8 @@ Q.push({topic:'Transistor',link:'transistor',type:'pick',title:'A chip that driv
   if(a!==0)wire(ctx,[[420,175],[420,120]]);
   part(ctx,'motor',420,60,420,120,{spin:S.spin});wire(ctx,[[420,60],[420,30],[650,30],[650,90]]);part(ctx,'batt',650,90,650,250,{label:'9 V'});wire(ctx,[[650,250],[650,280],[115,280],[115,220]]);
   if(a!==0&&a!==null)wire(ctx,[[420,280],[420,280]]);
-  txt(ctx,'common ground',380,298,'#60a5fa',11);
-  if(a!==null)txt(ctx,a===0?'Motor at full speed, chip cool ✓':a===1?'Twitches once, then stops':'Chip overheating, motor barely turns ✗',560,330,a===0?'#10b981':'#ef4444',13);},
+  txt(ctx,'common ground',380,298,PAL.blue,11);
+  if(a!==null)txt(ctx,a===0?'Motor at full speed, chip cool ✓':a===1?'Twitches once, then stops':'Chip overheating, motor barely turns ✗',560,330,a===0?PAL.good:PAL.bad,13);},
  explain:['✓ The pin only supplies a few mA into the base, and the transistor switches the 500 mA from the battery. It\'s a big valve opened by a small lever.',
   'A capacitor in series passes only a brief pulse: the motor twitches, then DC is blocked.',
   'A diode doesn\'t amplify anything. The pin would still have to supply all 500 mA.',
@@ -233,7 +274,7 @@ Q.push({topic:'Transistor',link:'transistor',type:'value',title:'Choose the base
   part(ctx,Rv?'res':'gap',260,175,340,175,{label:Rv?fmtOhm(Rv):''});wire(ctx,[[340,175],[376,175]]);npnQ(ctx,410,175,on>0.5);
   wire(ctx,[[420,141],[420,120]]);part(ctx,'motor',420,60,420,120,{spin:S.spin});wire(ctx,[[420,60],[420,30],[650,30],[650,90]]);part(ctx,'batt',650,90,650,250,{label:'9 V'});
   wire(ctx,[[420,209],[420,280]]);wire(ctx,[[650,250],[650,280],[115,280],[115,220]]);
-  if(Rv)txt(ctx,'base current = (5 − 0.7) V ÷ '+fmtOhm(Rv)+' = '+(Ib<10?Ib.toFixed(2):Ib.toFixed(0))+' mA',430,325,Ib>20?'#ef4444':Ib<2?Y:'#10b981',14);},
+  if(Rv)txt(ctx,'base current = (5 − 0.7) V ÷ '+fmtOhm(Rv)+' = '+(Ib<10?Ib.toFixed(2):Ib.toFixed(0))+' mA',430,325,Ib>20?PAL.bad:Ib<2?Y:PAL.good,14);},
  explain:S=>'R = (5 − 0.7) V ÷ 0.004 A ≈ <b>1.1 kΩ</b>, so <b>1 kΩ</b> is the classic choice (anything ≈ 680 Ω–2.2 kΩ works). Too small (under ~220 Ω) and the pin is overloaded. Too big (10 kΩ+) and the transistor only half-opens, so the motor is weak.'});
 
 // 10. Parallel resistors current
@@ -243,7 +284,7 @@ Q.push({topic:'Resistor',link:'resistor',type:'mc',title:'Two paths',prompt:'Two
   part(ctx,'batt',L,T,L,B,{label:'9 V',left:true});wire(ctx,[[L,T],[500,T]]);wire(ctx,[[L,B],[500,B]]);
   part(ctx,'res',300,T,300,B,{label:'1 kΩ'});part(ctx,'res',500,T,500,B,{label:'1 kΩ'});dot(ctx,300,T);dot(ctx,300,B);
   if(on){dots(ctx,[[L,B-20],[L,T],[300,T]],S.off*2);dots(ctx,[[300,T],[300,B]],S.off);dots(ctx,[[300,T],[500,T],[500,B],[300,B]],S.off);dots(ctx,[[300,B],[L,B]],S.off*2);
-    txt(ctx,'9 mA',290,150,Y,13,'right');txt(ctx,'9 mA',490,150,Y,13,'right');txt(ctx,'18 mA total',200,T-12,Y,14);txt(ctx,'together they act like 500 Ω',650,180,'#10b981',13);}
+    txt(ctx,'9 mA',290,150,Y,13,'right');txt(ctx,'9 mA',490,150,Y,13,'right');txt(ctx,'18 mA total',200,T-12,Y,14);txt(ctx,'together they act like 500 Ω',650,180,PAL.good,13);}
   else txt(ctx,'current = ?',200,T-12,Y,14);},
  explain:['4.5 mA would be the current with the two resistors in series (2 kΩ). Side by side, it\'s easier, not harder.',
   '9 mA is what one resistor alone takes. The second path adds another 9 mA.',
@@ -257,19 +298,19 @@ Q.push({topic:'Resistor',link:'resistor',type:'value',title:'Make 3 V from 9 V',
  draw(ctx,S){const Rv=S.done?S.val:null,V=Rv?9*Rv/(10000+Rv):null;const x=360;
   part(ctx,'batt',LOOP.L,LOOP.T,LOOP.L,LOOP.B,{label:'9 V',left:true});wire(ctx,[[LOOP.L,LOOP.T],[x,LOOP.T]]);
   part(ctx,'res',x,LOOP.T,x,180,{label:'R1 = 10 kΩ'});part(ctx,Rv?'res':'gap',x,180,x,LOOP.B,{label:Rv?'R2 = '+fmtOhm(Rv):'R2 ?'});wire(ctx,[[x,LOOP.B],[LOOP.L,LOOP.B]]);
-  dot(ctx,x,180);wire(ctx,[[x,180],[520,180]]);txt(ctx,'output',528,184,'#10b981',12,'left');
-  ctx.fillStyle='#1e293b';ctx.fillRect(600,110,150,90);ctx.strokeStyle='#475569';ctx.strokeRect(600,110,150,90);txt(ctx,'voltmeter',675,130,'#94a3b8',11);
-  txt(ctx,V===null?'— V':V.toFixed(2)+' V',675,175,V===null?'#94a3b8':(V>=2.6&&V<=3.4)?'#10b981':Y,26);},
+  dot(ctx,x,180);wire(ctx,[[x,180],[520,180]]);txt(ctx,'output',528,184,PAL.good,12,'left');
+  ctx.fillStyle=PAL.raised;ctx.fillRect(600,110,150,90);ctx.strokeStyle=PAL.slate;ctx.strokeRect(600,110,150,90);txt(ctx,'voltmeter',675,130,PAL.muted,11);
+  txt(ctx,V===null?'— V':V.toFixed(2)+' V',675,175,V===null?PAL.muted:(V>=2.6&&V<=3.4)?PAL.good:Y,26);},
  explain:S=>'Vout = 9 V × R2 ÷ (R1 + R2) = 3 V means R2 is half of R1: <b>R2 = 5 kΩ</b>, so a standard <b>4.7 kΩ</b> (2.9 V) or <b>5.6 kΩ</b> (3.2 V). With R2 = 10 kΩ you\'d get 4.5 V (half).'});
 
 // 12. 555 bigger cap
 Q.push({topic:'Microchips',link:'s555',type:'mc',title:'A bigger timing capacitor',prompt:'A 555 blinker uses a 10 µF timing capacitor. You replace it with <b>100 µF</b>. The LED will…',
  options:['blink 10× faster','blink 10× slower','stay on all the time','get 10× brighter'],correct:1,
- draw(ctx,S){const t=S.time;const f1=2,f2=0.2;const led=(x,f,l)=>{const on=((t*f)%1)<0.55;glowAt(ctx,x,150,on?1:0);ctx.fillStyle=on?'#ef4444':'#3f1d1d';ctx.beginPath();ctx.arc(x,150,16,0,7);ctx.fill();txt(ctx,l,x,200,'#e2e8f0',13);};
-  ctx.fillStyle='#1f2937';ctx.fillRect(60,100,90,110);txt(ctx,'NE555',105,160,'#e2e8f0',14);
-  led(260,f1,'with 10 µF');txt(ctx,'2 blinks per second',260,220,'#94a3b8',11);
-  if(S.ans!==null){led(470,f2,'with 100 µF');txt(ctx,'1 blink every 5 s',470,220,'#94a3b8',11);
-    miniGraph(ctx,560,90,220,60,tt=>((tt*f1)%1)<0.55?1:0,t-5,t,'#10b981',-0.1,1.1,'10 µF');miniGraph(ctx,560,190,220,60,tt=>((tt*f2)%1)<0.55?1:0,t-5,t,'#10b981',-0.1,1.1,'100 µF');}
+ draw(ctx,S){const t=S.time;const f1=2,f2=0.2;const led=(x,f,l)=>{const on=((t*f)%1)<0.55;glowAt(ctx,x,150,on?1:0);ctx.fillStyle=on?PAL.bad:'#3f1d1d';ctx.beginPath();ctx.arc(x,150,16,0,7);ctx.fill();txt(ctx,l,x,200,PAL.ink,13);};
+  ctx.fillStyle=PAL.chip;ctx.fillRect(60,100,90,110);txt(ctx,'NE555',105,160,PAL.ink,14);
+  led(260,f1,'with 10 µF');txt(ctx,'2 blinks per second',260,220,PAL.muted,11);
+  if(S.ans!==null){led(470,f2,'with 100 µF');txt(ctx,'1 blink every 5 s',470,220,PAL.muted,11);
+    miniGraph(ctx,560,90,220,60,tt=>((tt*f1)%1)<0.55?1:0,t-5,t,PAL.good,-0.1,1.1,'10 µF');miniGraph(ctx,560,190,220,60,tt=>((tt*f2)%1)<0.55?1:0,t-5,t,PAL.good,-0.1,1.1,'100 µF');}
   else{ctx.setLineDash([5,4]);ctx.strokeStyle=Y;ctx.strokeRect(430,110,80,80);ctx.setLineDash([]);txt(ctx,'?',470,158,Y,24);}},
  explain:['It\'s the reverse: a bigger tank takes longer to fill and empty.',
   '✓ The 555 fills and drains the capacitor between ⅓ and ⅔. Ten times more capacitance takes ten times longer, so it blinks 10× slower (frequency ≈ 1.44 ÷ ((R1 + 2R2) × C)).',
@@ -280,9 +321,9 @@ Q.push({topic:'Microchips',link:'s555',type:'mc',title:'A bigger timing capacito
 Q.push({topic:'Capacitor',link:'capacitor',type:'mc',title:'Through a series capacitor',prompt:'A signal made of <b>4.5 V steady + a small wiggle</b> goes through a capacitor into a resistor to ground. What appears at the output?',
  options:['Exactly the same signal','Only the steady 4.5 V','Only the wiggle, centred on 0 V','Nothing at all'],correct:2,
  draw(ctx,S){const t=S.time,inp=tt=>4.5+0.8*Math.sin(tt*5);
-  miniGraph(ctx,40,60,250,160,inp,t-4,t,'#f59e0b',-1.5,6,'input: 4.5 V + wiggle');
+  miniGraph(ctx,40,60,250,160,inp,t-4,t,PAL.amber,-1.5,6,'input: 4.5 V + wiggle');
   wire(ctx,[[300,140],[360,140]]);part(ctx,'cap',360,140,440,140,{label:'capacitor'});wire(ctx,[[440,140],[480,140]]);part(ctx,'res',480,140,480,250,{label:'resistor to ground',left:true});
-  if(S.ans!==null){miniGraph(ctx,530,60,250,160,tt=>0.8*Math.sin(tt*5),t-4,t,'#10b981',-1.5,6,'output');const y0=60+160-(0+1.5)/7.5*160;ctx.strokeStyle='#64748b';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(530,y0);ctx.lineTo(780,y0);ctx.stroke();ctx.setLineDash([]);txt(ctx,'0 V',526,y0+4,'#94a3b8',11,'right');}
+  if(S.ans!==null){miniGraph(ctx,530,60,250,160,tt=>0.8*Math.sin(tt*5),t-4,t,PAL.good,-1.5,6,'output');const y0=60+160-(0+1.5)/7.5*160;ctx.strokeStyle=PAL.muted2;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(530,y0);ctx.lineTo(780,y0);ctx.stroke();ctx.setLineDash([]);txt(ctx,'0 V',526,y0+4,PAL.muted,11,'right');}
   else{ctx.setLineDash([5,4]);ctx.strokeStyle=Y;ctx.strokeRect(530,60,250,160);ctx.setLineDash([]);txt(ctx,'output = ?',655,145,Y,18);}},
  explain:['The steady part can\'t get through: it stretches the "rubber sheet" once and stops.',
   'It\'s the opposite: the capacitor blocks the steady DC and passes the changes.',
@@ -292,11 +333,11 @@ Q.push({topic:'Capacitor',link:'capacitor',type:'mc',title:'Through a series cap
 // 14. 7805 dropout
 Q.push({topic:'Microchips',link:'s7805',type:'mc',title:'A regulator with a weak battery',prompt:'A 7805 regulator is fed only <b>6 V</b>. What does it output?',
  options:['Exactly 5 V','About 4 V','6 V','0 V, and it overheats'],correct:1,
- draw(ctx,S){ctx.fillStyle='#94a3b8';ctx.fillRect(330,90,90,40);ctx.fillStyle='#1f2937';ctx.fillRect(330,130,90,70);txt(ctx,'7805',375,170,'#e2e8f0',14);
-  wire(ctx,[[180,165],[330,165]]);wire(ctx,[[420,165],[570,165]]);txt(ctx,'IN',300,155,'#94a3b8',11);txt(ctx,'OUT',455,155,'#94a3b8',11);
-  const g=(x,v,l,c)=>{ctx.fillStyle='#1e293b';ctx.fillRect(x-60,110,120,110);ctx.strokeStyle='#475569';ctx.strokeRect(x-60,110,120,110);txt(ctx,l,x,135,'#94a3b8',12);txt(ctx,v,x,185,c,28);};
-  g(120,'6.0 V','input','#f59e0b');g(640,S.ans===null?'? V':'≈ 4.0 V','output',S.ans===null?Y:'#fbbf24');
-  if(S.ans!==null)txt(ctx,'needs ≈ 2 V of "headroom": 6 − 2 = 4 V',400,270,'#94a3b8',13);},
+ draw(ctx,S){ctx.fillStyle=PAL.muted;ctx.fillRect(330,90,90,40);ctx.fillStyle=PAL.chip;ctx.fillRect(330,130,90,70);txt(ctx,'7805',375,170,PAL.ink,14);
+  wire(ctx,[[180,165],[330,165]]);wire(ctx,[[420,165],[570,165]]);txt(ctx,'IN',300,155,PAL.muted,11);txt(ctx,'OUT',455,155,PAL.muted,11);
+  const g=(x,v,l,c)=>{ctx.fillStyle=PAL.raised;ctx.fillRect(x-60,110,120,110);ctx.strokeStyle=PAL.slate;ctx.strokeRect(x-60,110,120,110);txt(ctx,l,x,135,PAL.muted,12);txt(ctx,v,x,185,c,28);};
+  g(120,'6.0 V','input',PAL.amber);g(640,S.ans===null?'? V':'≈ 4.0 V','output',S.ans===null?Y:PAL.yellow);
+  if(S.ans!==null)txt(ctx,'needs ≈ 2 V of "headroom": 6 − 2 = 4 V',400,270,PAL.muted,13);},
  explain:['A 7805 needs its input at least ~2 V above 5 V (7 V or more) to regulate properly.',
   '✓ Below ~7 V the regulator "drops out": its internal valve is wide open but still loses ~2 V, so the output sags to about 4 V. Feed it 7 V or more.',
   'The regulator always loses some voltage across its internal valve, so the output is never more than the input minus ~2 V.',
@@ -315,7 +356,7 @@ Q.push({topic:'Build',link:'capacitor',type:'build',title:'Build: an LED that fa
   const sl=(k,ax,ay,bx,by)=>{const v=s[k];if(v===undefined)part(ctx,'gap',ax,ay,bx,by,{slot:k});else part(ctx,this.kinds[v],ax,ay,bx,by,{label:k+': '+(this.labels[v]||this.palette[v])});};
   sl('A',340,T,340,B);dot(ctx,340,T);dot(ctx,340,B);
   sl('B',560,T,560,170);part(ctx,'led',560,170,560,250,{glow:S.burnt?0:r.glow,burnt:S.burnt});wire(ctx,[[560,250],[560,B],[L,B]]);
-  if(S.testing){txt(ctx,r.pressed?'👆 button held':'button released…',690,140,r.pressed?'#10b981':'#94a3b8',14);if(r.shortC&&r.pressed)txt(ctx,'💥 slot A shorts the battery!',690,170,'#ef4444',13);}},
+  if(S.testing){txt(ctx,r.pressed?'👆 button held':'button released…',690,140,r.pressed?PAL.good:PAL.muted,14);if(r.shortC&&r.pressed)txt(ctx,'💥 slot A shorts the battery!',690,170,PAL.bad,13);}},
  explain:S=>{const s=S.slots;if(s.A===2&&s.B===1)return '✓ The capacitor (A) fills while the button is held, then keeps feeding the LED through the resistor (B), which also limits the current. That gives a slow fade.';
   const m=[];if(s.A===0)m.push('Slot A as a wire connects + straight to ground: a short circuit.');if(s.A!==2)m.push('Slot A needs an <b>energy reserve</b> that keeps the LED fed after you let go: a big capacitor.');
   if(s.B===0||s.B===3)m.push('Slot B must <b>limit the LED current</b>. A wire or diode lets it burn.');if(s.B===2)m.push('A capacitor in slot B blocks steady DC, so the LED only flashes.');if(s.B===4)m.push('Slot B empty means an open circuit, so the LED never lights.');
@@ -328,13 +369,13 @@ Q.push({topic:'Build',link:'transistor',type:'build',title:'Build: an automatic 
  sim(S){const s=S.slots,tt=S.ta;const light=0.5+0.5*Math.cos(tt*1.2);const ldr=1000*Math.pow(200,1-light);const R=k=>k===0?47000:k===1?ldr:k===2?0.001:1e12;
   const ra=R(s.A),rb=R(s.B);const vb=9*rb/(ra+rb);return {light,on:vb>0.7};},
  draw(ctx,S){const s=S.slots,T=40,B=290,x=260;const r=S.testing?this.sim(S):{light:1,on:false};
-  ctx.fillStyle=`rgb(${Math.round(10+60*r.light)},${Math.round(15+110*r.light)},${Math.round(40+150*r.light)})`;ctx.fillRect(620,0,180,340);txt(ctx,r.light>0.5?'☀️':'🌙',710,90,'#fff',40);
-  if(S.testing)txt(ctx,r.light>0.5?'daytime':'night',710,130,'#fff',14);
-  wire(ctx,[[60,T],[560,T]],'#f87171');txt(ctx,'+9 V',56,T+4,'#f87171',12,'right');wire(ctx,[[60,B],[560,B]],'#60a5fa');txt(ctx,'0 V',56,B+4,'#60a5fa',12,'right');
+  ctx.fillStyle=`rgb(${Math.round(10+60*r.light)},${Math.round(15+110*r.light)},${Math.round(40+150*r.light)})`;ctx.fillRect(620,0,180,340);txt(ctx,r.light>0.5?'☀️':'🌙',710,90,PAL.white,40);
+  if(S.testing)txt(ctx,r.light>0.5?'daytime':'night',710,130,PAL.white,14);
+  wire(ctx,[[60,T],[560,T]],PAL.redSoft);txt(ctx,'+9 V',56,T+4,PAL.redSoft,12,'right');wire(ctx,[[60,B],[560,B]],PAL.blue);txt(ctx,'0 V',56,B+4,PAL.blue,12,'right');
   const sl=(k,ax,ay,bx,by)=>{const v=s[k];if(v===undefined)part(ctx,'gap',ax,ay,bx,by,{slot:k});else part(ctx,this.kinds[v],ax,ay,bx,by,{label:k+': '+(this.labels[v]||this.palette[v])});};
   sl('A',x,T,x,165);sl('B',x,165,x,B);dot(ctx,x,165);wire(ctx,[[x,165],[340,165]]);part(ctx,'res',340,165,420,165,{label:'10 kΩ'});wire(ctx,[[420,165],[466,165]]);
   npnQ(ctx,500,165,r.on);wire(ctx,[[510,131],[510,120]]);part(ctx,'led',510,50,510,120,{glow:r.on?1:0,rgb:'250,204,21'});wire(ctx,[[510,50],[510,T]]);wire(ctx,[[510,199],[510,B]]);
-  if(S.testing)txt(ctx,'light: '+(r.on?'ON':'off'),510,320,r.on?'#facc15':'#94a3b8',14);},
+  if(S.testing)txt(ctx,'light: '+(r.on?'ON':'off'),510,320,r.on?PAL.yellowSoft:PAL.muted,14);},
  explain:S=>{const s=S.slots;if(s.A===0&&s.B===1)return '✓ In the dark the LDR (bottom) becomes a big resistance, so the base voltage rises above 0.7 V and the transistor lights the LED. In daylight the LDR is small and pulls the base low.';
   if(s.A===1&&s.B===0)return 'Close! With the LDR on top it works <b>backwards</b>: the light turns on in daylight. Swap them: <b>A = 47 kΩ, B = LDR</b>.';
   return 'You need a <b>voltage divider</b> that changes with light: a fixed resistor on top (A = 47 kΩ) and the LDR at the bottom (B), so darkness raises the base voltage. A wire forces the base fully high or low, and a capacitor blocks the steady DC.';}});
@@ -342,25 +383,25 @@ Q.push({topic:'Build',link:'transistor',type:'build',title:'Build: an automatic 
 // ================= UI =================
 // ===== More challenges for the circuits (generated block) =====
 const QM_T=80,QM_B=280;
-function qmMeter(ctx,x,y,label,val,col){ctx.fillStyle='#111c2e';ctx.strokeStyle=col||'#fbbf24';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,y,150,64,8);ctx.fill();ctx.stroke();txt(ctx,label,x+75,y+22,'#94a3b8',12);txt(ctx,val,x+75,y+50,'#fff',18);}
-function qmSeg(ctx,x,y,s,on,dim){const G={a:[10,0,40,8],g:[10,49,40,8],d:[10,98,40,8],f:[2,8,8,41],b:[50,8,8,41],e:[2,57,8,41],c:[50,57,8,41]};ctx.fillStyle='#0a0a0a';ctx.fillRect(x-10,y-10,60*s+20,106*s+20);ctx.save();ctx.translate(x,y);ctx.scale(s,s);Object.entries(G).forEach(([k,[a,b,w,h]])=>{ctx.fillStyle=on.includes(k)?(dim?'#7f1d1d':'#ef4444'):'#2a1416';ctx.fillRect(a,b,w,h);});ctx.restore();}
+function qmMeter(ctx,x,y,label,val,col){ctx.fillStyle=PAL.panel;ctx.strokeStyle=col||PAL.yellow;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,y,150,64,8);ctx.fill();ctx.stroke();txt(ctx,label,x+75,y+22,PAL.muted,12);txt(ctx,val,x+75,y+50,PAL.white,18);}
+function qmSeg(ctx,x,y,s,on,dim){drawDigit(ctx,x,y,s,on,{col:dim?'#7f1d1d':PAL.bad});}
 
 // A. Floating input
 Q.push({order:[2, 0, 3, 1],topic:'Sensors',link:'sebtn',type:'pick',title:'The counter that counts by itself',prompt:'A push button connects the CLOCK input of a CD4017 to +9 V. When nobody touches it, the counter still <b>counts randomly</b>. What belongs in the gap, between the input and −?',
  options:['A 10 kΩ resistor','A 100 µF capacitor','A wire','Nothing: it\'s a faulty chip'],correct:0,
  draw(ctx,S){const a=S.ans,t=S.ta||0;part(ctx,'batt',80,QM_T,80,QM_B,{label:'9 V',left:true});wire(ctx,[[80,QM_T],[200,QM_T]]);part(ctx,'switch',200,QM_T,280,QM_T,{closed:false,label:'button (released)'});wire(ctx,[[280,QM_T],[360,QM_T],[360,150]]);dot(ctx,360,150);
   wire(ctx,[[360,150],[470,150]]);chipBox(ctx,470,120,130,90,'CD4017','CLK input');part(ctx,a===null?'gap':['res','cap','wire','empty'][a],360,150,360,250,{label:a===0?'10 kΩ':a===1?'100 µF':''});wire(ctx,[[360,250],[360,QM_B],[80,QM_B]]);
-  const floating=a!==0&&a!==2;const v=floating?0.5+0.45*Math.sin(t*23)*Math.sin(t*3.1):0;txt(ctx,'input: '+(floating?(v>0.6?'1':v<0.4?'0':'??')+' (floating, picks up noise)':'0 (held low)'),535,240,floating?'#ef4444':'#10b981',13);
-  if(a===2)txt(ctx,'wire: pressing the button now shorts the battery! 💥',360,QM_B+30,'#ef4444',13);},
+  const floating=a!==0&&a!==2;const v=floating?0.5+0.45*Math.sin(t*23)*Math.sin(t*3.1):0;txt(ctx,'input: '+(floating?(v>0.6?'1':v<0.4?'0':'??')+' (floating, picks up noise)':'0 (held low)'),535,240,floating?PAL.bad:PAL.good,13);
+  if(a===2)txt(ctx,'wire: pressing the button now shorts the battery! 💥',360,QM_B+30,PAL.bad,13);},
  explain:['✓ A <b>pull-down</b> resistor gently holds the input at 0 V when the button is released, and is weak enough that pressing the button still pulls it up to 9 V. That\'s the 10 kΩ on the reset pins of the dice (projects 13–15).',
   'A capacitor only slows changes: the input still floats and drifts.','With a wire, the input is stuck at 0 V, and pressing the button connects + straight to −: a short circuit!','The chip is fine: a CMOS input connected to nothing "floats" and reads random 0s and 1s from electrical noise. It needs a pull-down.']});
 
 // B. Bounce
 Q.push({order:[1, 3, 0, 2],topic:'Sensors',link:'sebtn',type:'mc',title:'One press, three counts',prompt:'You clock a CD4518 counter with a push button (with its pull-down). Sometimes <b>one press adds 2 or 3</b> instead of 1. Why?',
  options:['The metal contacts bounce for a few milliseconds','The battery is too weak','The pull-down resistor is too big','The counter counts both edges'],correct:0,
- draw(ctx,S){const x=60,y=60,w=680,h=200;ctx.fillStyle='#111c2e';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#2a3650';ctx.strokeRect(x,y,w,h);txt(ctx,'button voltage, zoomed on the first 20 ms of a press',x+8,y+18,'#94a3b8',12,'left');
-  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<=400;i++){const q=i/400*0.02;let v=q<0.003?0:(q<0.011?(Math.sin((q-0.003)*2600)>-0.2?1:0):1);const px=x+i/400*w,py=y+h-20-v*(h-60);i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.stroke();
-  if(S.ans!==null){txt(ctx,'each spike = one more count →',x+w/2,y+h+28,'#fbbf24',13);}},
+ draw(ctx,S){const x=60,y=60,w=680,h=200;ctx.fillStyle=PAL.panel;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.strokeRect(x,y,w,h);txt(ctx,'button voltage, zoomed on the first 20 ms of a press',x+8,y+18,PAL.muted,12,'left');
+  ctx.strokeStyle=PAL.amber;ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<=400;i++){const q=i/400*0.02;let v=q<0.003?0:(q<0.011?(Math.sin((q-0.003)*2600)>-0.2?1:0):1);const px=x+i/400*w,py=y+h-20-v*(h-60);i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.stroke();
+  if(S.ans!==null){txt(ctx,'each spike = one more count →',x+w/2,y+h+28,PAL.yellow,13);}},
  explain:['✓ Mechanical contacts <b>bounce</b> like a dropped ball for 1–10 ms, so a fast counter sees several presses. Fix: a 100 nF capacitor across the button, or ignore changes for ~20 ms in code. See the <b>Sensors → Push button</b> page.',
   'A weak battery makes things dimmer, it doesn\'t add counts.','The pull-down size doesn\'t create extra pulses.','The CD4518 counts on one edge only (rising CLK). The extra counts come from the contact bouncing.']});
 
@@ -369,7 +410,7 @@ Q.push({order:[2, 1, 0, 3],topic:'Sensors',link:'seldr',type:'mc',title:'More li
  options:['It rises','It falls','It stays the same','It goes negative'],correct:0,
  draw(ctx,S){const L=S.ans!==null?0.5+0.5*Math.sin((S.ta||0)*1.5):0.3;const lux=Math.pow(10,-1+L*5),R=Math.min(1e6,7000*Math.pow(lux/10,-0.75)),V=5*10000/(R+10000);
   glowAt(ctx,120,80,L,'250,204,21',70);ctx.fillStyle=`rgba(250,204,21,${0.2+0.8*L})`;ctx.beginPath();ctx.arc(120,80,26,0,7);ctx.fill();
-  txt(ctx,'+5 V',330,40,'#ef4444',12);part(ctx,'ldr',330,50,330,150,{label:S.ans!==null?'LDR '+fmtOhm(R):'LDR'});dot(ctx,330,165);wire(ctx,[[330,150],[330,180]]);part(ctx,'res',330,180,330,270,{label:'10 kΩ'});txt(ctx,'0 V',330,292,'#94a3b8',12);
+  txt(ctx,'+5 V',330,40,PAL.bad,12);part(ctx,'ldr',330,50,330,150,{label:S.ans!==null?'LDR '+fmtOhm(R):'LDR'});dot(ctx,330,165);wire(ctx,[[330,150],[330,180]]);part(ctx,'res',330,180,330,270,{label:'10 kΩ'});txt(ctx,'0 V',330,292,PAL.muted,12);
   wire(ctx,[[330,165],[420,165]]);if(S.ans!==null)qmMeter(ctx,430,133,'middle voltage',V.toFixed(2)+' V');},
  explain:['✓ More light → the LDR\'s resistance drops → it "pulls" harder towards +5 V than the 10 kΩ pulls towards 0 V → the middle point rises. Swap them and it would fall instead (that\'s how the night light reacts to darkness).',
   'It falls only if the LDR is at the bottom. Here it is on top.','The LDR changes resistance, so the ratio changes, so the voltage changes.','A divider between 0 V and +5 V always stays between 0 and 5 V.']});
@@ -377,16 +418,16 @@ Q.push({order:[2, 1, 0, 3],topic:'Sensors',link:'seldr',type:'mc',title:'More li
 // D. LM35 reading
 Q.push({topic:'Sensors',link:'selm35',type:'value',title:'Read the LM35',prompt:'Your multimeter shows <b>0.27 V</b> on the LM35\'s output. What temperature is it?',
  slider:{min:0,max:60,def:10,unit:'°C',fmt:v=>Math.round(v)+' °C',val:v=>Math.round(v)},judge:v=>Math.abs(v-27)<=1,
- draw(ctx,S){ctx.fillStyle='#111827';ctx.beginPath();ctx.arc(200,150,50,Math.PI,0);ctx.lineTo(250,190);ctx.lineTo(150,190);ctx.closePath();ctx.fill();txt(ctx,'LM35',200,165,'#cbd5e1',15);
-  ['+Vs','Vout','GND'].forEach((l,i)=>{const x=165+i*35;W(ctx,[[x,190],[x,250]],'#9ca3af',3);txt(ctx,l,x,268,i===1?'#fbbf24':'#94a3b8',11);});wire(ctx,[[200,250],[200,290],[420,290],[420,240]]);qmMeter(ctx,400,170,'multimeter','0.27 V');
-  if(S.done)txt(ctx,'your answer: '+S.val+' °C → '+(S.val*10)+' mV',600,120,Math.abs(S.val-27)<=1?'#10b981':'#ef4444',14);},
+ draw(ctx,S){ctx.fillStyle=PAL.chipDark;ctx.beginPath();ctx.arc(200,150,50,Math.PI,0);ctx.lineTo(250,190);ctx.lineTo(150,190);ctx.closePath();ctx.fill();txt(ctx,'LM35',200,165,PAL.ink2,15);
+  ['+Vs','Vout','GND'].forEach((l,i)=>{const x=165+i*35;W(ctx,[[x,190],[x,250]],PAL.gray,3);txt(ctx,l,x,268,i===1?PAL.yellow:PAL.muted,11);});wire(ctx,[[200,250],[200,290],[420,290],[420,240]]);qmMeter(ctx,400,170,'multimeter','0.27 V');
+  if(S.done)txt(ctx,'your answer: '+S.val+' °C → '+(S.val*10)+' mV',600,120,Math.abs(S.val-27)<=1?PAL.good:PAL.bad,14);},
  explain:()=>'10 mV per °C, so 0.27 V = 270 mV ÷ 10 = <b>27 °C</b>. That\'s the whole trick of the LM35 (projects 20 and 21).'});
 
 // E. Resistor power
 Q.push({order:[3, 1, 0, 2],topic:'Formulas',link:'formulas',type:'mc',title:'Will the resistor survive?',prompt:'A <b>100 Ω</b> resistor ends up with the full <b>9 V</b> across it. It\'s a normal <b>¼ W</b> resistor. What happens?',
  options:['It overheats: it has to burn 0.81 W','Fine: 9 V is a low voltage','Fine: resistors don\'t care about power','It only works if you flip it'],correct:0,
  draw(ctx,S){part(ctx,'batt',120,QM_T,120,QM_B,{label:'9 V',left:true});wire(ctx,[[120,QM_T],[340,QM_T]]);const hot=S.ans!==null?Math.min(1,(S.ta||0)/2):0;glowAt(ctx,390,QM_T,hot,'249,115,22',60);part(ctx,'res',340,QM_T,440,QM_T,{label:'100 Ω, ¼ W'});wire(ctx,[[440,QM_T],[600,QM_T],[600,QM_B],[120,QM_B]]);
-  if(S.ans!==null){txt(ctx,'P = V² ÷ R = 9 × 9 ÷ 100 = 0.81 W',360,180,'#fbbf24',16);txt(ctx,hot>0.8?'🔥 smoking: more than 3 × its ¼ W rating':'getting hot…',360,215,'#ef4444',14);}},
+  if(S.ans!==null){txt(ctx,'P = V² ÷ R = 9 × 9 ÷ 100 = 0.81 W',360,180,PAL.yellow,16);txt(ctx,hot>0.8?'🔥 smoking: more than 3 × its ¼ W rating':'getting hot…',360,215,PAL.bad,14);}},
  explain:['✓ Power = V² ÷ R = 81 ÷ 100 = <b>0.81 W</b>, three times what a ¼ W resistor can handle: it gets very hot, smells and burns. Use 1 W, or a bigger resistance. See <b>Formulas → Power</b>.',
   'The voltage alone isn\'t the question: power = V × I. With only 100 Ω, the current is 90 mA, and 9 V × 90 mA = 0.81 W.','Every resistor turns power into heat and has a maximum: ¼ W for the usual small ones.','Resistors have no direction.']});
 
@@ -395,7 +436,7 @@ Q.push({order:[1, 0, 2, 3],topic:'LED',link:'led',type:'mc',title:'Two LEDs, one
  options:['≈ 10 mA','≈ 19 mA','≈ 40 mA','0 mA: two LEDs need two resistors'],correct:0,
  draw(ctx,S){const on=S.ans!==null;part(ctx,'batt',90,QM_T,90,QM_B,{label:'9 V',left:true});wire(ctx,[[90,QM_T],[220,QM_T]]);part(ctx,'res',220,QM_T,320,QM_T,{label:'470 Ω'});wire(ctx,[[320,QM_T],[600,QM_T],[600,110]]);
   part(ctx,'led',600,110,600,180,{glow:on?0.8:0});part(ctx,'led',600,190,600,260,{glow:on?0.8:0});wire(ctx,[[600,180],[600,190]]);wire(ctx,[[600,260],[600,QM_B],[90,QM_B]]);
-  if(on)txt(ctx,'I = (9 − 2 − 2) V ÷ 470 Ω ≈ 10.6 mA',330,190,'#fbbf24',15);},
+  if(on)txt(ctx,'I = (9 − 2 − 2) V ÷ 470 Ω ≈ 10.6 mA',330,190,PAL.yellow,15);},
  explain:['✓ In series the same current flows through everything. The LEDs take 2 V each, the resistor gets the rest: (9 − 4) ÷ 470 ≈ <b>10.6 mA</b>. That\'s how the dice face (project 13) lights pairs of dots with one resistor.',
   '19 mA would be one LED alone with less resistance. With two LEDs, there\'s even less voltage left for the resistor.','40 mA would burn the LEDs. The resistor keeps it near 10 mA.','In series, one resistor is enough: the current is the same everywhere in the loop.']});
 
@@ -403,62 +444,62 @@ Q.push({order:[1, 0, 2, 3],topic:'LED',link:'led',type:'mc',title:'Two LEDs, one
 Q.push({topic:'Microchips',link:'p8',type:'value',title:'A 555 that blinks once per second',prompt:'A 555 blinker with <b>R1 = 1 kΩ</b> and <b>C = 10 µF</b>. Choose <b>R2</b> so the LED blinks about <b>once per second</b>. (f = 1.44 ÷ ((R1 + 2 × R2) × C))',
  slider:{min:3,max:6,def:3.5,unit:'Ω',fmt:v=>fmtOhm(snapE12(Math.pow(10,v))),val:v=>snapE12(Math.pow(10,v))},judge:R=>{const f=1.44/((1000+2*R)*10e-6);return f>=0.6&&f<=1.6;},
  draw(ctx,S){chipBox(ctx,300,90,160,140,'NE555','astable');const R=S.done?S.val:null;const f=R?1.44/((1000+2*R)*10e-6):0;const on=R?((S.ta||0)*f)%1<0.55:false;
-  part(ctx,'led',600,110,600,220,{glow:on?0.9:0});wire(ctx,[[460,160],[600,160]]);txt(ctx,'R1 = 1 kΩ',220,110,'#94a3b8',13);txt(ctx,'R2 = '+(R?fmtOhm(R):'?'),220,140,'#fbbf24',13);txt(ctx,'C = 10 µF',220,170,'#94a3b8',13);
-  if(R)txt(ctx,'f = 1.44 ÷ ((1k + 2 × '+fmtOhm(R)+') × 10 µF) = '+(f<10?f.toFixed(2):f.toFixed(0))+' Hz',400,280,f>=0.6&&f<=1.6?'#10b981':'#ef4444',14);},
+  part(ctx,'led',600,110,600,220,{glow:on?0.9:0});wire(ctx,[[460,160],[600,160]]);txt(ctx,'R1 = 1 kΩ',220,110,PAL.muted,13);txt(ctx,'R2 = '+(R?fmtOhm(R):'?'),220,140,PAL.yellow,13);txt(ctx,'C = 10 µF',220,170,PAL.muted,13);
+  if(R)txt(ctx,'f = 1.44 ÷ ((1k + 2 × '+fmtOhm(R)+') × 10 µF) = '+(f<10?f.toFixed(2):f.toFixed(0))+' Hz',400,280,f>=0.6&&f<=1.6?PAL.good:PAL.bad,14);},
  explain:()=>'1 Hz means (R1 + 2 × R2) × C ≈ 1.44, so R1 + 2 R2 ≈ 144 kΩ and <b>R2 ≈ 68–72 kΩ</b>. Anything from 47 kΩ to 100 kΩ blinks about once per second. Project 8 uses 47 kΩ: about 1.5 times per second.'});
 
 // H. 4017 count to 5
 Q.push({topic:'Microchips',link:'s4017',type:'mc',title:'Count to 5 with a CD4017',prompt:'You want 5 LEDs to chase in a loop (Q0 → Q4, then back). Which output do you wire to <b>RESET</b> (pin 15)?',
  options:['Q4','Q5','Q6','Q9'],correct:1,
- draw(ctx,S){const n=S.ans===null?10:[4,5,6,9][S.ans];const step=Math.floor((S.ta||0)*4)%n;for(let i=0;i<10;i++){const x=110+i*62,on=S.ans!==null&&i===step;glowAt(ctx,x,150,on?0.9:0,'239,68,68',30);ctx.fillStyle=on?'#ef4444':'#3b1d1d';ctx.beginPath();ctx.arc(x,150,14,0,7);ctx.fill();txt(ctx,'Q'+i,x,190,i<5?'#cbd5e1':'#64748b',12);}
-  if(S.ans!==null)txt(ctx,'reset on Q'+[4,5,6,9][S.ans]+' → counts '+n+' states (Q0…Q'+(n-1)+')',400,250,S.ans===1?'#10b981':'#ef4444',15);},
+ draw(ctx,S){const n=S.ans===null?10:[4,5,6,9][S.ans];const step=Math.floor((S.ta||0)*4)%n;for(let i=0;i<10;i++){const x=110+i*62,on=S.ans!==null&&i===step;glowAt(ctx,x,150,on?0.9:0,'239,68,68',30);ctx.fillStyle=on?PAL.bad:'#3b1d1d';ctx.beginPath();ctx.arc(x,150,14,0,7);ctx.fill();txt(ctx,'Q'+i,x,190,i<5?PAL.ink2:PAL.muted2,12);}
+  if(S.ans!==null)txt(ctx,'reset on Q'+[4,5,6,9][S.ans]+' → counts '+n+' states (Q0…Q'+(n-1)+')',400,250,S.ans===1?PAL.good:PAL.bad,15);},
  explain:['Q4 resets as soon as it\'s reached: only Q0–Q3 ever light, 4 states.','✓ The moment Q5 turns on, it resets the counter to Q0, so you see Q0 → Q4: <b>5 states</b>. Rule: to count N states, reset with output Q<i>N</i>. The dice use Q6 for 6 faces.','Q6 gives 6 states (that\'s the dice).','Q9 gives 9 states, and resetting is useless for 10: just leave RESET to ground.']});
 
 // I. Multiplexing
 Q.push({order:[2, 3, 0, 1],topic:'Circuits',link:'p12',type:'mc',title:'Two displays, shared wires',prompt:'In the dice and the thermometer, both 7-segment displays share the <b>same 8 segment wires</b>. How can they show different digits?',
  options:['They are lit one at a time, switching every few ms','Each segment wire carries two voltages','The second display is a mirror of the first','They can\'t: both always show the same digit'],correct:0,
  draw(ctx,S){const slow=S.ans!==null,t=S.ta||0,which=slow?Math.floor(t*1.5)%2:-1;qmSeg(ctx,250,80,1.4,'abged',which===1);qmSeg(ctx,420,80,1.4,'abgcd',which===0);
-  if(slow)txt(ctx,'slow motion: display '+(which+1)+' on, the other off',400,280,'#fbbf24',14);else txt(ctx,'shows "23"',400,280,'#94a3b8',14);},
+  if(slow)txt(ctx,'slow motion: display '+(which+1)+' on, the other off',400,280,PAL.yellow,14);else txt(ctx,'shows "23"',400,280,PAL.muted,14);},
  explain:['✓ <b>Multiplexing</b>: the Arduino sets the segments for digit 1 and switches on its transistor, then 4 ms later does the same for digit 2, and so on. Your eye blends it into two steady digits.','A wire is at one voltage at a time.','They are wired the same way, but switched separately.','With the trick of switching, they can (projects 12 and 20).']});
 
 // J. Common cathode
 Q.push({order:[1, 2, 3, 0],topic:'Circuits',link:'parts',type:'mc',title:'Where does COM go?',prompt:'The SC39-11SURKWA is a <b>common-cathode</b> display. Where does its COM pin go?',
  options:['To − (ground)','To + (5 V)','To + through a resistor','To any segment pin'],correct:0,
- draw(ctx,S){const ok=S.ans===0;qmSeg(ctx,330,60,1.6,ok?'abcdefg':'',false);txt(ctx,'COM',360,262,'#cbd5e1',13);wire(ctx,[[360,240],[360,250]]);if(S.ans!==null)txt(ctx,ok?'all cathodes to ground: segments light when their pin goes +':'cathodes at + : no LED can be forward-biased',400,295,ok?'#10b981':'#ef4444',14);},
+ draw(ctx,S){const ok=S.ans===0;qmSeg(ctx,330,60,1.6,ok?'abcdefg':'',false);txt(ctx,'COM',360,262,PAL.ink2,13);wire(ctx,[[360,240],[360,250]]);if(S.ans!==null)txt(ctx,ok?'all cathodes to ground: segments light when their pin goes +':'cathodes at + : no LED can be forward-biased',400,295,ok?PAL.good:PAL.bad,14);},
  explain:['✓ "Common cathode" = all the LEDs\' minus ends are joined at COM. COM goes to ground, and each segment lights when its pin gets + through its resistor.','That\'s for common-<b>anode</b> displays. Here nothing would light.','Still the anode-side idea: wrong type.','COM is the shared return of every segment.']});
 
 // K. Base resistor missing
 Q.push({order:[3, 0, 2, 1],topic:'Transistor',link:'transistor',type:'mc',title:'No base resistor',prompt:'An Arduino pin (5 V) is wired <b>straight</b> to a BC547\'s base, with no resistor. What happens?',
  options:['Far too much base current: the pin and the transistor overheat','It works perfectly, just brighter','Nothing: a base needs no current','The transistor only works half the time'],correct:0,
- draw(ctx,S){npnQ(ctx,400,170,S.ans!==null);wire(ctx,[[200,170],[366,170]]);chipBox(ctx,90,130,110,80,'Arduino','pin 5 V');if(S.ans!==null){glowAt(ctx,380,170,0.8,'249,115,22',50);txt(ctx,'base = a diode to ground (0.7 V): 5 V straight in = huge current',400,260,'#ef4444',13);}},
+ draw(ctx,S){npnQ(ctx,400,170,S.ans!==null);wire(ctx,[[200,170],[366,170]]);chipBox(ctx,90,130,110,80,'Arduino','pin 5 V');if(S.ans!==null){glowAt(ctx,380,170,0.8,'249,115,22',50);txt(ctx,'base = a diode to ground (0.7 V): 5 V straight in = huge current',400,260,PAL.bad,13);}},
  explain:['✓ The base–emitter junction is a diode: above 0.7 V its current shoots up. With no resistor, the pin tries to push far more than its ~20–40 mA: both get damaged. A 1 kΩ gives (5 − 0.7) ÷ 1 k ≈ 4 mA, plenty.','The LED/load current is set by the transistor and its own resistor, not by more base current, and the pin is overloaded.','A bipolar transistor needs a small base current to switch on; it must be limited by a resistor.','It switches on fully, but at the cost of an overloaded pin.']});
 
 // L. Flyback diode direction
 Q.push({order:[1, 2, 0, 3],topic:'Diode',link:'relay',type:'mc',title:'The relay\'s diode',prompt:'A transistor drives a relay coil. Which way must the <b>flyback diode</b> across the coil go?',
  options:['Stripe (cathode) towards +','Stripe towards the transistor (−)','Either way','No diode is needed with a relay'],correct:0,
- draw(ctx,S){txt(ctx,'+9 V',300,46,'#ef4444',12);wire(ctx,[[300,55],[300,90]]);part(ctx,'coil',300,90,300,210,{label:'relay coil'});wire(ctx,[[300,210],[300,240]]);npnQ(ctx,290,274,S.ans!==null);
-  wire(ctx,[[300,90],[400,90]]);wire(ctx,[[300,210],[400,210]]);part(ctx,'diode',400,210,400,90,{label:S.ans===1?'diode (stripe down)':'diode (stripe up)',col:S.ans===null?WIRE:S.ans===0?'#10b981':'#ef4444'});
-  if(S.ans===1)txt(ctx,'💥 short: + straight through the diode',560,260,'#ef4444',13,'left');if(S.ans===0)txt(ctx,'off normally; catches the spike',560,260,'#10b981',13,'left');},
+ draw(ctx,S){txt(ctx,'+9 V',300,46,PAL.bad,12);wire(ctx,[[300,55],[300,90]]);part(ctx,'coil',300,90,300,210,{label:'relay coil'});wire(ctx,[[300,210],[300,240]]);npnQ(ctx,290,274,S.ans!==null);
+  wire(ctx,[[300,90],[400,90]]);wire(ctx,[[300,210],[400,210]]);part(ctx,'diode',400,210,400,90,{label:S.ans===1?'diode (stripe down)':'diode (stripe up)',col:S.ans===null?WIRE:S.ans===0?PAL.good:PAL.bad});
+  if(S.ans===1)txt(ctx,'💥 short: + straight through the diode',560,260,PAL.bad,13,'left');if(S.ans===0)txt(ctx,'off normally; catches the spike',560,260,PAL.good,13,'left');},
  explain:['✓ Normally the diode is <b>reversed</b> (stripe to +) so it carries nothing. When the transistor switches off, the coil\'s voltage flips and the diode conducts, letting the energy loop round instead of zapping the transistor (projects 6, 7 and B).','Stripe down = forward-biased: it shorts the supply as soon as the transistor turns on.','Only one way protects without shorting.','The coil kick can reach tens of volts: without the diode the transistor eventually dies.']});
 
 // M. 555 pin 5
 Q.push({order:[2, 0, 1, 3],topic:'Microchips',link:'p17',type:'mc',title:'Pushing on pin 5',prompt:'In the siren, the slow 555 pulls the fast 555\'s <b>pin 5 (CTRL)</b> up through 10 kΩ. What does that do to the tone?',
  options:['Lower note','Higher note','Louder, same note','The tone stops'],correct:0,
- draw(ctx,S){chipBox(ctx,320,110,160,110,'NE555','tone');txt(ctx,'pin 5 ↑',260,165,'#fbbf24',15);if(S.ans!==null){const f=2+Math.sin((S.ta||0)*4)*0.8;ctx.strokeStyle='#60a5fa';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=200;i++){const x=520+i,y=165-30*Math.sign(Math.sin(i/200*Math.PI*2*f*2));i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}},
+ draw(ctx,S){chipBox(ctx,320,110,160,110,'NE555','tone');txt(ctx,'pin 5 ↑',260,165,PAL.yellow,15);if(S.ans!==null){const f=2+Math.sin((S.ta||0)*4)*0.8;ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=200;i++){const x=520+i,y=165-30*Math.sign(Math.sin(i/200*Math.PI*2*f*2));i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}},
  explain:['✓ Pin 5 is the 555\'s "⅔ mark". Raise it and the capacitor must fill higher before each flip: every cycle takes longer → a <b>lower</b> note. Pull it down → higher. That\'s the pin-pon.','The opposite: pulling pin 5 down gives the higher note.','The output still swings 0–9 V: the volume stays the same.','The 555 keeps oscillating, just at another rhythm.']});
 
 // N. Fuzz
 Q.push({order:[1, 3, 2, 0],topic:'Circuits',link:'p18',type:'mc',title:'Why does clipping sound fuzzy?',prompt:'The fuzz pedal slices the tops and bottoms of the guitar wave flat. Why does that sound buzzy?',
  options:['A square-ish wave contains many extra harmonics','It only makes the sound louder','It removes the bass','It adds an echo'],correct:0,
- draw(ctx,S){const k=S.ans!==null?1:0;ctx.strokeStyle='#60a5fa';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=600;i++){const x=100+i,y=170-70*Math.sin(i/600*Math.PI*8);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
-  if(k){ctx.strokeStyle='#f97316';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=600;i++){const x=100+i,y=170-Math.max(-35,Math.min(35,70*Math.sin(i/600*Math.PI*8)*3));i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();txt(ctx,'blue: clean string · orange: clipped (≈ square)',400,280,'#fbbf24',14);}},
+ draw(ctx,S){const k=S.ans!==null?1:0;ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=600;i++){const x=100+i,y=170-70*Math.sin(i/600*Math.PI*8);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+  if(k){ctx.strokeStyle=PAL.orange;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=600;i++){const x=100+i,y=170-Math.max(-35,Math.min(35,70*Math.sin(i/600*Math.PI*8)*3));i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();txt(ctx,'blue: clean string · orange: clipped (≈ square)',400,280,PAL.yellow,14);}},
  explain:['✓ Any wave shape is a mix of sine waves. A pure-ish string note is mostly one; a square wave adds 3×, 5×, 7×… the frequency (odd harmonics). Those extra high tones are the buzz. Same as the Ruby\'s overdrive, pushed further.','It is louder too, but the character changes because of the new harmonics.','The fundamental (the bass of the note) is still there.','Echo needs a delay; clipping is instant.']});
 
 // O. LM339 ladder scale
 Q.push({topic:'Circuits',link:'p21',type:'value',title:'Set the bar-graph scale',prompt:'In the bar thermometer, a current flows through a ladder of <b>100 Ω</b> rungs, and each rung is one segment step. The LM35 gives 10 mV/°C. Which ladder current gives <b>2 °C per segment</b>?',
  slider:{min:0.05,max:0.5,def:0.35,unit:'mA',fmt:v=>v.toFixed(2)+' mA',val:v=>Math.round(v*100)/100},judge:v=>v>=0.19&&v<=0.21,
- draw(ctx,S){const v=S.done?S.val/1000:null;for(let i=0;i<10;i++){const th=v?(800+100*i)*v:null,on=v?0.22>=th:false;ctx.fillStyle=on?'#22c55e':'#14301f';ctx.fillRect(140+i*52,120,40,90);if(v)txt(ctx,(th*100).toFixed(0)+'°',160+i*52,232,'#94a3b8',11);}
-  txt(ctx,'room at 22 °C → LM35 = 0.22 V',400,90,'#cbd5e1',14);if(v)txt(ctx,'each step = '+(v*100*100).toFixed(1)+' °C',400,275,Math.abs(v*1000-0.2)<=0.01?'#10b981':'#ef4444',15);},
+ draw(ctx,S){const v=S.done?S.val/1000:null;for(let i=0;i<10;i++){const th=v?(800+100*i)*v:null,on=v?0.22>=th:false;ctx.fillStyle=on?PAL.green:'#14301f';ctx.fillRect(140+i*52,120,40,90);if(v)txt(ctx,(th*100).toFixed(0)+'°',160+i*52,232,PAL.muted,11);}
+  txt(ctx,'room at 22 °C → LM35 = 0.22 V',400,90,PAL.ink2,14);if(v)txt(ctx,'each step = '+(v*100*100).toFixed(1)+' °C',400,275,Math.abs(v*1000-0.2)<=0.01?PAL.good:PAL.bad,15);},
  explain:()=>'2 °C = 20 mV. Ohm\'s law: I = U ÷ R = 0.020 V ÷ 100 Ω = <b>0.2 mA</b>. That\'s what the trimmer sets in project 21 (with 800 Ω at the bottom, the first segment lights at 16 °C).'});
 // ===== end of more challenges =====
 const ST=Q.map(()=>({ans:null,done:false,ta:0,time:0,dt:0,slots:{},val:null,testing:false}));
@@ -480,7 +521,7 @@ function render(){const q=Q[cur],S=ST[cur];$('quizResults').hidden=true;$('quizC
       b.onclick=()=>{if(S.ans!==null)return;S.ans=i;S.ta=0;S.done=true;const ok=i===q.correct;record(ok);render();feedback(ok,q.explain[i]+(ok?'':' <i>'+q.explain[q.correct]+'</i>'),q.link);};g.appendChild(b);});C.appendChild(g);
     if(S.ans!==null){const ok=S.ans===q.correct;feedback(ok,q.explain[S.ans]+(ok?'':' <i>'+q.explain[q.correct]+'</i>'),q.link);}}
   else if(q.type==='value'){const sl=q.slider;if(S.sv===undefined)S.sv=sl.def;
-    C.innerHTML=`<div class="controls"><label class="slider" style="flex:1">Your choice<input id="qVal" type="range" min="${sl.min}" max="${sl.max}" step="0.01" value="${S.sv}" style="flex:1;width:auto" ${S.done?'disabled':''}></label><b id="qValT" style="min-width:90px;font-size:1.2rem;color:#fbbf24"></b><button id="qCheck" class="active" ${S.done?'disabled':''}>✔ Check</button></div>`;
+    C.innerHTML=`<div class="controls"><label class="slider" style="flex:1">Your choice<input id="qVal" type="range" min="${sl.min}" max="${sl.max}" step="0.01" value="${S.sv}" style="flex:1;width:auto" ${S.done?'disabled':''}></label><b id="qValT" style="min-width:90px;font-size:1.2rem;color:${PAL.yellow}"></b><button id="qCheck" class="active" ${S.done?'disabled':''}>✔ Check</button></div>`;
     const upd=()=>{S.sv=+$('qVal').value;$('qValT').textContent=sl.fmt(S.sv);};$('qVal').oninput=upd;upd();
     $('qCheck').onclick=()=>{S.val=sl.val(S.sv);S.done=true;S.ta=0;const ok=q.judge(S.val);record(ok);render();};
     if(S.done){const ok=q.judge(S.val);feedback(ok,q.explain(S),q.link);}}
@@ -501,9 +542,7 @@ function results(){const c=RES.filter(r=>r===true).length,a=RES.filter(r=>r!==nu
   <div class="qdots" style="margin-top:14px">${Q.map((q,i)=>`<button class="qd ${RES[i]===true?'ok':RES[i]===false?'ko':''}" data-i="${i}" title="${q.title}">${i+1}</button>`).join('')}</div>`;
   document.querySelectorAll('#qResBody .qd').forEach(b=>b.onclick=()=>go(+b.dataset.i));}
 render();
-let lastQ=performance.now();
-function frameQ(now){const dt=Math.min(0.05,(now-lastQ)/1000);lastQ=now;const S=ST[cur];S.time+=dt;S.ta+=dt;S.dt=dt;
-  const c=$('cQuiz'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);try{Q[cur].draw.call(Q[cur],ctx,S);}catch(e){console.error(e);}requestAnimationFrame(frameQ);}
-requestAnimationFrame(frameQ);
+loop((dt,now)=>{const S=ST[cur];S.time+=dt;S.ta+=dt;S.dt=dt;
+  const c=$('cQuiz'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);try{Q[cur].draw.call(Q[cur],ctx,S);}catch(e){console.error(e);}});
 
 })();

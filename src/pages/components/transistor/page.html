@@ -29,7 +29,7 @@
     <li><b>Amplifying (active):</b> the main flow = <b>gain × base flow</b>. With a gain of 100, 50 µA in gives 5 mA through. Double the base flow and you double the main flow.</li>
     <li><b>Fully on (saturated):</b> the gate is wide open. More base flow can't help, because the rest of the circuit (the load) now limits the flow. This is the "switch on" state.</li>
   </ul>
-  <div class="controls"><label class="slider" style="flex:1">Small base flow (base current)<input id="tIb" type="range" min="0" max="150" step="1" value="40" style="flex:1;width:auto"></label><b id="tIbt" style="min-width:70px"></b></div>
+  <div class="controls"><label class="slider grow">Small base flow (base current)<input id="tIb" type="range" min="0" max="150" step="1" value="40"></label><b id="tIbt" style="min-width:70px"></b></div>
   <canvas id="cTV" width="800" height="330"></canvas>
   <p class="hint">One more detail: the base-emitter junction is a <b>diode</b> inside the transistor, so the base needs about <b>0.7 V</b> before any base current flows (see the <a data-page="diode" class="navlink">diode page</a>). That's also why you always put a <b>resistor in front of the base</b>: to limit that current, just like with an LED.</p>
 </section>
@@ -53,13 +53,13 @@
     <li><b>Rc (collector resistor):</b> turns the transistor's changing <i>current</i> into a changing <i>voltage</i>. More current means a bigger voltage drop across Rc, so the collector goes <b>down</b>, which is why the output is upside down.</li>
     <li><b>Re (emitter resistor):</b> sets the gain: <b>gain ≈ Rc ÷ Re</b>. The slider changes Re: a smaller Re gives more gain.</li>
   </ul>
-  <div class="controls"><label class="slider" style="flex:1">Gain<input id="amG" type="range" min="1" max="40" step="1" value="12" style="flex:1;width:auto"></label><b id="amGt" style="min-width:60px"></b></div>
+  <div class="controls"><label class="slider grow">Gain<input id="amG" type="range" min="1" max="40" step="1" value="12"></label><b id="amGt" class="val"></b></div>
   <canvas id="cAmp" width="800" height="525"></canvas>
   <p class="hint">🎸 In your Ruby amp, the first part (the <b>J310 JFET</b>) is a transistor used as a <b>buffer</b>: it doesn't add much gain, but it lets the guitar's weak, fragile signal drive the rest of the circuit without being loaded down. Then the LM386 chip, made of transistors inside, provides gain of 20 to 200×.</p>
 
   <h3>C. Automatic night light</h3>
   <p>An <b>LDR</b> (light-dependent resistor) and a resistor form a voltage divider on the base. In daylight the LDR's resistance is low and pulls the base below 0.7 V, so the transistor is off. When it gets dark, the LDR's resistance shoots up, the base voltage rises above 0.7 V, and the transistor turns the LED on.</p>
-  <div class="controls"><label class="slider" style="flex:1">🌙 Dark ←→ Bright ☀️<input id="nlL" type="range" min="0" max="1" step="0.01" value="0.9" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">🌙 Dark ←→ Bright ☀️<input id="nlL" type="range" min="0" max="1" step="0.01" value="0.9"></label></div>
   <canvas id="cNL" width="800" height="260"></canvas>
 
   <h3>D. Logic gates: how computers think</h3>
@@ -72,7 +72,7 @@
   <h2><span class="num">5</span>Key facts</h2>
   <div class="grid2">
     <div><canvas id="cSymT" width="380" height="180"></canvas>
-    <p class="hint" style="text-align:center">NPN symbol: the arrow on the emitter points <b>out</b> (the direction current leaves). On PNP it points in.</p></div>
+    <p class="hint center">NPN symbol: the arrow on the emitter points <b>out</b> (the direction current leaves). On PNP it points in.</p></div>
     <table>
       <tr><td>Legs</td><td><b>B</b>ase (control), <b>C</b>ollector (in), <b>E</b>mitter (out). The order differs between models: always check the datasheet!</td></tr>
       <tr><td>Gain (hFE, β)</td><td>Typically 100–300: collector current ≈ gain × base current.</td></tr>

@@ -34,7 +34,7 @@
   <p><b>What it's for:</b> night lights and street lamps that switch on at dusk, light meters, "is the box open?" alarms, robots that follow light. <b>Why use one:</b> it's cheap, needs no power of its own and works with any voltage.</p>
   <p><b>How it works inside:</b> the squiggly track is <b>cadmium sulphide</b>, a material whose electrons are stuck in place in the dark. Each particle of light (photon) that hits it knocks electrons loose, and free electrons can carry current. More light → more free electrons → <b>lower resistance</b>. It reacts in a few tens of milliseconds: fine for daylight, too slow for fast signals.</p>
   <p><b>Water analogy:</b> a pipe stuffed with ice. Sunlight melts the ice, so the brighter it is, the more water gets through.</p>
-  <div class="controls"><label class="slider" style="flex:1">Light level<input id="ldrL" type="range" min="0" max="1" step="0.005" value="0.45" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Light level<input id="ldrL" type="range" min="0" max="1" step="0.005" value="0.45"></label></div>
   <canvas id="cldr" width="800" height="290"></canvas>
   <p class="hint">Left: light falling on the LDR. Middle: the voltage divider used in the night light (LDR on top, 10 kΩ to ground): more light → lower LDR resistance → higher voltage. Right: resistance against light (both scales logarithmic).</p>
   <h3>How to connect it</h3>
@@ -50,7 +50,7 @@
   <p><b>What it's for:</b> thermometers, fan controllers, overheat alarms, fridge or aquarium monitors. <b>Why use one:</b> it's accurate (±0.5 °C at 25 °C), linear, and its output can go straight into an Arduino or a comparator.</p>
   <p><b>How it works inside:</b> it uses a property of transistors: the voltage needed to turn one on (~0.6 V) <b>drops by about 2 mV for every degree</b>. The LM35 compares two transistors running at different currents: the difference between them grows exactly in proportion to the temperature. An internal op-amp amplifies and trims it to a neat 10 mV/°C, set at the factory.</p>
   <p><b>Water analogy:</b> a thermometer that pushes a piston: every degree pushes the pressure up by exactly the same small step.</p>
-  <div class="controls"><label class="slider" style="flex:1">Temperature<input id="lmT" type="range" min="-10" max="100" step="0.5" value="23" style="flex:1;width:auto"></label></div>
+  <div class="controls"><label class="slider grow">Temperature<input id="lmT" type="range" min="-10" max="100" step="0.5" value="23"></label></div>
   <canvas id="clm35" width="800" height="290"></canvas>
   <p class="hint">The output is a straight line: 0 V at 0 °C, 1 V at 100 °C. Below 0 °C the basic circuit just gives 0 V (it would need a negative supply to show negative temperatures).</p>
   <h3>How to connect it</h3>
@@ -66,7 +66,7 @@
   <p><b>What it's for:</b> touch lamps, buttons with no moving parts, "don't touch!" alarms, simple moisture detectors (water conducts too). <b>Why use one:</b> nothing to wear out, and it costs two wires.</p>
   <p><b>How it works:</b> the current through your skin is only a few µA, far too little for an LED. So it goes into the base of a transistor, which multiplies it by ~200, then into a second one (a <b>Darlington pair</b>), which multiplies it again by ~200: <b>× 40,000</b> in total. A few µA become a few mA: the LED lights.</p>
   <p><b>Water analogy:</b> a trickle that opens a small valve, whose flow opens a big valve.</p>
-  <div class="controls"><button id="tcTouch" style="font-size:1.05rem">☝️ Hold to touch</button><label class="slider" style="flex:1">Skin<input id="tcSkin" type="range" min="0" max="1" step="0.01" value="0.5" style="flex:1;width:auto"></label><span class="hint">dry ← → damp</span></div>
+  <div class="controls"><button class="big" id="tcTouch">☝️ Hold to touch</button><label class="slider grow">Skin<input id="tcSkin" type="range" min="0" max="1" step="0.01" value="0.5"></label><span class="hint">dry ← → damp</span></div>
   <canvas id="ctouch" width="800" height="290"></canvas>
   <p class="hint">Hold the button: the tiny skin current (µA) is multiplied twice. Damp skin conducts better: try the slider. With only one transistor (× 200), dry skin wouldn't be enough.</p>
   <h3>How to connect it</h3>
@@ -83,7 +83,7 @@
   <p><b>Two catches:</b></p>
   <ul><li><b>Floating input:</b> when released, a button connects the input to <i>nothing</i>. A chip input left floating picks up noise and reads random 0s and 1s. Fix: a <b>pull-down</b> resistor (10 kΩ to −, button to +) or a <b>pull-up</b> (10 kΩ to +, button to −). The Arduino has internal pull-ups (<code>INPUT_PULLUP</code>).</li><li><b>Bounce:</b> the metal contacts bounce for 1–10 ms, so one press can look like 5 presses to a fast counter. Fix: a 100 nF capacitor across the button, or a short delay in code.</li></ul>
   <p><b>Water analogy:</b> a tap. A pull-down resistor is a small drain that keeps the pipe empty when the tap is closed, so it never "half-fills" by itself.</p>
-  <div class="controls"><button id="btPress" style="font-size:1.05rem">👆 Hold to press</button><span class="hint">Resistor:</span><button id="btPD" class="active">Pull-down</button><button id="btPU">Pull-up</button><button id="btNone">None (floating!)</button><label class="slider"><input type="checkbox" id="btDeb"> 100 nF debounce</label></div>
+  <div class="controls"><button class="big" id="btPress">👆 Hold to press</button><span class="hint">Resistor:</span><button id="btPD" class="active">Pull-down</button><button id="btPU">Pull-up</button><button id="btNone">None (floating!)</button><label class="slider"><input type="checkbox" id="btDeb"> 100 nF debounce</label></div>
   <canvas id="cbtn" width="800" height="290"></canvas>
   <p class="hint">Right: what a fast counter sees (zoomed on the first milliseconds). Without debounce, the contact bounces and the counter adds several counts per press. With "None", watch the input wander when the button is released.</p>
   <h3>Key facts</h3>
@@ -97,7 +97,7 @@
   <p><b>What it's for:</b> turning string vibrations into a signal for an amp like your <b>Ruby</b>, a pedal like the <a class="navlink" href="#p18">fuzz</a>, or a tuner. <b>Why:</b> no battery, no microphone feedback, and it only hears the strings, not the room.</p>
   <p><b>How it works inside:</b> a changing magnetic field through a coil makes a voltage (Faraday's law, the same physics as the <a class="navlink" href="#inductor">inductor</a> and the switch-off spike). The faster the field changes, the bigger the voltage: so the pickup gives ~100–300 mV, wiggling at the string's frequency (110 Hz for the A string). Single coils have ~5,000–8,000 turns, about <b>6 kΩ</b> of resistance and a few henries of inductance.</p>
   <p><b>Water analogy:</b> a paddle wheel in a pipe, turned back and forth by a pendulum swinging next to it: the water sloshes in time with the swing.</p>
-  <div class="controls"><button id="pkPluck" style="font-size:1.05rem">🎸 Pluck</button><label class="slider" style="flex:1">String height<input id="pkH" type="range" min="0" max="1" step="0.01" value="0.4" style="flex:1;width:auto"></label><span class="hint">close ← → far</span></div>
+  <div class="controls"><button class="big" id="pkPluck">🎸 Pluck</button><label class="slider grow">String height<input id="pkH" type="range" min="0" max="1" step="0.01" value="0.4"></label><span class="hint">close ← → far</span></div>
   <canvas id="cpick" width="800" height="290"></canvas>
   <p class="hint">Pluck: the string swings over the magnet, the field through the coil changes, and the coil produces the voltage on the right. Raise the string (or lower the pickup) and the signal gets weaker: that's what adjusting pickup height on a real guitar does.</p>
   <h3>How to connect it</h3>
@@ -114,7 +114,7 @@
   <div class="controls"><button class="irM active" data-m="0">🔦 Obstacle / reflection</button><button class="irM" data-m="1">📺 Remote receiver</button><button class="irM" data-m="2">🚶 PIR motion</button></div>
   <div class="controls" id="irCtl"></div>
   <canvas id="cir" width="800" height="290"></canvas>
-  <div class="cards" style="margin-top:12px">
+  <div class="cards mt-s">
     <div class="card"><div class="ico">🔦</div><h3>Obstacle / reflection</h3><p>An <b>IR LED</b> shines, a <b>phototransistor</b> next to it looks. A nearby object (or a white surface) reflects the light back: the phototransistor conducts. A dark surface absorbs it.<br><b>Parts:</b> TCRT5000 (2–8 mm, line-following robots), obstacle modules with a 555 and two trimmers (2–40 cm, e.g. Gotronic GT1081).<br><b>Wiring:</b> IR LED + 220 Ω at 5 V; phototransistor collector to + through 10 kΩ, emitter to −: the collector voltage <b>drops</b> when something is close. Modules give a ready digital output (often LOW = obstacle).<br><i>Water:</i> a torch and a mirror: you only see light back when something is in front.</p></div>
     <div class="card"><div class="ico">📺</div><h3>Remote-control receiver (TSOP38238)</h3><p>A remote doesn't just switch its IR LED on: it flashes it <b>38,000 times a second</b> in bursts. The receiver contains a photodiode, an amplifier, a <b>38 kHz filter</b> and a demodulator, so it ignores sunlight and lamps and outputs clean pulses (LOW during a burst). The pattern of long and short bursts is the button code (NEC, RC5…).<br><b>Parts:</b> TSOP38238 (Gotronic 03417, €0.95): pins OUT, GND, VS (check the datasheet: other TSOP series have another order!).<br><b>Wiring:</b> VS to 5 V, GND, OUT to an Arduino pin with the <i>IRremote</i> library. Quick test without code: an LED + 1 kΩ from +5 V into OUT flickers when you press any remote button.<br><i>Water:</i> a whistle at one exact pitch that only one dog in the park responds to.</p></div>
     <div class="card"><div class="ico">🚶</div><h3>PIR motion detector</h3><p>"Passive infrared": it sends nothing. A <b>pyroelectric</b> crystal reacts to <b>changes</b> in the heat (IR) it sees. Behind the white <b>Fresnel lens</b> (the faceted dome), the view is split into zones: a warm body moving from zone to zone makes the signal swing, and the module's chip turns that into a clean HIGH output for a few seconds.<br><b>Parts:</b> HC-SR501-type modules (Gotronic SBC-PIR, 3–6 m, output HIGH for 3–5 s). Two trimmers: sensitivity (range) and hold time; a jumper chooses single or repeat trigger.<br><b>Wiring:</b> VCC 5 V, GND, OUT (3.3 V high) to an Arduino pin, or through 1 kΩ to a BC547 driving an LED, buzzer or relay. Allow ~1 minute to settle after power-up.<br><i>Water:</i> a guard who doesn't see shapes, only notices when something warm <i>moves</i> between the slats of a fence.</p></div>

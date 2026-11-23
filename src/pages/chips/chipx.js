@@ -1,7 +1,7 @@
 
 // ===== Pinout + inside-the-chip schematics =====
 (function(){
-const TC={pwr:'#ef4444',gnd:'#94a3b8',in:'#60a5fa',out:'#10b981',ctl:'#f59e0b'};
+const TC={pwr:PAL.bad,gnd:PAL.muted,in:PAL.blue,out:PAL.good,ctl:PAL.amber};
 const TN={pwr:'Power +',gnd:'Ground',in:'Input',out:'Output',ctl:'Control / setting'};
 // [pin, name, type, what it's for, how to connect]
 const CH={
@@ -213,120 +213,120 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 // ---------- package drawings ----------
 function dipSVG(k){const P=CH[k].pins,n=P.length,h=n/2,sp=n>20?28:40,top=34,H=top+h*sp+14,bx=165,bw=130;
   let s=`<svg viewBox="0 0 460 ${H+16}" class="pinsvg">`;
-  s+=`<rect x="${bx}" y="${top-10}" width="${bw}" height="${h*sp+10}" rx="8" fill="#1f2937" stroke="#475569" stroke-width="2"/>`;
-  s+=`<path d="M${bx+bw/2-16} ${top-10} a16 16 0 0 0 32 0" fill="#0b1220" stroke="#475569" stroke-width="2"/><circle cx="${bx+18}" cy="${top+8}" r="5" fill="#0b1220" stroke="#64748b"/>`;
-  s+=`<text x="${bx+bw/2}" y="${top+h*sp/2}" fill="#cbd5e1" font-size="15" font-weight="700" text-anchor="middle" transform="rotate(-90 ${bx+bw/2} ${top+h*sp/2})">${esc(CH[k].title.split(' ')[0])}</text>`;
+  s+=`<rect x="${bx}" y="${top-10}" width="${bw}" height="${h*sp+10}" rx="8" fill="${PAL.chip}" stroke="${PAL.slate}" stroke-width="2"/>`;
+  s+=`<path d="M${bx+bw/2-16} ${top-10} a16 16 0 0 0 32 0" fill="${PAL.canvas}" stroke="${PAL.slate}" stroke-width="2"/><circle cx="${bx+18}" cy="${top+8}" r="5" fill="${PAL.canvas}" stroke="${PAL.muted2}"/>`;
+  s+=`<text x="${bx+bw/2}" y="${top+h*sp/2}" fill="${PAL.ink2}" font-size="15" font-weight="700" text-anchor="middle" transform="rotate(-90 ${bx+bw/2} ${top+h*sp/2})">${esc(CH[k].title.split(' ')[0])}</text>`;
   P.forEach(([num,name,t])=>{const left=num<=h,r=left?num-1:n-num,y=top+r*sp+14,c=TC[t];
     const x0=left?bx-32:bx+bw;
     s+=`<g class="pp" data-pin="${num}"><rect x="${x0}" y="${y-7}" width="32" height="14" rx="2" fill="${c}" stroke="${c}"/>`;
-    s+=`<text x="${left?bx+10:bx+bw-10}" y="${y+5}" fill="#e2e8f0" font-size="13" font-weight="700" text-anchor="${left?'start':'end'}">${num}</text>`;
+    s+=`<text x="${left?bx+10:bx+bw-10}" y="${y+5}" fill="${PAL.ink}" font-size="13" font-weight="700" text-anchor="${left?'start':'end'}">${num}</text>`;
     s+=`<text x="${left?x0-8:x0+40}" y="${y+5}" fill="${c}" font-size="14" font-weight="700" text-anchor="${left?'end':'start'}">${esc(name)}</text>`;
     s+=`<rect x="${left?0:x0}" y="${y-16}" width="${left?bx:460-x0}" height="32" fill="transparent"/></g>`;});
-  s+=`<text x="230" y="${H+10}" fill="#64748b" font-size="12" text-anchor="middle">seen from above · notch at the top · pin 1 by the dot</text>`;
+  s+=`<text x="230" y="${H+10}" fill="${PAL.muted2}" font-size="12" text-anchor="middle">seen from above · notch at the top · pin 1 by the dot</text>`;
   return s+'</svg>';}
 function to220SVG(k){const P=CH[k].pins;let s=`<svg viewBox="0 0 460 330" class="pinsvg">`;
-  s+=`<rect x="160" y="14" width="140" height="70" rx="4" fill="#94a3b8" stroke="#cbd5e1"/><circle cx="230" cy="46" r="14" fill="#0b1220"/>`;
-  s+=`<rect x="160" y="80" width="140" height="110" rx="4" fill="#1f2937" stroke="#475569" stroke-width="2"/><text x="230" y="130" fill="#cbd5e1" font-size="17" font-weight="700" text-anchor="middle">L7805</text><text x="230" y="152" fill="#64748b" font-size="12" text-anchor="middle">writing facing you</text>`;
+  s+=`<rect x="160" y="14" width="140" height="70" rx="4" fill="${PAL.muted}" stroke="${PAL.ink2}"/><circle cx="230" cy="46" r="14" fill="${PAL.canvas}"/>`;
+  s+=`<rect x="160" y="80" width="140" height="110" rx="4" fill="${PAL.chip}" stroke="${PAL.slate}" stroke-width="2"/><text x="230" y="130" fill="${PAL.ink2}" font-size="17" font-weight="700" text-anchor="middle">L7805</text><text x="230" y="152" fill="${PAL.muted2}" font-size="12" text-anchor="middle">writing facing you</text>`;
   P.forEach(([num,name,t],i)=>{const x=185+i*45,c=TC[t];s+=`<g class="pp" data-pin="${num}"><rect x="${x-6}" y="190" width="12" height="80" fill="${c}"/><text x="${x}" y="290" fill="${c}" font-size="14" font-weight="700" text-anchor="middle">${num}</text><text x="${x}" y="310" fill="${c}" font-size="14" font-weight="700" text-anchor="middle">${name}</text><rect x="${x-22}" y="186" width="44" height="130" fill="transparent"/></g>`;});
-  s+=`<text x="330" y="50" fill="#94a3b8" font-size="12">metal tab = GND</text><text x="330" y="66" fill="#94a3b8" font-size="12">(bolt a heatsink here)</text>`;
+  s+=`<text x="330" y="50" fill="${PAL.muted}" font-size="12">metal tab = GND</text><text x="330" y="66" fill="${PAL.muted}" font-size="12">(bolt a heatsink here)</text>`;
   return s+'</svg>';}
 // ---------- schematic helpers ----------
 let CUR='';
-const ln=(pts,pin,c='#94a3b8')=>`<polyline ${pin?`class="wp" data-pin="${pin}"`:''} points="${pts}" fill="none" stroke="${c}" stroke-width="2"/>`;
-const tx=(x,y,t,o={})=>`<text x="${x}" y="${y}" fill="${o.c||'#cbd5e1'}" font-size="${o.s||12}" font-weight="${o.b?700:400}" text-anchor="${o.a||'middle'}">${esc(t)}</text>`;
-const bx=(x,y,w,h,t,c='#334155')=>{const L=t.split('\n');return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#111c2e" stroke="${c}" stroke-width="2"/>`+L.map((l,i)=>tx(x+w/2,y+h/2+5+(i-(L.length-1)/2)*15,l,{s:12,b:i===0,c:i===0?'#e2e8f0':'#94a3b8'})).join('');};
-const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="3.5" fill="#94a3b8"/>`;
+const ln=(pts,pin,c=PAL.muted)=>`<polyline ${pin?`class="wp" data-pin="${pin}"`:''} points="${pts}" fill="none" stroke="${c}" stroke-width="2"/>`;
+const tx=(x,y,t,o={})=>`<text x="${x}" y="${y}" fill="${o.c||PAL.ink2}" font-size="${o.s||12}" font-weight="${o.b?700:400}" text-anchor="${o.a||'middle'}">${esc(t)}</text>`;
+const bx=(x,y,w,h,t,c=PAL.slateDark)=>{const L=t.split('\n');return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${PAL.panel}" stroke="${c}" stroke-width="2"/>`+L.map((l,i)=>tx(x+w/2,y+h/2+5+(i-(L.length-1)/2)*15,l,{s:12,b:i===0,c:i===0?PAL.ink:PAL.muted})).join('');};
+const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="3.5" fill="${PAL.muted}"/>`;
 function tp(x,y,n,side){const p=pinOf(CUR,n),c=TC[p[2]];const lab=`${n} ${p[1]}`;
   const L={l:[x-10,y+4,'end'],r:[x+10,y+4,'start'],t:[x,y-11,'middle'],b:[x,y+20,'middle']}[side];
   return `<g class="pp" data-pin="${n}"><rect x="${x-6}" y="${y-6}" width="12" height="12" rx="2" fill="${c}"/>${tx(L[0],L[1],lab,{c,b:1,a:L[2],s:13})}<rect x="${x-30}" y="${y-18}" width="60" height="36" fill="transparent"/></g>`;}
-function cmp(x,y,lab,flip){const d=flip?-1:1,w=70;let s=`<path d="M${x} ${y-30}L${x+d*w} ${y}L${x} ${y+30}Z" fill="#111c2e" stroke="#cbd5e1" stroke-width="2"/>`;
-  s+=tx(x+d*10,y-8,'−',{s:15,b:1,c:'#e2e8f0'})+tx(x+d*10,y+19,'+',{s:15,b:1,c:'#e2e8f0'});if(lab)s+=tx(x+d*w/2,y+48,lab,{s:11,c:'#94a3b8'});return s;}
-function res(x,y1,y2,lab,hor){const n=6;let p=[];if(!hor){const h=(y2-y1)/n;for(let i=0;i<=n;i++)p.push(`${x+(i===0||i===n?0:(i%2?8:-8))},${y1+i*h}`);return ln(p.join(' '))+(lab?tx(x+14,(y1+y2)/2+4,lab,{a:'start',s:11,c:'#94a3b8'}):'');}
-  const w=(y2-y1)/n;for(let i=0;i<=n;i++)p.push(`${y1+i*w},${x+(i===0||i===n?0:(i%2?8:-8))}`);return ln(p.join(' '))+(lab?tx((y1+y2)/2,x-12,lab,{s:11,c:'#94a3b8'}):'');}
-const gnd=(x,y)=>`<path d="M${x-10} ${y}h20M${x-6} ${y+5}h12M${x-2} ${y+10}h4" stroke="#94a3b8" stroke-width="2"/>`;
-const arrow=(x1,y,x2,pin)=>ln(`${x1},${y} ${x2},${y}`,pin)+`<path d="M${x2} ${y}l-8 -5v10z" fill="#94a3b8"/>`;
+function cmp(x,y,lab,flip){const d=flip?-1:1,w=70;let s=`<path d="M${x} ${y-30}L${x+d*w} ${y}L${x} ${y+30}Z" fill="${PAL.panel}" stroke="${PAL.ink2}" stroke-width="2"/>`;
+  s+=tx(x+d*10,y-8,'−',{s:15,b:1,c:PAL.ink})+tx(x+d*10,y+19,'+',{s:15,b:1,c:PAL.ink});if(lab)s+=tx(x+d*w/2,y+48,lab,{s:11,c:PAL.muted});return s;}
+function res(x,y1,y2,lab,hor){const n=6;let p=[];if(!hor){const h=(y2-y1)/n;for(let i=0;i<=n;i++)p.push(`${x+(i===0||i===n?0:(i%2?8:-8))},${y1+i*h}`);return ln(p.join(' '))+(lab?tx(x+14,(y1+y2)/2+4,lab,{a:'start',s:11,c:PAL.muted}):'');}
+  const w=(y2-y1)/n;for(let i=0;i<=n;i++)p.push(`${y1+i*w},${x+(i===0||i===n?0:(i%2?8:-8))}`);return ln(p.join(' '))+(lab?tx((y1+y2)/2,x-12,lab,{s:11,c:PAL.muted}):'');}
+const gnd=(x,y)=>`<path d="M${x-10} ${y}h20M${x-6} ${y+5}h12M${x-2} ${y+10}h4" stroke="${PAL.muted}" stroke-width="2"/>`;
+const arrow=(x1,y,x2,pin)=>ln(`${x1},${y} ${x2},${y}`,pin)+`<path d="M${x2} ${y}l-8 -5v10z" fill="${PAL.muted}"/>`;
 // ---------- inside each chip ----------
 const IN={
 '555':()=>{let s='';
   s+=ln('40,30 90,30 90,50',8)+res(90,50,100,'5 kΩ')+ln('90,100 90,120')+res(90,120,170,'5 kΩ')+ln('90,170 90,205')+res(90,205,255,'5 kΩ')+ln('90,255 90,295 40,295',1);
-  s+=ln('40,110 90,110',5)+dot(90,110)+ln('90,110 200,110')+tx(130,104,'⅔ supply',{s:11,c:'#fbbf24'});
-  s+=dot(90,188)+ln('90,188 200,188')+tx(130,182,'⅓ supply',{s:11,c:'#fbbf24'});
+  s+=ln('40,110 90,110',5)+dot(90,110)+ln('90,110 200,110')+tx(130,104,'⅔ supply',{s:11,c:PAL.yellow});
+  s+=dot(90,188)+ln('90,188 200,188')+tx(130,182,'⅓ supply',{s:11,c:PAL.yellow});
   s+=ln('160,30 160,74 200,74',6)+ln('160,300 160,224 200,224',2);
   s+=cmp(200,92,'"⅔ watcher"')+cmp(200,206,'"⅓ watcher"');
   s+=arrow(270,92,300)+arrow(270,206,300)+bx(300,62,90,170,'Flip-flop\n(1-bit memory)\n\nR: off\nS: on');
   s+=ln('345,30 345,62',4);
   s+=arrow(390,100,430)+bx(430,82,70,36,'Output\nstage')+ln('500,100 530,100',3);
-  s+=ln('390,196 418,196');s+=`<path d="M418 182v28M418 190l22 -14v-12M418 202l22 14v16" stroke="#cbd5e1" stroke-width="2" fill="none"/>`+ln('440,164 440,160 530,160',7)+gnd(440,232)+tx(440,262,'(pin 1)',{s:10,c:'#64748b'});
-  s+=tx(450,212,'discharge',{s:11,c:'#94a3b8',a:'start'})+tx(450,226,'transistor',{s:11,c:'#94a3b8',a:'start'});
+  s+=ln('390,196 418,196');s+=`<path d="M418 182v28M418 190l22 -14v-12M418 202l22 14v16" stroke="${PAL.ink2}" stroke-width="2" fill="none"/>`+ln('440,164 440,160 530,160',7)+gnd(440,232)+tx(440,262,'(pin 1)',{s:10,c:PAL.muted2});
+  s+=tx(450,212,'discharge',{s:11,c:PAL.muted,a:'start'})+tx(450,226,'transistor',{s:11,c:PAL.muted,a:'start'});
   return {vb:'-50 0 660 320',s:s+tp(40,30,8,'t')+tp(40,295,1,'b')+tp(40,110,5,'l')+tp(160,30,6,'t')+tp(160,300,2,'b')+tp(345,30,4,'t')+tp(530,100,3,'r')+tp(530,160,7,'r')};},
 '7805':()=>{let s='';
-  s+=ln('40,90 200,90',1)+bx(200,65,140,50,'Pass transistor\n(the valve)','#f59e0b')+ln('340,90 530,90',3);
-  s+=bx(200,10,140,34,'Heat & over-current\nprotection')+`<path d="M270 44v21" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 3"/>`;
+  s+=ln('40,90 200,90',1)+bx(200,65,140,50,'Pass transistor\n(the valve)',PAL.amber)+ln('340,90 530,90',3);
+  s+=bx(200,10,140,34,'Heat & over-current\nprotection')+`<path d="M270 44v21" stroke="${PAL.muted}" stroke-width="2" stroke-dasharray="4 3"/>`;
   s+=dot(450,90)+ln('450,90 450,115')+res(450,115,160)+ln('450,160 450,200')+res(450,200,245)+ln('450,245 450,280');
-  s+=dot(450,180)+ln('450,180 360,180')+tx(405,172,'measured',{s:11,c:'#94a3b8'});
+  s+=dot(450,180)+ln('450,180 360,180')+tx(405,172,'measured',{s:11,c:PAL.muted});
   s+=bx(240,150,120,60,'Error amplifier\n"too high? too low?"');
-  s+=ln('300,150 300,115')+tx(306,138,'opens / closes',{a:'start',s:11,c:'#fbbf24'});
+  s+=ln('300,150 300,115')+tx(306,138,'opens / closes',{a:'start',s:11,c:PAL.yellow});
   s+=bx(100,160,100,40,'Reference\n1.25 V')+ln('200,180 240,180')+ln('150,200 150,280');
   s+=ln('150,280 450,280',2)+ln('300,210 300,280');
   return {vb:'0 0 600 320',s:s+tp(40,90,1,'t')+tp(530,90,3,'t')+tp(300,300,2,'b')+ln('300,280 300,300',2)+dot(300,280)};},
 '339':()=>{let s='',pins='';
   [[110,90,4,5,2,0,'1'],[110,230,6,7,1,0,'2'],[490,90,8,9,14,1,'3'],[490,230,10,11,13,1,'4']].forEach(([x,y,m,p,o,f,l])=>{const d=f?-1:1,xin=f?560:40,xo=x+d*70,xp=f?340:260,xs=f?385:215;
     s+=ln(`${xin},${y-20} ${x},${y-20}`,m)+ln(`${xin},${y+20} ${x},${y+20}`,p)+cmp(x,y,'comparator '+l,f)+ln(`${xo},${y} ${xp},${y}`,o);
-    s+=`<path d="M${xs} ${y}v10M${xs} ${y+10}l9 12M${xs} ${y+26}v4M${xs-8} ${y+30}h16M${xs-5} ${y+34}h10M${xs-2} ${y+38}h4" stroke="#10b981" stroke-width="2" fill="none"/>`;
+    s+=`<path d="M${xs} ${y}v10M${xs} ${y+10}l9 12M${xs} ${y+26}v4M${xs-8} ${y+30}h16M${xs-5} ${y+34}h10M${xs-2} ${y+38}h4" stroke="${PAL.good}" stroke-width="2" fill="none"/>`;
     pins+=tp(xin,y-20,m,f?'r':'l')+tp(xin,y+20,p,f?'r':'l')+tp(xp,y,o,'t');});
-  s+=tx(300,160,'each output = a switch to ground',{s:11,c:'#10b981'})+tx(300,176,'(closes when − is higher than +)',{s:11,c:'#94a3b8'});
-  s+=tx(300,18,'3 VCC / 12 GND power all four',{s:11,c:'#94a3b8'});
+  s+=tx(300,160,'each output = a switch to ground',{s:11,c:PAL.good})+tx(300,176,'(closes when − is higher than +)',{s:11,c:PAL.muted});
+  s+=tx(300,18,'3 VCC / 12 GND power all four',{s:11,c:PAL.muted});
   return {vb:'-70 0 730 330',s:s+pins};},
 '4013':()=>{let s='',pins='';
   [[30,'1',5,3,6,4,1,2],[190,'2',9,11,8,10,13,12]].forEach(([y0,L,D,C,S,R,Q,Qb])=>{
     [[D,20],[C,45],[S,70],[R,95]].forEach(([n,dy])=>{s+=ln(`40,${y0+dy} 180,${y0+dy}`,n);pins+=tp(40,y0+dy,n,'l');});
     s+=bx(180,y0,170,120,'D flip-flop '+L+'\nQ = D at the\nclock\'s rising edge\nS / R force 1 / 0');
-    s+=`<path d="M180 ${y0+38}l10 7l-10 7" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>`;
+    s+=`<path d="M180 ${y0+38}l10 7l-10 7" fill="none" stroke="${PAL.ink2}" stroke-width="1.5"/>`;
     [[Q,30],[Qb,90]].forEach(([n,dy])=>{s+=ln(`350,${y0+dy} 470,${y0+dy}`,n);pins+=tp(470,y0+dy,n,'r');});});
-  s+=tx(260,172,'tip: wire Q̅ back to D (outside) and it divides the clock by 2',{s:11,c:'#fbbf24'});
-  s+=tx(40,14,'14 VDD / 7 VSS power both flip-flops',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(260,172,'tip: wire Q̅ back to D (outside) and it divides the clock by 2',{s:11,c:PAL.yellow});
+  s+=tx(40,14,'14 VDD / 7 VSS power both flip-flops',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 330',s:s+pins};},
 '4060':()=>{let s='',pins='';
   [[11,70],[10,110],[9,150]].forEach(([n,y])=>{s+=ln(`40,${y} 110,${y}`,n);pins+=tp(40,y,n,'l');});
-  s+=bx(110,50,120,120,'Oscillator\n2 inverters\n\nquartz between\npins 11 and 10','#f59e0b')+arrow(230,110,290);
+  s+=bx(110,50,120,120,'Oscillator\n2 inverters\n\nquartz between\npins 11 and 10',PAL.amber)+arrow(230,110,290);
   s+=bx(290,20,190,260,'14 flip-flops\nin a chain\n\neach one ÷ 2\n\n32 768 Hz\n→ Q14 = 2 Hz');
-  [[7,'÷16'],[5,'÷32'],[4,'÷64'],[6,'÷128'],[14,'÷256'],[13,'÷512'],[15,'÷1024'],[1,'÷4096'],[2,'÷8192'],[3,'÷16384']].forEach(([n,t],i)=>{const y=34+i*26;s+=ln(`480,${y} 545,${y}`,n)+tx(512,y-4,t,{s:9,c:'#94a3b8'});pins+=tp(545,y,n,'r');});
+  [[7,'÷16'],[5,'÷32'],[4,'÷64'],[6,'÷128'],[14,'÷256'],[13,'÷512'],[15,'÷1024'],[1,'÷4096'],[2,'÷8192'],[3,'÷16384']].forEach(([n,t],i)=>{const y=34+i*26;s+=ln(`480,${y} 545,${y}`,n)+tx(512,y-4,t,{s:9,c:PAL.muted});pins+=tp(545,y,n,'r');});
   s+=ln('385,280 385,300',12);pins+=tp(385,302,12,'b');
-  s+=tx(40,14,'16 VDD / 8 VSS power everything',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(40,14,'16 VDD / 8 VSS power everything',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 335',s:s+pins};},
-'293':()=>{let s='',pins='';const buf=(x,y)=>`<path d="M${x} ${y-16}L${x+40} ${y}L${x} ${y+16}Z" fill="#111c2e" stroke="#cbd5e1" stroke-width="2"/>`;
-  [[50,2,3],[110,7,6],[200,10,11],[260,15,14]].forEach(([y,i,o])=>{s+=ln(`40,${y} 200,${y}`,i)+buf(200,y)+ln(`240,${y} 420,${y}`,o)+`<path d="M330 ${y-14}v28" stroke="#f59e0b" stroke-width="2"/><path d="M322 ${y-6}l8 -8l8 8" fill="#f59e0b"/>`;pins+=tp(40,y,i,'l')+tp(420,y,o,'r');});
+'293':()=>{let s='',pins='';const buf=(x,y)=>`<path d="M${x} ${y-16}L${x+40} ${y}L${x} ${y+16}Z" fill="${PAL.panel}" stroke="${PAL.ink2}" stroke-width="2"/>`;
+  [[50,2,3],[110,7,6],[200,10,11],[260,15,14]].forEach(([y,i,o])=>{s+=ln(`40,${y} 200,${y}`,i)+buf(200,y)+ln(`240,${y} 420,${y}`,o)+`<path d="M330 ${y-14}v28" stroke="${PAL.amber}" stroke-width="2"/><path d="M322 ${y-6}l8 -8l8 8" fill="${PAL.amber}"/>`;pins+=tp(40,y,i,'l')+tp(420,y,o,'r');});
   [[150,1,[50,110]],[300,9,[200,260]]].forEach(([y,n,ys])=>{s+=ln(`40,${y} 170,${y} 170,${ys[0]+28}`,n)+ys.map(yy=>ln(`170,${yy+28} 215,${yy+28} 215,${yy+12}`,n)).join('');pins+=tp(40,y,n,'l');});
-  s+=tx(300,28,'each output: switched to VCC2 (+) or GND, like its input',{s:11,c:'#94a3b8'});
-  s+=tx(330,160,'motor 1 between 3 and 6',{s:11,c:'#fbbf24'})+tx(330,176,'motor 2 between 11 and 14',{s:11,c:'#fbbf24'});
-  s+=tx(375,92,'built-in diodes',{s:10,c:'#f59e0b',a:'start'});
-  s+=tx(40,322,'16 VCC1 (logic) · 8 VCC2 (motor) · 4, 5, 12, 13 GND + heat sink',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(300,28,'each output: switched to VCC2 (+) or GND, like its input',{s:11,c:PAL.muted});
+  s+=tx(330,160,'motor 1 between 3 and 6',{s:11,c:PAL.yellow})+tx(330,176,'motor 2 between 11 and 14',{s:11,c:PAL.yellow});
+  s+=tx(375,92,'built-in diodes',{s:10,c:PAL.amber,a:'start'});
+  s+=tx(40,322,'16 VCC1 (logic) · 8 VCC2 (motor) · 4, 5, 12, 13 GND + heat sink',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 330',s:s+pins};},
 '358':()=>{let s='';
   s+=ln('40,110 110,110',2)+ln('40,150 110,150',3)+cmp(110,130,'op-amp A')+ln('180,130 235,130',1);
   s+=ln('560,110 490,110',6)+ln('560,150 490,150',5)+cmp(490,130,'op-amp B',1)+ln('420,130 365,130',7);
   s+=ln('300,40 300,60',8)+ln('145,60 455,60',8)+ln('145,60 145,113',8)+ln('455,60 455,113',8);
   s+=ln('300,240 300,215',4)+ln('145,215 455,215',4)+ln('145,147 145,215',4)+ln('455,147 455,215',4);
-  s+=tx(300,105,'gain ≈ 100 000',{s:12,c:'#fbbf24'})+tx(300,122,'(each op-amp)',{s:11,c:'#94a3b8'});
+  s+=tx(300,105,'gain ≈ 100 000',{s:12,c:PAL.yellow})+tx(300,122,'(each op-amp)',{s:11,c:PAL.muted});
   return {vb:'-70 0 730 280',s:s+tp(40,110,2,'l')+tp(40,150,3,'l')+tp(235,130,1,'b')+tp(560,110,6,'r')+tp(560,150,5,'r')+tp(365,130,7,'b')+tp(300,40,8,'t')+tp(300,240,4,'b')};},
 '386':()=>{let s='';
   s+=ln('40,110 110,110',3)+ln('40,170 110,170',2)+bx(110,90,100,100,'Input stage\n(transistor pair)\ncompares + / −');
   s+=arrow(210,140,255)+bx(255,115,95,50,'Gain stage');
-  s+=arrow(350,140,390)+bx(390,80,85,120,'Push-pull\noutput\n↑ push\n↓ pull','#10b981')+ln('475,140 540,140',5);
+  s+=arrow(350,140,390)+bx(390,80,85,120,'Push-pull\noutput\n↑ push\n↓ pull',PAL.good)+ln('475,140 540,140',5);
   s+=ln('430,40 430,80',6)+ln('160,40 160,90',7);
   s+=ln('40,222 430,222',4)+ln('430,200 430,222',4);
   s+=dot(505,140)+ln('505,140 505,262')+res(262,440,500,'15 kΩ',1)+ln('440,262 410,262')+dot(410,262)+res(262,320,390,'1.35 kΩ',1)+ln('390,262 410,262')+ln('320,262 300,262')+dot(300,262)+res(262,220,280,'150 Ω',1)+ln('220,262 160,262 160,190');
   s+=ln('410,262 410,290',1)+ln('300,262 300,290',8);
-  s+=tx(600,296,'nothing on 1↔8: gain 20',{s:12,c:'#fbbf24',a:'end'})+tx(600,312,'10 µF on 1↔8: gain 200',{s:12,c:'#fbbf24',a:'end'});
+  s+=tx(600,296,'nothing on 1↔8: gain 20',{s:12,c:PAL.yellow,a:'end'})+tx(600,312,'10 µF on 1↔8: gain 200',{s:12,c:PAL.yellow,a:'end'});
   return {vb:'-50 0 660 320',s:s+tp(40,110,3,'l')+tp(40,170,2,'l')+tp(540,140,5,'t')+tp(430,40,6,'t')+tp(160,40,7,'t')+tp(40,222,4,'b')+tp(410,290,1,'b')+tp(300,290,8,'b')};},
 '4017':()=>{let s='';const outs=[3,2,4,7,10,1,5,6,9,11];
   s+=ln('40,90 110,90',14)+ln('40,150 110,150',13)+bx(110,70,90,100,'Clock gate\n\npasses CLK\nwhile INH low');
   s+=arrow(200,120,240)+bx(240,70,110,190,'Johnson\ncounter\n\n5 flip-flops\n(counts 0–9)');
-  s+=ln('40,230 240,230',15)+tx(140,222,'reset → back to 0',{s:11,c:'#94a3b8'});
-  s+=ln('350,165 390,165')+`<path d="M390 165l-8 -5v10z" fill="#94a3b8"/>`+bx(390,30,80,270,'Decoder\n\n"1 of 10"');
+  s+=ln('40,230 240,230',15)+tx(140,222,'reset → back to 0',{s:11,c:PAL.muted});
+  s+=ln('350,165 390,165')+`<path d="M390 165l-8 -5v10z" fill="${PAL.muted}"/>`+bx(390,30,80,270,'Decoder\n\n"1 of 10"');
   outs.forEach((n,i)=>{const y=44+i*26;s+=ln(`470,${y} 520,${y}`,n)+tp(520,y,n,'r');});
   s+=ln('295,260 295,300 360,300',12)+tp(360,300,12,'r');
-  s+=tx(40,26,'16 VDD / 8 VSS power every block',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(40,26,'16 VDD / 8 VSS power every block',{a:'start',s:11,c:PAL.muted});
   return {vb:'-60 0 670 320',s:s+tp(40,90,14,'l')+tp(40,150,13,'l')+tp(40,230,15,'l')};},
 
 '4511':()=>{let s='';const ins=[[7,'A'],[1,'B'],[2,'C'],[6,'D']],outs=[13,12,11,10,9,15,14];
@@ -337,61 +337,61 @@ const IN={
   s+=ln('40,230 180,230 180,180',5)+tp(40,230,5,'l');
   s+=ln('300,300 300,240',3)+tp(300,300,3,'b')+ln('380,300 380,240',4)+tp(380,300,4,'b');
   for(let i=0;i<4;i++){const y=70+i*40;s+=arrow(400,y,440);}
-  s+=bx(440,40,70,200,'7 output\ndrivers\n(NPN)','#10b981');
+  s+=bx(440,40,70,200,'7 output\ndrivers\n(NPN)',PAL.good);
   outs.forEach((n,i)=>{const y=50+i*30;s+=ln(`510,${y} 545,${y}`,n)+tp(545,y,n,'r');});
-  s+=tx(40,20,'16 VDD / 8 VSS power every block',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(40,20,'16 VDD / 8 VSS power every block',{a:'start',s:11,c:PAL.muted});
   return {vb:'-60 0 680 330',s};},
 '4518':()=>{let s='';
   [[0,'A',[1,2,7],[3,4,5,6]],[1,'B',[9,10,15],[11,12,13,14]]].forEach(([k,L,ins,outs])=>{const y0=30+k*150;
     ins.forEach((n,i)=>{const y=y0+20+i*40;s+=ln(`40,${y} 160,${y}`,n)+tp(40,y,n,'l');});
     s+=bx(160,y0,170,120,'Counter '+L+'\n4 flip-flops\ncounts 0 → 9 → 0\n(BCD)');
     outs.forEach((n,i)=>{const y=y0+15+i*30;s+=ln(`330,${y} 470,${y}`,n)+tp(470,y,n,'r');});});
-  s+=`<polyline points="470,141 470,160 120,160 120,240" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6 4" fill="none"/>`+tx(300,176,'to chain: wire Q4A → EN B outside the chip')+'<circle cx="120" cy="240" r="4" fill="#fbbf24"/>'+tx(300,176,'',{s:12,c:'#fbbf24'});
-  s+=tx(40,18,'16 VDD / 8 VSS power both counters',{a:'start',s:11,c:'#94a3b8'});
+  s+=`<polyline points="470,141 470,160 120,160 120,240" stroke="${PAL.yellow}" stroke-width="2" stroke-dasharray="6 4" fill="none"/>`+tx(300,176,'to chain: wire Q4A → EN B outside the chip')+('<circle cx="120" cy="240" r="4" fill="'+PAL.yellow+'"/>')+tx(300,176,'',{s:12,c:PAL.yellow});
+  s+=tx(40,18,'16 VDD / 8 VSS power both counters',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 330',s};},
 
 '3914':()=>{let s='';
   s+=ln('40,60 120,60',5)+tp(40,60,5,'l')+bx(120,40,80,40,'Buffer');
   s+=ln('360,26 330,26',6)+tp(360,26,6,'t')+ln('330,26 330,40');
-  for(let i=0;i<10;i++){const y=40+i*24;s+=`<rect x="324" y="${y+3}" width="12" height="18" fill="none" stroke="#94a3b8" stroke-width="1.5"/>`;}
+  for(let i=0;i<10;i++){const y=40+i*24;s+=`<rect x="324" y="${y+3}" width="12" height="18" fill="none" stroke="${PAL.muted}" stroke-width="1.5"/>`;}
   s+=ln('330,280 330,300',4)+tp(330,300,4,'b');
-  s+=ln('200,60 230,60 230,270');for(let i=0;i<10;i++){const y=274-i*24;s+=ln(`230,${y} 250,${y}`)+`<path d="M250 ${y-9}L272 ${y}L250 ${y+9}Z" fill="#111c2e" stroke="#cbd5e1" stroke-width="1.5"/>`+ln(`324,${y-10} 272,${y-10} 262,${y-6}`);}
-  s+=tx(260,24,'10 comparators',{s:11,c:'#94a3b8'});
-  s+=bx(380,90,90,120,'Current\nregulated\nLED\noutputs','#10b981');
+  s+=ln('200,60 230,60 230,270');for(let i=0;i<10;i++){const y=274-i*24;s+=ln(`230,${y} 250,${y}`)+`<path d="M250 ${y-9}L272 ${y}L250 ${y+9}Z" fill="${PAL.panel}" stroke="${PAL.ink2}" stroke-width="1.5"/>`+ln(`324,${y-10} 272,${y-10} 262,${y-6}`);}
+  s+=tx(260,24,'10 comparators',{s:11,c:PAL.muted});
+  s+=bx(380,90,90,120,'Current\nregulated\nLED\noutputs',PAL.good);
   const outs=[1,18,17,16,15,14,13,12,11,10];outs.forEach((n,i)=>{const y=276-i*25;s+=ln(`470,${y>200?Math.min(y,205):Math.max(y,95)} 470,${y} 540,${y}`,n)+tp(540,y,n,'r');});
   s+=bx(80,170,110,50,'Reference\n1.25 V')+ln('40,190 80,190',8)+tp(40,190,8,'l')+ln('190,195 210,195 210,250 40,250',7)+tp(40,250,7,'l');
-  s+=ln('40,120 120,120',9)+tp(40,120,9,'l')+tx(150,124,'bar / dot',{s:11,c:'#94a3b8'});
-  s+=tx(40,18,'3 V+ / 2 V− power everything',{a:'start',s:11,c:'#94a3b8'});
+  s+=ln('40,120 120,120',9)+tp(40,120,9,'l')+tx(150,124,'bar / dot',{s:11,c:PAL.muted});
+  s+=tx(40,18,'3 V+ / 2 V− power everything',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 330',s};},
 '4056':()=>{let s='';
-  s+=ln('40,80 200,80',4)+tp(40,80,4,'l')+bx(200,55,150,50,'Power transistor\n(the valve)','#f59e0b')+ln('350,80 540,80',5)+tp(540,80,5,'r');
+  s+=ln('40,80 200,80',4)+tp(40,80,4,'l')+bx(200,55,150,50,'Power transistor\n(the valve)',PAL.amber)+ln('350,80 540,80',5)+tp(540,80,5,'r');
   s+=bx(200,150,150,70,'Control loop\nconstant current →\nconstant 4.2 V');s+=ln('275,150 275,105');s+=ln('450,80 450,185 350,185');
-  s+=ln('40,190 200,190',2)+tp(40,190,2,'l')+tx(120,180,'sets the current',{s:11,c:'#94a3b8'});
+  s+=ln('40,190 200,190',2)+tp(40,190,2,'l')+tx(120,180,'sets the current',{s:11,c:PAL.muted});
   s+=ln('40,250 200,250',1)+tp(40,250,1,'l')+bx(200,232,150,36,'Battery temp check');
   s+=ln('40,30 275,30 275,55',8)+tp(40,30,8,'l');
-  s+=bx(400,200,110,60,'Status\n(open-drain)','#10b981')+ln('510,215 540,215',7)+tp(540,215,7,'r')+ln('510,245 540,245',6)+tp(540,245,6,'r');
+  s+=bx(400,200,110,60,'Status\n(open-drain)',PAL.good)+ln('510,215 540,215',7)+tp(540,215,7,'r')+ln('510,245 540,245',6)+tp(540,245,6,'r');
   s+=ln('300,300 300,268',3)+tp(300,300,3,'b');
   return {vb:'-70 0 700 330',s};},
 '328':()=>{let s='';
-  s+=bx(220,90,140,110,'CPU\n16 MHz\n\nruns your\nprogram','#a78bfa');
+  s+=bx(220,90,140,110,'CPU\n16 MHz\n\nruns your\nprogram',PAL.violet);
   s+=bx(220,20,140,50,'Flash 32 KB\n(program)')+bx(380,20,120,50,'RAM 2 KB\n(variables)');
-  s+=ln('40,40 220,40',9)+tp(40,40,9,'l')+ln('40,70 120,70 120,110 220,110',10)+tp(40,70,10,'l')+tx(130,30,'crystal',{s:11,c:'#94a3b8'});
+  s+=ln('40,40 220,40',9)+tp(40,40,9,'l')+ln('40,70 120,70 120,110 220,110',10)+tp(40,70,10,'l')+tx(130,30,'crystal',{s:11,c:PAL.muted});
   s+=ln('40,150 220,150',1)+tp(40,150,1,'l');
-  s+=bx(400,100,110,40,'Port D (D0–D7)','#10b981')+ln('360,120 400,120')+ln('510,110 545,110',2)+tp(545,110,2,'r')+ln('510,130 545,130',3)+tp(545,130,3,'r');
-  s+=bx(400,160,110,40,'Port B (D8–D13)\ntimers / PWM','#10b981')+ln('360,180 400,180')+ln('510,170 545,170',15)+tp(545,170,15,'r')+ln('510,190 545,190',19)+tp(545,190,19,'r');
-  s+=bx(220,230,140,50,'ADC 10 bit\n(analogRead)','#60a5fa')+ln('290,200 290,230')+ln('360,255 545,255',23)+tp(545,255,23,'r');
+  s+=bx(400,100,110,40,'Port D (D0–D7)',PAL.good)+ln('360,120 400,120')+ln('510,110 545,110',2)+tp(545,110,2,'r')+ln('510,130 545,130',3)+tp(545,130,3,'r');
+  s+=bx(400,160,110,40,'Port B (D8–D13)\ntimers / PWM',PAL.good)+ln('360,180 400,180')+ln('510,170 545,170',15)+tp(545,170,15,'r')+ln('510,190 545,190',19)+tp(545,190,19,'r');
+  s+=bx(220,230,140,50,'ADC 10 bit\n(analogRead)',PAL.blue)+ln('290,200 290,230')+ln('360,255 545,255',23)+tp(545,255,23,'r');
   s+=ln('40,245 220,245',21)+tp(40,245,21,'l')+ln('40,275 220,275',20)+tp(40,275,20,'l');
-  s+=tx(40,312,'7 VCC / 8, 22 GND power everything',{a:'start',s:11,c:'#94a3b8'});
+  s+=tx(40,312,'7 VCC / 8, 22 GND power everything',{a:'start',s:11,c:PAL.muted});
   return {vb:'-70 0 700 330',s};},
 '595':()=>{let s='';const outs=[15,1,2,3,4,5,6,7];
   s+=ln('40,70 120,70',14)+ln('40,120 120,120',11)+ln('40,170 120,170',10)+bx(120,50,120,140,'Shift register\n8 cells\n(bucket brigade)');
-  for(let i=0;i<4;i++){const y=80+i*25;s+=arrow(240,y,280);}s+=tx(260,68,'×8',{s:11,c:'#94a3b8'});
+  for(let i=0;i<4;i++){const y=80+i*25;s+=arrow(240,y,280);}s+=tx(260,68,'×8',{s:11,c:PAL.muted});
   s+=bx(280,50,110,140,'Storage latch\n8 cells\n(copy on RCLK)');
   s+=ln('40,230 335,230 335,190',12);
   for(let i=0;i<4;i++){const y=80+i*25;s+=arrow(390,y,420);}
   s+=bx(420,50,70,140,'Output\nbuffers');s+=ln('40,280 455,280 455,190',13);
   outs.forEach((n,i)=>{const y=58+i*18;s+=ln(`490,${y} 530,${y}`,n)+tp(530,y,n,'r');});
-  s+=ln('240,175 255,175 255,305 530,305',9)+tp(530,305,9,'r')+tx(400,298,'→ next chip',{s:11,c:'#94a3b8'});
+  s+=ln('240,175 255,175 255,305 530,305',9)+tp(530,305,9,'r')+tx(400,298,'→ next chip',{s:11,c:PAL.muted});
   return {vb:'-75 0 700 330',s:s+tp(40,70,14,'l')+tp(40,120,11,'l')+tp(40,170,10,'l')+tp(40,230,12,'l')+tp(40,280,13,'l')};}
 };
 function build(el){const k=el.dataset.chip,C=CH[k];CUR=k;const I=IN[k]();
@@ -408,42 +408,30 @@ function build(el){const k=el.dataset.chip,C=CH[k];CUR=k;const I=IN[k]();
 document.querySelectorAll('.chipx').forEach(build);
 
 // ---------- chips menu: one chip at a time ----------
-function heroSwap(page,svg){const el=document.querySelector('#page-'+page+' .illus');if(!el)return;if(!el.dataset.orig)el.dataset.orig=el.innerHTML;const html=svg||el.dataset.orig;if(el.innerHTML!==html){el.innerHTML=html;el.animate&&el.animate([{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'scale(1)'}],{duration:260,easing:'ease-out'});}}
 
-function dipArt(lab,n,sub,col){const h=n/2,w=Math.min(220,30+h*24),x0=160-w/2,y0=70;let legs='';for(let i=0;i<h;i++){const x=x0+16+i*((w-32)/(h-1||1));legs+=`<rect x="${x-4}" y="${y0-22}" width="8" height="22" fill="#cbd5e1"/><rect x="${x-4}" y="${y0+70}" width="8" height="22" fill="#cbd5e1"/>`;}
-  return `<svg viewBox="0 0 320 200">${legs}<rect x="${x0}" y="${y0}" width="${w}" height="70" rx="6" fill="#111827" stroke="${col}" stroke-width="2"/><path d="M${x0} ${y0+25} a10 10 0 0 1 0 20" fill="#0b1220" stroke="${col}" stroke-width="2"/><circle cx="${x0+14}" cy="${y0+56}" r="4" fill="#475569"/><text x="160" y="${y0+40}" text-anchor="middle" fill="#e2e8f0" font-size="${lab.length>6?18:22}" font-weight="800" font-family="ui-monospace,monospace">${lab}</text><text x="160" y="${y0+58}" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="system-ui">${n} pins</text><text x="160" y="190" text-anchor="middle" fill="${col}" font-size="13" font-weight="700" font-family="system-ui">${sub}</text></svg>`;}
-const to220Art=`<svg viewBox="0 0 320 200"><rect x="110" y="10" width="100" height="56" rx="4" fill="#94a3b8"/><circle cx="160" cy="36" r="12" fill="#0b1220"/><rect x="110" y="62" width="100" height="70" rx="4" fill="#111827" stroke="#475569" stroke-width="2"/><text x="160" y="104" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="800" font-family="ui-monospace,monospace">7805</text><path d="M130 132 v46 M160 132 v46 M190 132 v46" stroke="#cbd5e1" stroke-width="6"/><text x="130" y="196" text-anchor="middle" fill="#ef4444" font-size="11" font-family="system-ui">IN</text><text x="160" y="196" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="system-ui">GND</text><text x="190" y="196" text-anchor="middle" fill="#10b981" font-size="11" font-family="system-ui">5 V</text></svg>`;
-const CH_ART={chfam:`<svg viewBox="0 0 320 200"><text x="160" y="95" text-anchor="middle" font-size="40" font-weight="800" font-family="ui-monospace,monospace"><tspan fill="#a78bfa">NE</tspan><tspan fill="#22c55e">555</tspan><tspan fill="#f59e0b">P</tspan></text><text x="70" y="140" text-anchor="middle" fill="#a78bfa" font-size="13" font-family="system-ui">maker/family</text><text x="170" y="140" text-anchor="middle" fill="#22c55e" font-size="13" font-family="system-ui">function</text><text x="262" y="140" text-anchor="middle" fill="#f59e0b" font-size="13" font-family="system-ui">package</text></svg>`,s555:dipArt('NE555',8,'Timer','#a78bfa'),s7805:to220Art,s358:dipArt('LM358',8,'Dual op-amp','#60a5fa'),s386:dipArt('LM386',8,'Audio amplifier','#f472b6'),s4017:dipArt('CD4017',16,'Decade counter','#34d399'),s4511:dipArt('CD4511',16,'BCD → 7-segment decoder','#ef4444'),s4518:dipArt('CD4518',16,'Dual BCD counter','#fbbf24'),s595:dipArt('74HC595',16,'Shift register','#38bdf8'),s3914:dipArt('LM3914',18,'Bar-graph driver','#22c55e'),s4056:dipArt('TP4056',8,'Li-ion charger','#f59e0b'),s328:dipArt('ATmega328P',28,'Arduino brain','#2dd4bf'),s339:dipArt('LM339',14,'Quad comparator','#60a5fa'),s4013:dipArt('CD4013',14,'Dual D flip-flop','#f472b6'),s4060:dipArt('CD4060',16,'Oscillator + divider','#f59e0b'),s293:dipArt('L293D',16,'H-bridge motor driver','#ef4444')};
+function dipArt(lab,n,sub,col){const h=n/2,w=Math.min(220,30+h*24),x0=160-w/2,y0=70;let legs='';for(let i=0;i<h;i++){const x=x0+16+i*((w-32)/(h-1||1));legs+=`<rect x="${x-4}" y="${y0-22}" width="8" height="22" fill="${PAL.ink2}"/><rect x="${x-4}" y="${y0+70}" width="8" height="22" fill="${PAL.ink2}"/>`;}
+  return `<svg viewBox="0 0 320 200">${legs}<rect x="${x0}" y="${y0}" width="${w}" height="70" rx="6" fill="${PAL.chipDark}" stroke="${col}" stroke-width="2"/><path d="M${x0} ${y0+25} a10 10 0 0 1 0 20" fill="${PAL.canvas}" stroke="${col}" stroke-width="2"/><circle cx="${x0+14}" cy="${y0+56}" r="4" fill="${PAL.slate}"/><text x="160" y="${y0+40}" text-anchor="middle" fill="${PAL.ink}" font-size="${lab.length>6?18:22}" font-weight="800" font-family="ui-monospace,monospace">${lab}</text><text x="160" y="${y0+58}" text-anchor="middle" fill="${PAL.muted}" font-size="10" font-family="system-ui">${n} pins</text><text x="160" y="190" text-anchor="middle" fill="${col}" font-size="13" font-weight="700" font-family="system-ui">${sub}</text></svg>`;}
+const to220Art=`<svg viewBox="0 0 320 200"><rect x="110" y="10" width="100" height="56" rx="4" fill="${PAL.muted}"/><circle cx="160" cy="36" r="12" fill="${PAL.canvas}"/><rect x="110" y="62" width="100" height="70" rx="4" fill="${PAL.chipDark}" stroke="${PAL.slate}" stroke-width="2"/><text x="160" y="104" text-anchor="middle" fill="${PAL.ink}" font-size="20" font-weight="800" font-family="ui-monospace,monospace">7805</text><path d="M130 132 v46 M160 132 v46 M190 132 v46" stroke="${PAL.ink2}" stroke-width="6"/><text x="130" y="196" text-anchor="middle" fill="${PAL.bad}" font-size="11" font-family="system-ui">IN</text><text x="160" y="196" text-anchor="middle" fill="${PAL.muted}" font-size="11" font-family="system-ui">GND</text><text x="190" y="196" text-anchor="middle" fill="${PAL.good}" font-size="11" font-family="system-ui">5 V</text></svg>`;
+const CH_ART={chfam:`<svg viewBox="0 0 320 200"><text x="160" y="95" text-anchor="middle" font-size="40" font-weight="800" font-family="ui-monospace,monospace"><tspan fill="${PAL.violet}">NE</tspan><tspan fill="${PAL.green}">555</tspan><tspan fill="${PAL.amber}">P</tspan></text><text x="70" y="140" text-anchor="middle" fill="${PAL.violet}" font-size="13" font-family="system-ui">maker/family</text><text x="170" y="140" text-anchor="middle" fill="${PAL.green}" font-size="13" font-family="system-ui">function</text><text x="262" y="140" text-anchor="middle" fill="${PAL.amber}" font-size="13" font-family="system-ui">package</text></svg>`,s555:dipArt('NE555',8,'Timer',PAL.violet),s7805:to220Art,s358:dipArt('LM358',8,'Dual op-amp',PAL.blue),s386:dipArt('LM386',8,'Audio amplifier',PAL.pink),s4017:dipArt('CD4017',16,'Decade counter','#34d399'),s4511:dipArt('CD4511',16,'BCD → 7-segment decoder',PAL.bad),s4518:dipArt('CD4518',16,'Dual BCD counter',PAL.yellow),s595:dipArt('74HC595',16,'Shift register',PAL.sky),s3914:dipArt('LM3914',18,'Bar-graph driver',PAL.green),s4056:dipArt('TP4056',8,'Li-ion charger',PAL.amber),s328:dipArt('ATmega328P',28,'Arduino brain','#2dd4bf'),s339:dipArt('LM339',14,'Quad comparator',PAL.blue),s4013:dipArt('CD4013',14,'Dual D flip-flop',PAL.pink),s4060:dipArt('CD4060',16,'Oscillator + divider',PAL.amber),s293:dipArt('L293D',16,'H-bridge motor driver',PAL.bad)};
 
-const CH_LINKS=[...document.querySelectorAll('#chMenu [data-ch]')];const CH_IDS=CH_LINKS.map(a=>a.dataset.ch);
-const chLabel=id=>{const a=CH_LINKS.find(x=>x.dataset.ch===id);return a?a.textContent.replace(/^\S+/,'').trim():id;};
-function chSelect(id){if(!CH_IDS.includes(id))return false;CH_IDS.forEach(k=>{const s=document.getElementById(k);if(s)s.hidden=k!==id;});
-  CH_LINKS.forEach(a=>a.classList.toggle('active',a.dataset.ch===id));const act=CH_LINKS.find(a=>a.dataset.ch===id);if(act&&window.innerWidth<820)act.scrollIntoView({block:'nearest',inline:'center'});heroSwap('chips',CH_ART[id]);return true;}
-function chFromHash(){const h=location.hash.slice(1);if(!chSelect(h)&&!CH_LINKS.some(a=>a.classList.contains('active')))chSelect('chwhat');}
-CH_IDS.forEach((id,i)=>{const s=document.getElementById(id);if(!s)return;const d=document.createElement('div');d.className='qnav';
-  d.innerHTML=(i>0?`<a class="navlink" href="#${CH_IDS[i-1]}">← ${chLabel(CH_IDS[i-1])}</a>`:'<span></span>')+(i<CH_IDS.length-1?`<a class="navlink" href="#${CH_IDS[i+1]}">${chLabel(CH_IDS[i+1])} →</a>`:'');s.appendChild(d);});
-window.addEventListener('hashchange',chFromHash);chFromHash();
+sectionMenu('chMenu',{first:'chwhat',onSelect:id=>heroSwap('chips',CH_ART[id])});
 // ---------- demos: CD4511 and CD4518 ----------
-const D7={0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg'};
-function seg7(ctx,x,y,sc,on){const G={a:[10,0,40,8],g:[10,49,40,8],d:[10,98,40,8],f:[2,8,8,41],b:[50,8,8,41],e:[2,57,8,41],c:[50,57,8,41]};
-  ctx.fillStyle='#0a0a0a';ctx.fillRect(x-12,y-12,60*sc+24,106*sc+24);ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);
-  Object.entries(G).forEach(([k,[a,b,w,h]])=>{const l=on.includes(k);ctx.shadowBlur=l?12:0;ctx.shadowColor='#ef4444';ctx.fillStyle=l?'#ef4444':'#2a1416';ctx.fillRect(a,b,w,h);});ctx.restore();ctx.shadowBlur=0;}
-function bitDots(ctx,x,y,v,names,click){names.forEach((nm,i)=>{const w=[1,2,4,8][i],on=(v&w)!==0,cx=x,cy=y+i*44;ctx.fillStyle=on?'#22c55e':'#1e293b';ctx.beginPath();ctx.arc(cx,cy,16,0,7);ctx.fill();ctx.strokeStyle='#475569';ctx.stroke();
-  ctx.fillStyle=on?'#04210f':'#94a3b8';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText(on?'1':'0',cx,cy+5);ctx.fillStyle='#cbd5e1';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText(nm+' (= '+w+')',cx+26,cy+4);});}
+function bitDots(ctx,x,y,v,names,click){names.forEach((nm,i)=>{const w=[1,2,4,8][i],on=(v&w)!==0,cx=x,cy=y+i*44;ctx.fillStyle=on?PAL.green:PAL.raised;ctx.beginPath();ctx.arc(cx,cy,16,0,7);ctx.fill();ctx.strokeStyle=PAL.slate;ctx.stroke();
+  ctx.fillStyle=on?'#04210f':PAL.muted;ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText(on?'1':'0',cx,cy+5);ctx.fillStyle=PAL.ink2;ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText(nm+' (= '+w+')',cx+26,cy+4);});}
 const D11={v:6,LT:false,BI:false,LE:false,shown:6};
 function draw4511(){const c=document.getElementById('c4511');if(!c)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
-  if(!D11.LE)D11.shown=D11.v;const val=D11.shown;let on=val<=9?D7[val]:'';if(D11.BI)on='';if(D11.LT)on='abcdefg';
-  ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('Inputs (click a bit)',40,24);
+  if(!D11.LE)D11.shown=D11.v;const val=D11.shown;let on=val<=9?DIGITS[val]:'';if(D11.BI)on='';if(D11.LT)on='abcdefg';
+  ctx.fillStyle=PAL.muted;ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('Inputs (click a bit)',40,24);
   bitDots(ctx,60,60,D11.v,['A','B','C','D']);
-  ctx.fillStyle='#e2e8f0';ctx.font='700 15px system-ui';ctx.fillText('D C B A = '+D11.v.toString(2).padStart(4,'0')+'  →  '+D11.v,40,250);
+  ctx.fillStyle=PAL.ink;ctx.font='700 15px system-ui';ctx.fillText('D C B A = '+D11.v.toString(2).padStart(4,'0')+'  →  '+D11.v,40,250);
   // arrows to box
-  ctx.fillStyle='#111c2e';ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(260,50,170,150,10);ctx.fill();ctx.stroke();
-  ctx.fillStyle='#e2e8f0';ctx.font='700 16px system-ui';ctx.textAlign='center';ctx.fillText('CD4511',345,100);ctx.font='12px system-ui';ctx.fillStyle='#94a3b8';
+  ctx.fillStyle=PAL.panel;ctx.strokeStyle=PAL.violet;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(260,50,170,150,10);ctx.fill();ctx.stroke();
+  ctx.fillStyle=PAL.ink;ctx.font='700 16px system-ui';ctx.textAlign='center';ctx.fillText('CD4511',345,100);ctx.font='12px system-ui';ctx.fillStyle=PAL.muted;
   ctx.fillText(D11.LT?'LT low: all segments on':D11.BI?'BI low: blank':D11.LE?'LE high: frozen at '+D11.shown:val>9?'not a digit → blank':'lights: '+on.split('').join(' '),345,130);
   ctx.fillText('a b c d e f g',345,160);
-  'abcdefg'.split('').forEach((k,i)=>{const l=on.includes(k);ctx.fillStyle=l?'#22c55e':'#334155';ctx.beginPath();ctx.arc(290+i*18.3,178,6,0,7);ctx.fill();});
-  ctx.strokeStyle='#64748b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(200,125);ctx.lineTo(255,125);ctx.moveTo(435,125);ctx.lineTo(530,125);ctx.stroke();
-  seg7(ctx,560,30,1.9,on);}
+  'abcdefg'.split('').forEach((k,i)=>{const l=on.includes(k);ctx.fillStyle=l?PAL.green:PAL.slateDark;ctx.beginPath();ctx.arc(290+i*18.3,178,6,0,7);ctx.fill();});
+  ctx.strokeStyle=PAL.muted2;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(200,125);ctx.lineTo(255,125);ctx.moveTo(435,125);ctx.lineTo(530,125);ctx.stroke();
+  drawDigit(ctx,560,30,1.9,on,{pad:12,glow:12});}
 document.getElementById('c4511').addEventListener('click',e=>{const r=e.target.getBoundingClientRect(),x=(e.clientX-r.left)*800/r.width,y=(e.clientY-r.top)*270/r.height;
   for(let i=0;i<4;i++){if(Math.hypot(x-60,y-(60+i*44))<22){D11.v^=(1<<i);draw4511();}}});
 const tg=(id,k)=>document.getElementById(id).addEventListener('click',e=>{D11[k]=!D11[k];e.target.classList.toggle('active',D11[k]);draw4511();});
@@ -454,63 +442,63 @@ const D18={a:0,b:0,acc:0,run:true,flash:0};
 function tick18(){const was=D18.a;D18.a=(D18.a+1)%10;if(was===9&&document.getElementById('d18chain').checked){D18.b=(D18.b+1)%10;D18.flash=0.6;}}
 function draw4518(dt){const c=document.getElementById('c4518');if(!c||!c.offsetParent)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
   if(D18.run){D18.acc+=dt*(+document.getElementById('d18sp').value);while(D18.acc>=1){D18.acc-=1;tick18();}}D18.flash=Math.max(0,D18.flash-dt);
-  ctx.textAlign='left';ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.fillText('Counter B (tens): Q1B–Q4B',40,24);ctx.fillText('Counter A (units): Q1A–Q4A',600,24);
+  ctx.textAlign='left';ctx.fillStyle=PAL.muted;ctx.font='12px system-ui';ctx.fillText('Counter B (tens): Q1B–Q4B',40,24);ctx.fillText('Counter A (units): Q1A–Q4A',600,24);
   bitDots(ctx,60,60,D18.b,['Q1B','Q2B','Q3B','Q4B']);bitDots(ctx,620,60,D18.a,['Q1A','Q2A','Q3A','Q4A']);
-  seg7(ctx,300,40,1.4,D7[D18.b]);seg7(ctx,420,40,1.4,D7[D18.a]);
-  ctx.textAlign='center';ctx.fillStyle='#e2e8f0';ctx.font='700 14px system-ui';ctx.fillText('tens',342,240);ctx.fillText('units',462,240);
-  if(D18.flash>0){ctx.strokeStyle=`rgba(251,191,36,${D18.flash/0.6})`;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(612,192);ctx.quadraticCurveTo(400,300,190,192);ctx.stroke();ctx.fillStyle='#fbbf24';ctx.font='13px system-ui';ctx.fillText('Q4A fell (9 → 0): EN B counts +1',400,262);}}
+  drawDigit(ctx,300,40,1.4,DIGITS[D18.b],{pad:12,glow:12});drawDigit(ctx,420,40,1.4,DIGITS[D18.a],{pad:12,glow:12});
+  ctx.textAlign='center';ctx.fillStyle=PAL.ink;ctx.font='700 14px system-ui';ctx.fillText('tens',342,240);ctx.fillText('units',462,240);
+  if(D18.flash>0){ctx.strokeStyle=`rgba(251,191,36,${D18.flash/0.6})`;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(612,192);ctx.quadraticCurveTo(400,300,190,192);ctx.stroke();ctx.fillStyle=PAL.yellow;ctx.font='13px system-ui';ctx.fillText('Q4A fell (9 → 0): EN B counts +1',400,262);}}
 document.getElementById('d18run').addEventListener('click',e=>{D18.run=!D18.run;e.target.textContent=D18.run?'⏸ Pause':'▶ Run';e.target.classList.toggle('active',D18.run);});
 document.getElementById('d18tick').addEventListener('click',()=>tick18());document.getElementById('d18rst').addEventListener('click',()=>{D18.a=0;D18.b=0;D18.acc=0;});
-let last18=performance.now();(function f18(now){const dt=Math.min(0.05,(now-last18)/1000);last18=now;draw4518(dt);requestAnimationFrame(f18);})(performance.now());
+loop((dt,now)=>{draw4518(dt);});
 
 // ---------- demos: LM3914, TP4056, ATmega328P ----------
 function draw3914(){const c=document.getElementById('c3914');if(!c||!c.offsetParent)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
   const v=+document.getElementById('lm39In').value,hi=+document.getElementById('lm39Hi').value,dot=document.getElementById('lm39Dot').checked;let n=0;for(let i=1;i<=10;i++)if(v>=hi*i/10)n=i;
-  ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillStyle='#cbd5e1';ctx.fillText('SIG = '+(v*1000).toFixed(0)+' mV',30,40);ctx.fillText('each step = RHI ÷ 10 = '+(hi*100).toFixed(0)+' mV',30,62);
-  for(let i=0;i<10;i++){const y=250-i*22,th=hi*(i+1)/10,on=dot?i===n-1:i<n;ctx.fillStyle='#1e293b';ctx.fillRect(250,y-9,90,18);ctx.fillStyle='#94a3b8';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText((th*1000).toFixed(0)+' mV',295,y+4);
-    ctx.fillStyle=v>=th?'#22c55e':'#475569';ctx.beginPath();ctx.moveTo(355,y-8);ctx.lineTo(375,y);ctx.lineTo(355,y+8);ctx.fill();
-    ctx.fillStyle=on?'#22c55e':'#14301f';if(on){ctx.shadowBlur=12;ctx.shadowColor='#22c55e';}ctx.fillRect(420,y-9,160,18);ctx.shadowBlur=0;ctx.fillStyle='#64748b';ctx.textAlign='left';ctx.fillText('LED'+(i+1),590,y+4);}
-  ctx.fillStyle='#fbbf24';ctx.font='14px system-ui';ctx.textAlign='left';ctx.fillText(n?(dot?'dot on LED'+n:n+' LED'+(n>1?'s':'')+' lit'):'below the first step',30,110);
-  ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.fillText('ladder',275,30);ctx.fillText('comparators',340,30);ctx.fillText('LEDs',480,30);}
+  ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillStyle=PAL.ink2;ctx.fillText('SIG = '+(v*1000).toFixed(0)+' mV',30,40);ctx.fillText('each step = RHI ÷ 10 = '+(hi*100).toFixed(0)+' mV',30,62);
+  for(let i=0;i<10;i++){const y=250-i*22,th=hi*(i+1)/10,on=dot?i===n-1:i<n;ctx.fillStyle=PAL.raised;ctx.fillRect(250,y-9,90,18);ctx.fillStyle=PAL.muted;ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText((th*1000).toFixed(0)+' mV',295,y+4);
+    ctx.fillStyle=v>=th?PAL.green:PAL.slate;ctx.beginPath();ctx.moveTo(355,y-8);ctx.lineTo(375,y);ctx.lineTo(355,y+8);ctx.fill();
+    ctx.fillStyle=on?PAL.green:'#14301f';if(on){ctx.shadowBlur=12;ctx.shadowColor=PAL.green;}ctx.fillRect(420,y-9,160,18);ctx.shadowBlur=0;ctx.fillStyle=PAL.muted2;ctx.textAlign='left';ctx.fillText('LED'+(i+1),590,y+4);}
+  ctx.fillStyle=PAL.yellow;ctx.font='14px system-ui';ctx.textAlign='left';ctx.fillText(n?(dot?'dot on LED'+n:n+' LED'+(n>1?'s':'')+' lit'):'below the first step',30,110);
+  ctx.fillStyle=PAL.muted;ctx.font='12px system-ui';ctx.fillText('ladder',275,30);ctx.fillText('comparators',340,30);ctx.fillText('LEDs',480,30);}
 ['lm39In','lm39Hi','lm39Dot'].forEach(id=>document.getElementById(id).addEventListener('input',draw3914));
 const TPS={t:0,run:true};const TPR=[[10000,'10 kΩ → 130 mA'],[4000,'4 kΩ → 300 mA'],[2400,'2.4 kΩ → 500 mA'],[1200,'1.2 kΩ → 1 A']];
 document.getElementById('tpGo').addEventListener('click',e=>{TPS.t=0;TPS.run=true;});
 function tpModel(tt,Ic){let v,i;const tcc=2.6*(1/Ic);if(tt<tcc){v=3.0+1.2*Math.pow(tt/tcc,0.6);i=Ic;}else{v=4.2;i=Ic*Math.exp(-(tt-tcc)/0.9);}return {v,i,done:i<Ic/10};}
 function draw4056(dt){const c=document.getElementById('c4056');if(!c||!c.offsetParent)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
   const [R,lab]=TPR[+document.getElementById('tpR').value];document.getElementById('tpRl').textContent=lab;const Ic=1200/R;if(TPS.run)TPS.t+=dt;const T=TPS.t,m=tpModel(T,Ic);if(m.done)TPS.run=false;
-  const gx=40,gy=30,gw=480,gh=200,tmax=2.6/Ic+3.5;ctx.fillStyle='#111c2e';ctx.fillRect(gx,gy,gw,gh);ctx.strokeStyle='#2a3650';ctx.strokeRect(gx,gy,gw,gh);
+  const gx=40,gy=30,gw=480,gh=200,tmax=2.6/Ic+3.5;ctx.fillStyle=PAL.panel;ctx.fillRect(gx,gy,gw,gh);ctx.strokeStyle=PAL.line;ctx.strokeRect(gx,gy,gw,gh);
   const plotF=(f,col,lo,hi)=>{ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();for(let k=0;k<=200;k++){const tt=k/200*Math.min(T,tmax);const y=gy+gh-(f(tpModel(tt,Ic))-lo)/(hi-lo)*gh;const x=gx+tt/tmax*gw;k?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();};
-  plotF(q=>q.v,'#60a5fa',2.8,4.4);plotF(q=>q.i,'#f59e0b',0,1.4);ctx.font='12px system-ui';ctx.textAlign='right';ctx.fillStyle='#60a5fa';ctx.fillText('battery voltage (→ 4.2 V)',gx+gw-8,gy+gh-28);ctx.fillStyle='#f59e0b';ctx.fillText('charge current',gx+gw-8,gy+gh-10);ctx.textAlign='left';
-  const ycv=gy+gh-(4.2-2.8)/1.6*gh;ctx.setLineDash([4,4]);ctx.strokeStyle='#64748b';ctx.beginPath();ctx.moveTo(gx,ycv);ctx.lineTo(gx+gw,ycv);ctx.stroke();ctx.setLineDash([]);
-  const phase=m.done?'FULL: charge stopped':m.v<4.19?'Phase 1: constant current':'Phase 2: constant voltage 4.2 V, current fading';ctx.fillStyle='#e2e8f0';ctx.font='14px system-ui';ctx.fillText(phase,gx,gy+gh+28);
-  ctx.textAlign='center';ctx.fillStyle='#cbd5e1';ctx.font='13px system-ui';ctx.fillText(m.v.toFixed(2)+' V · '+(m.i*1000).toFixed(0)+' mA',660,70);
-  [['CHRG',!m.done,'239,68,68',620],['STDBY',m.done,'34,197,94',700]].forEach(([l,on,rgb,x])=>{ctx.fillStyle=`rgba(${rgb},${on?1:0.2})`;if(on){ctx.shadowBlur=16;ctx.shadowColor=`rgb(${rgb})`;}ctx.beginPath();ctx.arc(x,140,13,0,7);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.fillText(l,x,172);});
-  ctx.fillStyle='#0f766e';ctx.fillRect(600,200,110,34);ctx.fillStyle='#22c55e';const f=Math.min(1,(m.v-3)/1.2*0.85+(m.done?0.15:0));ctx.fillRect(604,204,102*f,26);ctx.fillStyle='#fff';ctx.fillText('18650',655,222);}
+  plotF(q=>q.v,PAL.blue,2.8,4.4);plotF(q=>q.i,PAL.amber,0,1.4);ctx.font='12px system-ui';ctx.textAlign='right';ctx.fillStyle=PAL.blue;ctx.fillText('battery voltage (→ 4.2 V)',gx+gw-8,gy+gh-28);ctx.fillStyle=PAL.amber;ctx.fillText('charge current',gx+gw-8,gy+gh-10);ctx.textAlign='left';
+  const ycv=gy+gh-(4.2-2.8)/1.6*gh;ctx.setLineDash([4,4]);ctx.strokeStyle=PAL.muted2;ctx.beginPath();ctx.moveTo(gx,ycv);ctx.lineTo(gx+gw,ycv);ctx.stroke();ctx.setLineDash([]);
+  const phase=m.done?'FULL: charge stopped':m.v<4.19?'Phase 1: constant current':'Phase 2: constant voltage 4.2 V, current fading';ctx.fillStyle=PAL.ink;ctx.font='14px system-ui';ctx.fillText(phase,gx,gy+gh+28);
+  ctx.textAlign='center';ctx.fillStyle=PAL.ink2;ctx.font='13px system-ui';ctx.fillText(m.v.toFixed(2)+' V · '+(m.i*1000).toFixed(0)+' mA',660,70);
+  [['CHRG',!m.done,'239,68,68',620],['STDBY',m.done,'34,197,94',700]].forEach(([l,on,rgb,x])=>{ctx.fillStyle=`rgba(${rgb},${on?1:0.2})`;if(on){ctx.shadowBlur=16;ctx.shadowColor=`rgb(${rgb})`;}ctx.beginPath();ctx.arc(x,140,13,0,7);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle=PAL.muted;ctx.font='12px system-ui';ctx.fillText(l,x,172);});
+  ctx.fillStyle='#0f766e';ctx.fillRect(600,200,110,34);ctx.fillStyle=PAL.green;const f=Math.min(1,(m.v-3)/1.2*0.85+(m.done?0.15:0));ctx.fillRect(604,204,102*f,26);ctx.fillStyle=PAL.white;ctx.fillText('18650',655,222);}
 const AV={t:0};
 function draw328(dt){const c=document.getElementById('c328');if(!c||!c.offsetParent)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);AV.t+=dt;
   const v=+document.getElementById('avA0').value,val=Math.round(v/5*1023),pwm=Math.floor(val/4),led13=Math.floor(AV.t*2)%2===0;
-  ctx.fillStyle='#111827';ctx.beginPath();ctx.roundRect(300,40,200,200,10);ctx.fill();ctx.strokeStyle='#2dd4bf';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#e2e8f0';ctx.font='700 15px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('ATmega328P',400,130);ctx.fillStyle='#94a3b8';ctx.font='12px system-ui';ctx.fillText('16 million steps / s',400,152);
-  ctx.textAlign='left';ctx.fillStyle='#cbd5e1';ctx.font='13px system-ui';ctx.fillText('A0 (pin 23): '+v.toFixed(2)+' V',40,90);ctx.fillText('analogRead → '+val,40,114);
-  ctx.fillStyle='#1e293b';ctx.fillRect(40,130,200,14);ctx.fillStyle='#60a5fa';ctx.fillRect(40,130,200*val/1023,14);
-  ctx.strokeStyle='#64748b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(240,110);ctx.lineTo(300,110);ctx.moveTo(500,100);ctx.lineTo(600,100);ctx.moveTo(500,190);ctx.lineTo(600,190);ctx.stroke();
-  const b=pwm/255;ctx.fillStyle=`rgba(250,204,21,${0.15+0.85*b})`;if(b>0.05){ctx.shadowBlur=24*b;ctx.shadowColor='#facc15';}ctx.beginPath();ctx.arc(630,100,14,0,7);ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle='#cbd5e1';ctx.fillText('D9 (pin 15) PWM '+pwm+'/255',520,70);
-  ctx.fillStyle=led13?'#ef4444':'#3b1d1d';if(led13){ctx.shadowBlur=14;ctx.shadowColor='#ef4444';}ctx.beginPath();ctx.arc(630,190,12,0,7);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#cbd5e1';ctx.fillText('D13 (pin 19) blinks',520,225);
+  ctx.fillStyle=PAL.chipDark;ctx.beginPath();ctx.roundRect(300,40,200,200,10);ctx.fill();ctx.strokeStyle='#2dd4bf';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=PAL.ink;ctx.font='700 15px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('ATmega328P',400,130);ctx.fillStyle=PAL.muted;ctx.font='12px system-ui';ctx.fillText('16 million steps / s',400,152);
+  ctx.textAlign='left';ctx.fillStyle=PAL.ink2;ctx.font='13px system-ui';ctx.fillText('A0 (pin 23): '+v.toFixed(2)+' V',40,90);ctx.fillText('analogRead → '+val,40,114);
+  ctx.fillStyle=PAL.raised;ctx.fillRect(40,130,200,14);ctx.fillStyle=PAL.blue;ctx.fillRect(40,130,200*val/1023,14);
+  ctx.strokeStyle=PAL.muted2;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(240,110);ctx.lineTo(300,110);ctx.moveTo(500,100);ctx.lineTo(600,100);ctx.moveTo(500,190);ctx.lineTo(600,190);ctx.stroke();
+  const b=pwm/255;ctx.fillStyle=`rgba(250,204,21,${0.15+0.85*b})`;if(b>0.05){ctx.shadowBlur=24*b;ctx.shadowColor=PAL.yellowSoft;}ctx.beginPath();ctx.arc(630,100,14,0,7);ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle=PAL.ink2;ctx.fillText('D9 (pin 15) PWM '+pwm+'/255',520,70);
+  ctx.fillStyle=led13?PAL.bad:'#3b1d1d';if(led13){ctx.shadowBlur=14;ctx.shadowColor=PAL.bad;}ctx.beginPath();ctx.arc(630,190,12,0,7);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle=PAL.ink2;ctx.fillText('D13 (pin 19) blinks',520,225);
   // PWM wave
-  ctx.strokeStyle='#facc15';ctx.lineWidth=1.5;ctx.beginPath();for(let k=0;k<=150;k++){const x=650+k,ph=(k/30)%1,y=ph<b?126:146;k?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}
-let lastX=performance.now();(function fX(now){const dt=Math.min(0.05,(now-lastX)/1000);lastX=now;draw3914();draw4056(dt);draw328(dt);requestAnimationFrame(fX);})(performance.now());
+  ctx.strokeStyle=PAL.yellowSoft;ctx.lineWidth=1.5;ctx.beginPath();for(let k=0;k<=150;k++){const x=650+k,ph=(k/30)%1,y=ph<b?126:146;k?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}
+loop((dt,now)=>{draw3914();draw4056(dt);draw328(dt);});
 
 // ---------- part-number decoder ----------
 (()=>{const PN={
- 'NE555P':[['NE','#a78bfa','Signetics linear line, 0–70 °C grade'],['555','#22c55e','the 555 timer'],['P','#f59e0b','plastic DIP-8: breadboard ✓']],
- 'LM358N':[['LM','#a78bfa','Linear Monolithic (National → TI)'],['358','#22c55e','dual op-amp'],['N','#f59e0b','DIP-8']],
- 'L7805CV':[['L','#a78bfa','made by STMicroelectronics'],['78','#22c55e','positive fixed regulator'],['05','#38bdf8','5 volts'],['C','#94a3b8','commercial temperature'],['V','#f59e0b','TO-220 package']],
- 'CD4017BE':[['CD','#a78bfa','CMOS 4000 series (originally RCA)'],['4017','#22c55e','decade counter'],['B','#94a3b8','buffered (standard) version'],['E','#f59e0b','plastic DIP-16 (TI)']],
- 'SN74HC595N':[['SN','#a78bfa','Texas Instruments'],['74','#22c55e','7400 logic family'],['HC','#38bdf8','high-speed CMOS, 2–6 V'],['595','#22c55e','8-bit shift register'],['N','#f59e0b','DIP-16']],
- 'ATmega328P-PU':[['AT','#a78bfa','Atmel (now Microchip)'],['mega','#38bdf8','the megaAVR family'],['32','#22c55e','32 KB of program memory'],['8','#22c55e','family member'],['P','#94a3b8','picoPower (low power)'],['-PU','#f59e0b','DIP-28, industrial temp']],
- 'LM35DZ':[['LM','#a78bfa','Linear Monolithic'],['35','#22c55e','temperature sensor 10 mV/°C'],['D','#94a3b8','accuracy grade (0–100 °C)'],['Z','#f59e0b','TO-92 package']],
- 'LM3914N':[['LM','#a78bfa','Linear Monolithic'],['3914','#22c55e','10-LED bar-graph driver (linear)'],['N','#f59e0b','DIP-18']],
- 'TP4056':[['TP','#a78bfa','Top Power (NanJing)'],['4056','#22c55e','1 A Li-ion charger'],['','#f59e0b','sold in SOP-8 (surface-mount) only']]};
+ 'NE555P':[['NE',PAL.violet,'Signetics linear line, 0–70 °C grade'],['555',PAL.green,'the 555 timer'],['P',PAL.amber,'plastic DIP-8: breadboard ✓']],
+ 'LM358N':[['LM',PAL.violet,'Linear Monolithic (National → TI)'],['358',PAL.green,'dual op-amp'],['N',PAL.amber,'DIP-8']],
+ 'L7805CV':[['L',PAL.violet,'made by STMicroelectronics'],['78',PAL.green,'positive fixed regulator'],['05',PAL.sky,'5 volts'],['C',PAL.muted,'commercial temperature'],['V',PAL.amber,'TO-220 package']],
+ 'CD4017BE':[['CD',PAL.violet,'CMOS 4000 series (originally RCA)'],['4017',PAL.green,'decade counter'],['B',PAL.muted,'buffered (standard) version'],['E',PAL.amber,'plastic DIP-16 (TI)']],
+ 'SN74HC595N':[['SN',PAL.violet,'Texas Instruments'],['74',PAL.green,'7400 logic family'],['HC',PAL.sky,'high-speed CMOS, 2–6 V'],['595',PAL.green,'8-bit shift register'],['N',PAL.amber,'DIP-16']],
+ 'ATmega328P-PU':[['AT',PAL.violet,'Atmel (now Microchip)'],['mega',PAL.sky,'the megaAVR family'],['32',PAL.green,'32 KB of program memory'],['8',PAL.green,'family member'],['P',PAL.muted,'picoPower (low power)'],['-PU',PAL.amber,'DIP-28, industrial temp']],
+ 'LM35DZ':[['LM',PAL.violet,'Linear Monolithic'],['35',PAL.green,'temperature sensor 10 mV/°C'],['D',PAL.muted,'accuracy grade (0–100 °C)'],['Z',PAL.amber,'TO-92 package']],
+ 'LM3914N':[['LM',PAL.violet,'Linear Monolithic'],['3914',PAL.green,'10-LED bar-graph driver (linear)'],['N',PAL.amber,'DIP-18']],
+ 'TP4056':[['TP',PAL.violet,'Top Power (NanJing)'],['4056',PAL.green,'1 A Li-ion charger'],['',PAL.amber,'sold in SOP-8 (surface-mount) only']]};
  const box=document.getElementById('pnBtns'),out=document.getElementById('pnOut');if(!box)return;
  function show(k){box.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent===k));
   out.innerHTML='<div class="pnname">'+PN[k].map(([t,c])=>t?`<span style="color:${c};border-bottom:3px solid ${c}">${t}</span>`:'').join('')+'</div><ul>'+PN[k].map(([t,c,d])=>`<li><b style="color:${c}">${t||'(no suffix)'}</b> → ${d}</li>`).join('')+'</ul>';}
