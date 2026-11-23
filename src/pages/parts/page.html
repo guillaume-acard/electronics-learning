@@ -44,8 +44,8 @@
   <h2><span class="num">#</span>Choose the resistors (and why one per segment)</h2>
   <p>Each segment is an LED, so it needs its own current-limiting resistor: <code>R = (Supply − 1.85 V) ÷ current</code>.</p>
   <div class="controls">
-    <x-slider id="rcI" min="2" max="25" step="1" value="10">Supply <select class="fsel" id="rcV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
-    <label class="slider grow">Current per segment</x-slider><b id="rcIt" class="val"></b>
+    <label class="slider">Supply <select class="fsel" id="rcV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <x-slider id="rcI" min="2" max="25" step="1" value="10" grow="1">Current per segment</x-slider><b id="rcIt" class="val"></b>
   </div>
   <canvas id="cRes" width="800" height="140"></canvas>
   <p><b>Why not a single resistor on the COM pin?</b> It's tempting (1 resistor instead of 8), but all lit segments then <b>share</b> one current. A "1" (2 segments) is bright and an "8" (7 segments) is dim, so the brightness changes with the number shown. Try it:</p>
@@ -127,8 +127,8 @@ void loop()  { for (byte n = 0; n < 10; n++) { show(n); delay(500); } }</code></
   <h2><span class="num">#</span>DC10G: the resistors</h2>
   <p>Ten LEDs, so <b>ten resistors</b>, one per LED, for the same reason as the 7-segment display: <code>R = (Supply − 2.1 V) ÷ current</code>. One shared resistor would make the bar dimmer as it grows.</p>
   <div class="controls">
-    <x-slider id="brI" min="2" max="20" step="1" value="6">Supply <select class="fsel" id="brV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
-    <label class="slider grow">Current per LED</x-slider><b id="brIt" class="val"></b>
+    <label class="slider">Supply <select class="fsel" id="brV"><option value="3.3">3.3 V</option><option value="5" selected>5 V (Arduino / USB)</option><option value="9">9 V battery</option><option value="12">12 V</option></select></label>
+    <x-slider id="brI" min="2" max="20" step="1" value="6" grow="1">Current per LED</x-slider><b id="brIt" class="val"></b>
   </div>
   <canvas id="cBarRes" width="800" height="150"></canvas>
   <p><b>Fewer parts: a resistor network.</b> Eight resistors in one flat SIL package. The "common point" kind (Gotronic 04482, 8 × 470 Ω) has all eight joined on one side (pin 1, marked with a dot): put that pin on <b>+5 V</b> and the other eight pins on the <b>anodes</b>. Then pull each cathode to ground to light its LED. That's exactly what project 21 does (with 2 single 470 Ω for the last two LEDs). Isolated networks (4 separate resistors, Gotronic 15864/15863) work on any side.</p>

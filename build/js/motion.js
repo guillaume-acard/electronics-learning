@@ -154,13 +154,13 @@ let AC=null;
 $('bzPlay').onclick=()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
   const t0=AC.currentTime,gn=AC.createGain();gn.connect(AC.destination);gn.gain.setValueAtTime(0,t0);
   const beep=(f,a,b)=>{const o=AC.createOscillator();o.type='square';o.frequency.value=f;o.connect(gn);o.start(t0+a);o.stop(t0+b);};
-  const f=+$('bzF').value;
+  const f=+$('mbF').value;
   if(BZ.kind===0&&BZ.dc){beep(2300,0,1);gn.gain.setValueAtTime(0.04,t0);gn.gain.setValueAtTime(0,t0+1);}
   else if(BZ.kind===0){beep(2300,0,1);for(let i=0;i<5;i++){gn.gain.setValueAtTime(0.04,t0+i*0.2);gn.gain.setValueAtTime(0,t0+i*0.2+0.1);}}
   else if(BZ.dc){beep(1500,0,0.02);gn.gain.setValueAtTime(0.08,t0);gn.gain.linearRampToValueAtTime(0,t0+0.02);}
   else{beep(f,0,1);gn.gain.setValueAtTime(0.04,t0);gn.gain.setValueAtTime(0,t0+1);}};
 function drawBuzz(dt,t){const c=$('cBuzz'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
-  const f=+$('bzF').value,act=BZ.kind===0;BZ.click=Math.max(0,BZ.click-dt);
+  const f=+$('mbF').value,act=BZ.kind===0;BZ.click=Math.max(0,BZ.click-dt);
   // input waveform
   txt(ctx,'What you feed it',140,26,PAL.muted,12);ctx.fillStyle=PAL.panel;ctx.fillRect(30,40,220,110);
   ctx.strokeStyle=Y;ctx.lineWidth=2.5;ctx.beginPath();
