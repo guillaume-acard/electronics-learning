@@ -15,6 +15,15 @@
   --water:#3b82f6; --water-light:#bcd6fb; --water-bg:#1b2e4f; --warm-bg:#3a2c12;
   --good:#10b981; --bad:#ef4444; --bad-bg:#3a1a1d; --yellow:#fbbf24; --amber:#f59e0b; --blue:#60a5fa; --highlight:#fde047;
   --accent:#f59e0b;    /* each page overrides this with its own colour */
+  --cyan:#22d3ee;      /* the "signal" colour of the sci-fi frame (top bar line, focus, sliders) */
+  --void:#070b16;      /* deepest background, behind the page */
+  /* the sci-fi frame */
+  --font-display:'Orbitron','Rajdhani',system-ui,sans-serif;     /* titles, badges */
+  --font-head:'Rajdhani',system-ui,-apple-system,'Segoe UI',sans-serif;   /* headings, labels, menus */
+  --font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,Consolas,monospace;   /* numbers, code */
+  --radius:6px;        /* panels and cards: sharp, technical corners */
+  --glow:0 0 18px -6px color-mix(in srgb,var(--accent) 70%,transparent);
+  --edge:color-mix(in srgb,var(--accent) 26%,var(--line));      /* accent-tinted panel border */
   /* drawing palette (canvas demos, schematics) */
   --panel:#111c2e; --slate:#475569; --slate-dark:#334155; --gray:#9ca3af; --gray-light:#e5e7eb;
   --chip:#1f2937; --chip-dark:#111827; --chip-light:#374151;

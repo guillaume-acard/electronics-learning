@@ -1,20 +1,25 @@
 /* Reusable UI pieces (home cards, callouts, types cards, controls) + utilities */
   .comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-  .comp{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);color:var(--ink);text-decoration:none;transition:.15s}
-  .comp svg{width:96px;flex-shrink:0;margin-top:8px;overflow:visible}
-  .comp h3{margin:0 0 4px}.comp p{margin:0 0 6px;color:var(--muted);font-size:.95rem}
-  .comp .analogy{color:var(--link)}.comp .open{font-weight:700;color:var(--blue)}
+  .comp{position:relative;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+    background:linear-gradient(135deg,rgba(255,255,255,.035),transparent 45%),var(--surface);color:var(--ink);text-decoration:none;transition:.15s}
+  .comp::after{content:"";position:absolute;top:-1px;right:-1px;width:12px;height:12px;border-top:2px solid var(--accent,var(--blue));border-right:2px solid var(--accent,var(--blue));border-top-right-radius:var(--radius);opacity:.7}
+  .comp svg{width:96px;flex-shrink:0;margin-top:8px;overflow:visible;filter:drop-shadow(0 0 6px rgba(34,211,238,.25))}
+  .comp h3{margin:0 0 4px;font-size:1.25rem}.comp p{margin:0 0 6px;color:var(--muted);font-size:.95rem}
+  .comp .analogy{color:var(--link)}.comp .open{font:700 .78rem var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--accent,var(--blue))}
   .soon .comp{opacity:.6}
-  .howbox{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:4px 16px}
+  .howbox{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent 70%),var(--surface);border-left:3px solid var(--accent);
+    border-radius:var(--radius);padding:4px 16px;box-shadow:-4px 0 14px -8px var(--accent)}
   .howbox p{margin:10px 0}
-  .fsel{font:inherit;padding:7px;border-radius:8px;background:var(--line);color:var(--ink);border:1px solid var(--line)}
-  .qtopic{background:var(--raised);padding:3px 10px;border-radius:99px;font-size:.85rem}
+  .fsel{font:inherit;padding:7px;border-radius:var(--radius);background:var(--void);color:var(--ink);border:1px solid color-mix(in srgb,var(--cyan) 22%,var(--line))}
+  .qtopic{font:600 .72rem var(--font-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:2px 8px;border-radius:3px}
   button:disabled{cursor:default;opacity:.85}
   .tcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-  .tcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
-  .tcard .tart{background:var(--canvas);border-radius:8px;padding:6px;margin-bottom:8px}.tcard .tart svg{width:100%;height:84px;display:block}
-  .tcard h3{margin:4px 0 4px;font-size:1.02rem}.tcard .tlook{color:var(--muted);font-size:.9rem;margin:0 0 6px}
-  .tpc{list-style:none;padding:0;margin:0 0 6px;font-size:.9rem}.tpc .p{color:#86efac}.tpc .c{color:#fca5a5}
+  .tcard{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent),var(--surface);transition:.15s}
+  .tcard:hover{border-color:var(--edge);box-shadow:var(--glow)}
+  .tcard .tart{background:var(--canvas);border:1px solid rgba(34,211,238,.1);border-radius:4px;padding:6px;margin-bottom:8px}.tcard .tart svg{width:100%;height:84px;display:block}
+  .tcard h3{margin:4px 0 4px;font-size:1.12rem}.tcard .tlook{color:var(--muted);font-size:.9rem;margin:0 0 6px}
+  .tpc{list-style:none;padding:0;margin:0 0 6px;font-size:.9rem}.tpc .p{color:var(--green-light)}.tpc .c{color:var(--red-light)}
   .tcard .tuse{font-size:.9rem;margin:0}
 
   /* utilities: use these classes instead of style="..." */
@@ -23,7 +28,10 @@
   .val{min-width:60px}                             /* a slider's live value */
   .hint.sub{margin-top:-6px}                       /* a hint right under a heading */
   label.slider.grow{flex:1}label.slider.grow input[type=range]{flex:1;width:auto}
-  button.go{background:var(--good);color:var(--white)}button.stop{background:var(--bad);color:var(--white)}
-  .box{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;background:var(--surface)}
-  pre.code{background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font-size:.9rem;line-height:1.45}
-  select.fsel{padding:6px;border-radius:6px}
+  button.go{background:linear-gradient(180deg,#34d399,var(--good));border-color:#6ee7b7;color:var(--white);box-shadow:0 0 14px -4px var(--good)}
+  button.stop{background:linear-gradient(180deg,#f87171,var(--bad));border-color:#fca5a5;color:var(--white);box-shadow:0 0 14px -4px var(--bad)}
+  .box{border:1px solid var(--edge);border-radius:var(--radius);padding:16px 18px;margin:16px 0;background:var(--surface)}
+  pre.code{font:.86rem/1.5 var(--font-mono);background:var(--void);border:1px solid rgba(34,211,238,.18);border-left:3px solid var(--cyan);border-radius:var(--radius);padding:14px;overflow:auto;
+    box-shadow:inset 0 0 24px rgba(34,211,238,.04)}
+  pre.code code{background:none;border:0;padding:0;font-size:inherit}
+  select.fsel{padding:6px;border-radius:var(--radius)}
