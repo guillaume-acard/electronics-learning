@@ -1,12 +1,12 @@
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">An inductor is a <b>coil of wire</b>. When current flows through it, it builds a <b>magnetic field</b> and stores energy there. Its personality: it <b>hates sudden changes in current</b>. It slows the current down when you switch on, and it fights to keep it going when you switch off.</p>
   <p>It is the <b>mirror image of the capacitor</b>: a capacitor resists sudden changes in <i>voltage</i>, while an inductor resists sudden changes in <i>current</i>.</p>
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <div class="cards">
     <div class="card"><div class="ico">🔋</div><h3>Boost and buck converters</h3><p><b>Why:</b> by charging a coil and releasing it quickly, you can turn 3.7 V into 5 V (power banks) or 12 V into 3.3 V very efficiently.<br><i>Water:</i> a flywheel that is spun up, then used to pump water higher.</p></div>
     <div class="card"><div class="ico">🔇</div><h3>Filters and chokes</h3><p><b>Why:</b> fast wiggles (noise) can't get through easily, but steady DC can. That's the opposite of a capacitor. It's used to clean up power lines and in speaker crossovers (bass to the woofer).<br><i>Water:</i> a heavy wheel that ignores quick jolts.</p></div>
@@ -17,20 +17,20 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>The water analogy: a heavy water wheel in the pipe</h2>
+  <h2><span class="num">#</span>The water analogy: a heavy water wheel in the pipe</h2>
   <p>Picture a <b>heavy paddle wheel</b> (a flywheel) inside the pipe. Water can only flow if the wheel turns.</p>
   <ul>
     <li><b>Switch on:</b> the wheel is heavy, so the water can't rush instantly. The flow <b>builds up gradually</b>.</li>
     <li><b>Steady flow:</b> once spinning, the wheel turns freely. For steady DC an inductor is just a wire.</li>
     <li><b>Switch off suddenly:</b> the wheel keeps spinning and slams water against the closed valve. That's a <b>water hammer</b>, a huge pressure spike. Electrically: hundreds of volts, and sparks.</li>
   </ul>
-  <div class="controls"><button id="inSw">Switch: OFF</button><span id="inChoices"></span><label class="slider grow">Inductance (heavier wheel)<input id="inL" type="range" min="0.2" max="3" step="0.1" value="1.2"></label></div>
+  <div class="controls"><button id="inSw">Switch: OFF</button><span id="inChoices"></span><x-slider id="inL" min="0.2" max="3" step="0.1" value="1.2" grow="1">Inductance (heavier wheel)</x-slider></div>
   <canvas id="cInd" width="800" height="330"></canvas>
   <p class="hint">Turn it ON and watch the current climb slowly. Turn it OFF without the diode: spike and sparks. Add the flyback diode, and the current circles through the diode and fades gently, just like on the <a data-page="diode" class="navlink">diode page</a>.</p>
 </section>
 
 <section>
-  <h2><span class="num">4</span>Inductor vs capacitor: two mirror images</h2>
+  <h2><span class="num">#</span>Inductor vs capacitor: two mirror images</h2>
   <table>
     <tr><td></td><td><b>Capacitor</b></td><td><b>Inductor</b></td></tr>
     <tr><td>Stores energy in</td><td>An electric field (charge on plates)</td><td>A magnetic field (around the coil)</td></tr>
@@ -43,11 +43,11 @@
 </section>
 
 <section>
-  <h2><span class="num">5</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
 
   <h3>A. Boost converter: 1.5 V lights a 3 V LED</h3>
   <p>A single AA battery (1.5 V) can't light a white LED (needs ~3 V). But a coil can: a transistor <b>shorts the coil to ground</b> for a moment (the current builds up), then <b>lets go</b>. The coil's "water hammer" adds its push on top of the battery, through the diode into the LED. Repeat thousands of times per second and the LED glows. This is the famous <b>"Joule thief"</b>, and the same idea is inside every power bank.</p>
-  <div class="controls"><label class="slider grow">Switching speed<input id="bsF" type="range" min="0.3" max="3" step="0.05" value="0.6"></label></div>
+  <div class="controls"><x-slider id="bsF" min="0.3" max="3" step="0.05" value="0.6" grow="1">Switching speed</x-slider></div>
   <canvas id="cBoost" width="800" height="300"></canvas>
 
   <h3>B. Filtering noise (LC filter)</h3>
@@ -57,12 +57,12 @@
 
   <h3>C. Transformer: changing AC voltage</h3>
   <p>Two coils on one iron core. AC in the first coil makes a changing magnetic field, which pushes AC into the second coil. <b>Voltage ratio = turns ratio</b>: 10× fewer turns on the output gives 10× less voltage. With DC the field doesn't change, so <b>nothing comes out</b>.</p>
-  <div class="controls"><label class="slider grow">Output turns<input id="trN" type="range" min="10" max="400" step="10" value="50"></label><span id="trChoices"></span></div>
+  <div class="controls"><x-slider id="trN" min="10" max="400" step="10" value="50" grow="1">Output turns</x-slider><span id="trChoices"></span></div>
   <canvas id="cTr" width="800" height="270"></canvas>
 </section>
 
 <section>
-  <h2><span class="num">6</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <div class="grid2">
     <div><canvas id="cSymI" width="380" height="160"></canvas><p class="hint center">Top: air-core inductor. Bottom: with an iron/ferrite core (two lines).</p></div>
     <table>
@@ -85,7 +85,7 @@
 </section>
 
 <section>
-  <h2><span class="num">7</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>An inductor is a <b>coil</b>. It stores energy in a <b>magnetic field</b>.</li>
     <li>It resists <b>changes in current</b>: slow to start, hard to stop (water hammer spike).</li>

@@ -46,7 +46,7 @@ def types_section(p):
     for title, svg, look, pros, cons, use in load_module(f, 'types_' + p['id']).TYPES:
         cards += f'''<div class="tcard"><div class="tart">{svg}</div><h3>{title}</h3><p class="tlook">{look}</p><ul class="tpc">{''.join(f'<li class="p">✓ {x}</li>' for x in pros)}{''.join(f'<li class="c">✗ {x}</li>' for x in cons)}</ul><p class="tuse"><b>Use for:</b> {use}</p></div>'''
     return f'''<section>
-  <h2><span class="num">0</span>The types of {p["types"]} you'll meet</h2>
+  <h2><span class="num">#</span>The types of {p["types"]} you'll meet</h2>
   <p>Same job, different builds. Here's how to <b>recognise</b> each one, and its pros and cons.</p>
   <div class="tcards">{cards}</div>
 </section>
@@ -57,14 +57,6 @@ def group_menu(pages, p):
     items = ''.join(f'<a href="#{q["id"]}" data-cl="{q["id"]}" class="{"active" if q is p else ""}"><span class="n">{q["icon"]}</span>{q["name"]}</a>'
                     for q in pages if q.get('group') == p['group'])
     return f'<aside class="cl-menu"><h4>{p["group"].capitalize()}</h4>{items}</aside>'
-
-
-def renumber(html):
-    n = [0]
-    def f(m):
-        n[0] += 1
-        return f'<span class="num">{n[0]}</span>'
-    return re.sub(r'<span class="num">\d+</span>', f, html)
 
 
 def palette_js():
@@ -101,7 +93,10 @@ def build_site(site):
         main = components.expand(rd(f'pages/{p["dir"]}/page.html'), ctx)
         if p.get('group'):
             k = main.rfind('<section')
-            main = renumber(main[:k] + types_section(p) + main[k:])
+            main = main[:k] + types_section(p) + main[k:]
+        main = components.number_sections(main)
+        main = components.section_menu(p['id'], main)
+        if p.get('group'):
             main = f'<div class="cl-layout">{group_menu(pages, p)}<div class="cl-content">{main}</div></div>'
         wide = ' wide' if 'class="cl-layout"' in main else ''      # pages with a left menu get a wider column
         pages_html += f'\n<div class="page{wide}" id="page-{p["id"]}" style="--accent:{p["accent"]}" hidden>\n{hero(p)}\n<main>\n{main}\n{pager(pages, i)}\n</main>\n</div>\n'

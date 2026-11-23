@@ -144,7 +144,7 @@ function drawDigit(ctx,x,y,sc,on,o={}){const pad=o.pad??10,glow=o.glow||0,col=o.
 
 
 // ===== Formulas page =====
-sectionMenu('foMenu',{first:'fobasics'});
+sectionMenu('formulas-menu',{first:'fobasics'});
 const fv=id=>{const c=$(id);return c&&c.offsetParent?c:null;};
 const fctx=c=>{const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);return x;};
 const fR=r=>r>=1e6?+(r/1e6).toPrecision(3)+' MΩ':r>=1e3?+(r/1e3).toPrecision(3)+' kΩ':+r.toPrecision(3)+' Ω';

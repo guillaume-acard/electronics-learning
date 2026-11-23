@@ -145,7 +145,7 @@
     <p><b>Two transistors multiply twice.</b> The first one's output becomes the second one's input: 200 × 200 = <b>40,000</b>. Now 17 µA could become 680 mA, far more than needed, so the second transistor opens <b>fully</b> and the 470 Ω resistor sets a nice 14 mA. Even dry fingers work.</p>
     <p>💧 <b>Water analogy:</b> your finger is a tiny trickle. It can only open a small valve a little. Put that small valve's flow on a big valve, and the big valve opens wide.</p>
   </div>
-  <div class="controls"><button class="p5n active" data-n="2">2 transistors (Darlington)</button><button class="p5n" data-n="1">1 transistor only</button><label class="slider grow">Finger<input id="p5skin" type="range" min="0" max="1" step="0.01" value="0.4"></label><span class="hint">wet ← → dry</span></div>
+  <div class="controls"><button class="p5n active" data-n="2">2 transistors (Darlington)</button><button class="p5n" data-n="1">1 transistor only</button><x-slider id="p5skin" min="0" max="1" step="0.01" value="0.4" grow="1">Finger</x-slider><span class="hint">wet ← → dry</span></div>
   <canvas id="cp5w" width="800" height="230"></canvas>
   <p class="hint">Compare the "available" current with what the LED needs. With one transistor and a dry finger, the LED barely glows. Tip: click the transistors in the schematic above to see the real base and collector currents with the probe.</p>
   <h3>🔗 Why are the two collectors joined (and not on +9 V)?</h3>
@@ -286,7 +286,7 @@
   <p class="mt-m"><b>Water analogy:</b> a piezo disc is a <b>flexible membrane</b>. Push water on it once and it bends once (a click). Push it back and forth 2,000 times a second and it vibrates the air: a tone. The active buzzer has its own little pump that does the back-and-forth for you.</p>
   <div class="controls"><span class="hint">Buzzer:</span><span id="bzType"></span></div>
   <div class="controls"><span class="hint">Driven by:</span><span id="bzDrv"></span></div>
-  <div class="controls"><label class="slider grow">Pitch (555 pot R2 / Arduino frequency)<input id="bzF" type="range" min="2.4" max="3.7" step="0.01" value="3"></label><b id="bzFt" style="min-width:80px"></b>
+  <div class="controls"><x-slider id="bzF" min="2.4" max="3.7" step="0.01" value="3" grow="1">Pitch (555 pot R2 / Arduino frequency)</x-slider><b id="bzFt" style="min-width:80px"></b>
     <button class="go" id="bzBtn">👆 Hold to sound 🔊</button></div>
   <canvas id="cp11" width="800" height="290"></canvas>
   <p class="hint">Hold the button to hear it (your device volume must be on). Try a passive buzzer on a plain button: just a click. Then drive it with the 555 and turn the pitch knob.</p>
@@ -507,7 +507,7 @@ void loop() {
 <section id="p18">
   <h2><span class="num">18</span>Fuzz pedal for your Ruby</h2>
   <p><span class="qtopic">Guitar</span> A real guitar effect: a two-transistor <b>"Fuzz Face"</b> that goes between your guitar and the <b>Ruby amp</b>. It turns clean notes into the thick, buzzy fuzz of 60s and 70s rock.</p>
-  <div class="controls"><label class="slider grow">Fuzz (22 µF on Q2 emitter)<input id="m18f" type="range" min="0" max="1" step="0.01" value="0.8"></label><label class="slider grow">Bias trimmer<input id="m18b" type="range" min="0" max="1" step="0.01" value="0.5"></label><button id="m18c">🎸 Play clean</button><button id="m18p">🔥 Play with fuzz</button></div>
+  <div class="controls"><x-slider id="m18f" min="0" max="1" step="0.01" value="0.8" grow="1">Fuzz (22 µF on Q2 emitter)</x-slider><x-slider id="m18b" min="0" max="1" step="0.01" value="0.5" grow="1">Bias trimmer</x-slider><button id="m18c">🎸 Play clean</button><button id="m18p">🔥 Play with fuzz</button></div>
   <canvas id="m18" width="800" height="300"></canvas>
   <p class="hint">Left: one guitar note going in (blue) and coming out (orange). Right: the "transfer curve": how the input is mapped to the output. Flat parts = clipping. Move the bias away from the middle: the clipping becomes lopsided and the sound gets thin and sputtery.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>2 × BC547 (BC547A or BC549C also fine)</li><li>10 kΩ trimmer (bias)</li><li>33 kΩ, 100 kΩ, 1 kΩ, 470 Ω resistors</li><li>2.2 µF and 22 µF electrolytic, 10 nF ceramic capacitors</li><li>2 × 6.35 mm mono female jacks (solder 2 wires to each) + 2 guitar cables</li><li>9 V battery + clip, breadboard + jumpers</li></ul></div>
@@ -526,7 +526,7 @@ void loop() {
 <section id="p19">
   <h2><span class="num">19</span>2-digit counter 00–99</h2>
   <p><span class="qtopic">Counting chips</span> Two <b>SC39-11SURKWA</b> displays count from 00 to 99 by themselves: a 555 ticks, a <b>CD4518</b> counts in decimal and carries over to the tens, and two <b>CD4511</b> light the digits. A reset button brings it back to 00.</p>
-  <div class="controls"><button id="m19run" class="active">⏸ Pause</button><button id="m19tick">👆 One tick</button><button id="m19rst">↺ Reset (button)</button><label class="slider">Speed<input id="m19sp" type="range" min="0.5" max="20" step="0.5" value="1.5"></label></div>
+  <div class="controls"><button id="m19run" class="active">⏸ Pause</button><button id="m19tick">👆 One tick</button><button id="m19rst">↺ Reset (button)</button><x-slider id="m19sp" min="0.5" max="20" step="0.5" value="1.5">Speed</x-slider></div>
   <canvas id="m19" width="800" height="300"></canvas>
   <p class="hint">The 4 outputs of each counter are worth 8, 4, 2 and 1. Watch the units' "8" bit: when it drops (9 → 0), it ticks the tens. That's the carry.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>NE555 + CD4518 + 2 × CD4511</li><li>2 × SC39-11SURKWA displays</li><li>15 × 1 kΩ (14 segments + 555), 1 × 47 kΩ, 1 × 10 kΩ</li><li>10 µF electrolytic capacitor</li><li>Push button, 9 V battery + clip (or the USB power module), breadboard + plenty of jumpers</li></ul></div>
@@ -615,7 +615,7 @@ void loop() {
 <section id="p21">
   <h2><span class="num">21</span>Bar-graph thermometer (no Arduino)</h2>
   <p><span class="qtopic">No microcontroller</span> A 10-segment green <b>DC10G</b> bar graph that grows with the temperature, one segment every 2 °C from 16 to 34 °C. Built with three <b>LM339</b> comparator chips, an <b>LM35</b> sensor and a ladder of resistors: you build by hand what an LM3914 does inside.</p>
-  <div class="controls"><button class="big" id="bgHot">🤏 Hold to warm the sensor</button><label class="slider grow">Trimmer (ladder current)<input id="bgRHI" type="range" min="0.15" max="0.26" step="0.002" value="0.2"></label><span class="hint" id="bgI"></span></div>
+  <div class="controls"><button class="big" id="bgHot">🤏 Hold to warm the sensor</button><x-slider id="bgRHI" min="0.15" max="0.26" step="0.002" value="0.2" grow="1">Trimmer (ladder current)</x-slider><span class="hint" id="bgI"></span></div>
   <canvas id="m21" width="800" height="300"></canvas>
   <div class="howbox" style="margin-top:10px"><p>📌 <b>DC10G pins</b> (from Gotronic's technical sheet): pins 1–10 = anodes of segments A–J (bottom row), pins 20–11 = their cathodes (top row, pin 20 above pin 1). Still do step 7's 10-second test: if nothing lights, the bar is the other way round, so turn it 180°. More in <a class="navlink" href="#pbar">Real parts: the DC10G</a>.</p></div>
   <p class="hint">Left: the LM35 voltage. Middle: the ladder and the 10 comparators; each one compares the signal with its own rung and pulls its segment to ground when the signal is higher. Right: the bar graph. The trimmer sets the ladder current, so the size of each step.</p>
@@ -635,7 +635,7 @@ void loop() {
 <section id="p22">
   <h2><span class="num">22</span>Infrared beam alarm</h2>
   <p><span class="qtopic">Sensors</span> An invisible infrared beam between an <b>IR LED</b> and a <b>TSOP38238</b> receiver. Cut the beam with your hand (or a cat 🐈) and the red LED turns on. Two NE555 timers make the IR LED blink at 38 kHz in bursts, so that sunlight and lamps can't fool the receiver.</p>
-  <div class="controls"><button class="big" id="irBlock">✋ Hold to block the beam</button><label class="slider grow">555 #2 frequency<input id="irF" type="range" min="26" max="50" step="0.5" value="38"></label><span class="hint" id="irFv">38 kHz</span></div>
+  <div class="controls"><button class="big" id="irBlock">✋ Hold to block the beam</button><x-slider id="irF" min="26" max="50" step="0.5" value="38" grow="1">555 #2 frequency</x-slider><span class="hint" id="irFv">38 kHz</span></div>
   <canvas id="m22" width="800" height="360"></canvas>
   <p class="hint">Top: the signal path, from the two 555s to the IR LED, across the air to the TSOP, into the "bucket" and the alarm. Bottom: the signals, slowed down a lot. Move the frequency away from 38 kHz: the TSOP stops hearing it and the alarm goes off even with the beam.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>TSOP38238 IR receiver, 38 kHz (Gotronic 03417)</li><li>TSAL6200 IR LED (Gotronic 03458), or any 940 nm IR LED</li><li>2 × NE555, 1 × BC547, 1 × 1N4148, 1 red LED</li><li>Resistors: 4 × 1 kΩ, 2.2 kΩ, 2 × 330 Ω, 4.7 kΩ, 3 × 10 kΩ</li><li>Capacitors: 4.7 nF, 100 nF, 2 × 10 µF</li><li>Breadboard with its <b>5 V</b> power module (USB). Not the 9 V battery!</li></ul></div>
@@ -656,7 +656,7 @@ void loop() {
 <section id="p23">
   <h2><span class="num">23</span>Motor speed control (PWM)</h2>
   <p><span class="qtopic">Motors</span> Turn a knob, the motor goes from crawling to full speed. A <b>555</b> switches the motor on and off 13,000 times per second, and the knob sets how long each "on" lasts. That trick (<b>PWM</b>) is how almost every modern device controls motors, fans and LED brightness.</p>
-  <div class="controls"><label class="slider grow">Trimmer: on-time<input id="p23d" type="range" min="0.09" max="0.98" step="0.01" value="0.5"></label><span class="hint" id="p23v"></span></div>
+  <div class="controls"><x-slider id="p23d" min="0.09" max="0.98" step="0.01" value="0.5" grow="1">Trimmer: on-time</x-slider><span class="hint" id="p23v"></span></div>
   <canvas id="m23" width="800" height="300"></canvas>
   <p class="hint">Left: the 555 output, zoomed in (one period = 76 µs). The motor only feels the average (dashed line). Right: the motor speed follows that average. Below ~15 %, the motor is too weak to start.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>DC motor MFA RE140/1, 3–9 V (Gotronic 24851)</li><li>SS8050 NPN transistor, 1.5 A (Gotronic 43143)</li><li>NE555, 10 kΩ trimmer, 2 × 1N4148, 1N4007</li><li>2 × 1 kΩ, 470 Ω, red LED, 10 nF, 100 µF</li><li>9 V battery + clip (a 6 V pack of 4 AA batteries lasts longer with motors)</li></ul></div>
@@ -740,7 +740,7 @@ void loop() {
     <li><b>Done:</b> when the current drops to ~10% (e.g. 100 mA), the charger stops. Going above 4.2 V damages Li-ion cells and can make them catch fire, so the chip watches it precisely.</li>
   </ol>
   <p>The <b>TP4056</b> chip does all of this. The cheap blue modules also include a <b>protection chip</b> (DW01 + a MOSFET pair) that cuts the battery off if it's over-discharged (&lt; 2.5 V), over-charged or short-circuited.</p>
-  <div class="controls"><button id="bcGo" class="active">▶ Plug in USB</button><span id="bcChoices"></span><label class="slider">Speed<input id="bcSp" type="range" min="1" max="40" step="1" value="12"></label></div>
+  <div class="controls"><button id="bcGo" class="active">▶ Plug in USB</button><span id="bcChoices"></span><x-slider id="bcSp" min="1" max="40" step="1" value="12">Speed</x-slider></div>
   <canvas id="cBat" width="800" height="330"></canvas>
   <div class="mt-s">
     <div><h3 class="flush">🧰 You need</h3><ul><li>TP4056 charger module (Gotronic GT060)</li><li>BMS 1S protection board (B+, B−, P+, P−)</li><li>18650 Li-ion cell (65 mm) + holder with wires</li><li>USB cable / 5 V phone charger</li><li>A switch + a load to test (LED + 100 Ω, or a 5 V boost module for a power bank)</li><li>Multimeter</li></ul></div>
@@ -775,7 +775,7 @@ void loop() {
     <li><b>Decision:</b> the LM358 compares the two. Sensor above threshold means dark, so the output goes HIGH. A 1 MΩ resistor adds <b>hysteresis</b> (a small dead band) so the lamp doesn't flicker at dusk.</li>
     <li><b>Muscle:</b> the output → 1 kΩ → BC547 → relay coil (+ flyback diode) → its contact switches the <b>12 V lamp</b>.</li>
   </ol>
-  <div class="controls"><label class="slider grow">☀️ Daylight<input id="ldL" type="range" min="0" max="1" step="0.005" value="0.8"></label><label class="slider grow">Threshold knob<input id="ldT" type="range" min="1" max="8" step="0.05" value="4.5"></label><button id="ldAuto">🌅 Run a day</button></div>
+  <div class="controls"><x-slider id="ldL" min="0" max="1" step="0.005" value="0.8" grow="1">☀️ Daylight</x-slider><x-slider id="ldT" min="1" max="8" step="0.05" value="4.5" grow="1">Threshold knob</x-slider><button id="ldAuto">🌅 Run a day</button></div>
   <canvas id="cLight" width="800" height="340"></canvas>
   <div class="mt-s">
     <div><h3 class="flush">🧰 You need</h3><ul><li>LDR (photoresistor) + 10 kΩ resistor</li><li>10 kΩ potentiometer (threshold)</li><li>LM358 + 1 MΩ (hysteresis) + 100 nF decoupling</li><li>BC547 + 1 kΩ + 1N4007</li><li>12 V relay (or 5 V relay + 5 V supply)</li><li>12 V lamp/LED strip + 12 V supply</li></ul></div>

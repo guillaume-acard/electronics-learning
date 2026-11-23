@@ -1,12 +1,12 @@
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">Buzzers, speakers and motors turn electricity into something you can <b>hear</b> or <b>feel</b>. A buzzer or a speaker pushes the air back and forth (sound). A motor turns a shaft (motion). Most of them work with a <b>coil and a magnet</b>: the same force that pulls a <a data-page="relay" class="navlink">relay</a> arm.</p>
   <p>They are <b>loads</b>: they need far more current than a chip pin can give (a pin: ~20 mA; a speaker or a motor: hundreds of mA). So they are almost always driven through a <a data-page="transistor" class="navlink">transistor</a>, an amplifier chip (<a class="navlink" href="#s386">LM386</a>) or a motor driver (<a class="navlink" href="#s293">L293D</a>). And because the coil inside is an <a data-page="inductor" class="navlink">inductor</a>, it kicks back when switched off: hence the <b>flyback diode</b>.</p>
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <div class="cards">
     <div class="card"><div class="ico">🔔</div><h3>Alarms and beeps</h3><p><b>Why:</b> an <b>active buzzer</b> beeps as soon as it gets DC: one transistor and you have a microwave "done" beep, a smoke alarm or a reversing warning.</p></div>
     <div class="card"><div class="ico">🎵</div><h3>Tones and melodies</h3><p><b>Why:</b> a <b>passive buzzer</b> or piezo disc plays whatever frequency you feed it: a 555 siren, Arduino tunes, a doorbell.</p></div>
@@ -16,7 +16,7 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>Buzzers: active or passive?</h2>
+  <h2><span class="num">#</span>Buzzers: active or passive?</h2>
   <p>Two buzzers can look identical and behave completely differently:</p>
   <ul>
     <li><b>Active buzzer</b> (like the GT1143 module): it contains its own little <b>oscillator</b>. Give it steady DC (5 V) and it beeps on its own, always at the same pitch (~2.3 kHz). Easy, but you can't change the note.</li>
@@ -25,13 +25,13 @@
   <p><b>Telling them apart:</b> the active one is often taller with its underside sealed in black resin, and its + leg is longer or marked. A passive one often shows a green circuit board underneath. Or test it: 5 V for a second. A continuous beep = active, a click = passive.</p>
   <p><b>Inside, two technologies:</b> a <b>piezo</b> buzzer is a thin ceramic disc that bends when you put a voltage on it (the same piezoelectric effect as a <a class="navlink" href="#s4060">quartz crystal</a>). It draws very little current and can be driven straight from a pin. A <b>magnetic</b> buzzer is a small coil pulling a metal disc, like a tiny speaker: it needs more current, a transistor, and a <b>flyback diode</b> (it's a coil!).</p>
   <p><b>Water analogy:</b> the active buzzer is a toy whistle with its own pump: open the tap and it whistles. The passive buzzer is a bare whistle: it only sings if <i>you</i> blow into it at the right rhythm.</p>
-  <div class="controls"><span id="bzKind"></span><button id="bzDC">⚡ Steady DC</button><button id="bzSQ" class="active">〰 Square wave</button><label class="slider grow">Frequency<input id="bzF" type="range" min="200" max="4000" step="10" value="1000"></label><button id="bzPlay">🔊 Listen</button></div>
+  <div class="controls"><span id="bzKind"></span><button id="bzDC">⚡ Steady DC</button><button id="bzSQ" class="active">〰 Square wave</button><x-slider id="bzF" min="200" max="4000" step="10" value="1000" grow="1">Frequency</x-slider><button id="bzPlay">🔊 Listen</button></div>
   <canvas id="cBuzz" width="800" height="260"></canvas>
   <p class="hint">"Listen" plays the sound for one second through your computer (quietly). Try the passive buzzer at 300 Hz, then 3,000 Hz, and the active one on DC. Used in <a class="navlink" href="#p8">project 8</a>, <a class="navlink" href="#p11">project 11</a> and the <a class="navlink" href="#p22">IR alarm</a>.</p>
 </section>
 
 <section>
-  <h2><span class="num">4</span>The speaker: a coil that pushes air</h2>
+  <h2><span class="num">#</span>The speaker: a coil that pushes air</h2>
   <p>A speaker is a <b>coil</b> glued to a paper or plastic <b>cone</b>, sitting in the gap of a strong permanent <b>magnet</b>. Current one way pushes the coil (and the cone) <b>out</b>; current the other way pulls it <b>in</b>. Feed it an audio signal (AC that wiggles hundreds or thousands of times per second) and the cone follows every wiggle, pushing the air into pressure waves: sound.</p>
   <ul>
     <li><b>8 Ω</b> is the speaker's <b>impedance</b>: roughly its resistance to an audio signal. It's very low, so it needs a lot of current: that's the job of an amplifier like the <a class="navlink" href="#s386">LM386</a> (project 10) or your Ruby's.</li>
@@ -39,13 +39,13 @@
     <li><b>0.5 W</b> (the HP508) is the most power it can take without damage. A bigger cone moves more air: more volume and deeper bass.</li>
   </ul>
   <p><b>Water analogy:</b> a rubber membrane in a pipe, pushed back and forth by the water. It can't let water through, but each push makes a wave on the other side.</p>
-  <div class="controls"><label class="slider grow">Frequency<input id="spF" type="range" min="1" max="12" step="0.1" value="3"></label><label class="slider grow">Volume<input id="spV" type="range" min="0" max="1" step="0.01" value="0.6"></label><button id="spDC">⚡ Apply 9 V DC</button></div>
+  <div class="controls"><x-slider id="spF" min="1" max="12" step="0.1" value="3" grow="1">Frequency</x-slider><x-slider id="spV" min="0" max="1" step="0.01" value="0.6" grow="1">Volume</x-slider><button id="spDC">⚡ Apply 9 V DC</button></div>
   <canvas id="cSpk" width="800" height="270"></canvas>
   <p class="hint">The animation is slowed down enormously: real sound is 20 to 20,000 pushes per second. Used in <a class="navlink" href="#p10">project 10: mini amp</a> and <a class="navlink" href="#p17">project 17: police siren</a>.</p>
 </section>
 
 <section>
-  <h2><span class="num">5</span>The DC motor: magnets that chase each other</h2>
+  <h2><span class="num">#</span>The DC motor: magnets that chase each other</h2>
   <p>Inside a small DC motor (like the RE140 of projects 23–25) there are two curved <b>permanent magnets</b> on the case, and a spinning part, the <b>rotor</b>, made of coils. Powered coils become electromagnets that are pulled towards the opposite pole of the fixed magnets. Just as a coil arrives, two little carbon <b>brushes</b> rubbing on a split ring (the <b>commutator</b>) swap its current, so it's pushed onwards again instead of stopping. Result: continuous rotation.</p>
   <ul>
     <li><b>Speed follows the voltage</b>, roughly: 9 V → full speed, 4.5 V → about half.</li>
@@ -55,13 +55,13 @@
     <li><b>Slowing it down:</b> not with a resistor (it wastes energy and kills the strength). Use <b>PWM</b>: full voltage switched on and off very fast (project 23), or a lower supply voltage (project 25).</li>
   </ul>
   <p><b>Water analogy:</b> a water wheel. More pressure (voltage) spins it faster. A free wheel lets little water through; block it with your hand and the full flow rushes through the pipe (the stall current).</p>
-  <div class="controls"><label class="slider grow">Supply voltage<input id="moV" type="range" min="0" max="9" step="0.1" value="6"></label><label class="slider grow">Load (finger on the shaft)<input id="moL" type="range" min="0" max="1" step="0.01" value="0.1"></label></div>
+  <div class="controls"><x-slider id="moV" min="0" max="9" step="0.1" value="6" grow="1">Supply voltage</x-slider><x-slider id="moL" min="0" max="1" step="0.01" value="0.1" grow="1">Load (finger on the shaft)</x-slider></div>
   <canvas id="cMotor" width="800" height="300"></canvas>
   <p class="hint">Push the load all the way: the motor stalls and the current jumps to its maximum. A stalled motor heats up fast, and that's the moment the battery, transistor or driver chip suffers most. The numbers are typical for a small RE140-type motor, not exact.</p>
 </section>
 
 <section>
-  <h2><span class="num">6</span>How to drive them</h2>
+  <h2><span class="num">#</span>How to drive them</h2>
   <table>
     <tr><td>Part</td><td>Current</td><td>Straight from a pin?</td><td>Use</td></tr>
     <tr><td>Piezo (passive) buzzer</td><td>~5 mA</td><td>✓ Yes</td><td>A square wave from a 555 or Arduino <code>tone()</code></td></tr>
@@ -73,7 +73,7 @@
 </section>
 
 <section>
-  <h2><span class="num">7</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li><b>Active buzzer:</b> has its own oscillator, beeps on DC, one fixed pitch.</li>
     <li><b>Passive buzzer / piezo:</b> needs a square wave, and you choose the pitch.</li>

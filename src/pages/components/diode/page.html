@@ -1,14 +1,14 @@
 
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">A diode lets current flow in <b>one direction only</b>. Forward it conducts, backwards it blocks. It's a <b>one-way valve</b> (a check valve) in the pipe.</p>
   <p>There's one catch: the valve has a small spring, so it needs a little push to open. For a normal silicon diode that's about <b>0.7 V</b>, the <b>forward voltage</b>. Below that, nothing flows even in the right direction.</p>
   <p>The two legs are called the <b>anode (+)</b> and the <b>cathode (−)</b>. Current flows from anode to cathode, in the direction the arrow in the symbol points. On the real part, the <b>stripe marks the cathode</b>.</p>
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <div class="cards">
     <div class="card"><div class="ico">🔄</div><h3>1. AC → DC (rectifier)</h3><p><b>Why:</b> the wall gives AC (back and forth), but electronics need DC. Diodes let only one direction through. Every charger has some.<br><i>Water:</i> check valves that turn sloshing into a one-way stream.</p></div>
     <div class="card"><div class="ico">🔋</div><h3>2. Reverse battery protection</h3><p><b>Why:</b> if someone puts the battery in backwards, the diode blocks it and the circuit survives.<br><i>Water:</i> a valve that refuses backward flow.</p></div>
@@ -20,19 +20,19 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>The water analogy: a check valve</h2>
+  <h2><span class="num">#</span>The water analogy: a check valve</h2>
   <ul>
     <li><b>Forward push above ~0.7 V:</b> the flap swings open and water flows.</li>
     <li><b>Forward push below 0.7 V:</b> the spring keeps the flap shut. Nothing flows yet.</li>
     <li><b>Backward push:</b> the flap is pressed against its seat, so it's sealed and nothing flows.</li>
   </ul>
-  <div class="controls"><label class="slider grow">Push (voltage across the diode)<input id="dV" type="range" min="-3" max="1.2" step="0.01" value="0.3"></label><b id="dVt" style="min-width:70px"></b></div>
+  <div class="controls"><x-slider id="dV" min="-3" max="1.2" step="0.01" value="0.3" grow="1">Push (voltage across the diode)</x-slider><b id="dVt" style="min-width:70px"></b></div>
   <canvas id="cValve" width="800" height="290"></canvas>
   <p class="hint">Right: the diode's "personality" graph. Nothing happens until about 0.6 V, then the current shoots up very steeply. That steepness is why diodes and LEDs need a resistor to limit the current.</p>
 </section>
 
 <section>
-  <h2><span class="num">4</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
 
   <h3>A. Reverse battery protection</h3>
   <p>A diode in series with the battery. Battery the right way: current flows (losing 0.7 V). Battery backwards: the diode blocks and the circuit is safe. <b>Why:</b> toys, remote controls and pedals all have this, because people do put batteries in backwards.</p>
@@ -52,12 +52,12 @@
 
   <h3>D. Guitar distortion (clipping diodes)</h3>
   <p>Two diodes, pointing opposite ways, sit from the signal to ground. Small signals below 0.7 V pass untouched. Bigger signals get their tops <b>sliced off at ±0.7 V</b>, because the diodes open and drain the excess. The wave becomes squarer, which adds the harmonics we hear as <b>overdrive and fuzz</b>.</p>
-  <div class="controls"><label class="slider grow">Guitar signal strength (play harder)<input id="clA" type="range" min="0.2" max="3" step="0.05" value="1.5"></label></div>
+  <div class="controls"><x-slider id="clA" min="0.2" max="3" step="0.05" value="1.5" grow="1">Guitar signal strength (play harder)</x-slider></div>
   <canvas id="cClip" width="800" height="250"></canvas>
 </section>
 
 <section>
-  <h2><span class="num">5</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <div class="grid2">
     <div><canvas id="cSymD" width="380" height="190"></canvas>
     <p class="hint center">Top: the symbol, where the arrow shows the current direction. Bottom: the real part, where the stripe is the cathode (−).</p></div>
@@ -80,7 +80,7 @@
 </section>
 
 <section>
-  <h2><span class="num">6</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>A diode is a <b>one-way valve</b>: anode → cathode only. The stripe is the cathode.</li>
     <li>It needs about <b>0.7 V</b> forward to open (the spring), and then current rises very steeply.</li>

@@ -1,7 +1,7 @@
 
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">A transistor is a <b>valve that a small current can open</b>. A tiny current into one leg (the <b>base</b>) controls a much bigger current flowing between the other two legs (the <b>collector → emitter</b>).</p>
   <p>That gives it two superpowers:</p>
   <ul>
@@ -12,7 +12,7 @@
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <div class="cards">
     <div class="card"><div class="ico">🔌</div><h3>Switching big loads</h3><p><b>Why:</b> a microcontroller pin can give about 20 mA, but a motor needs 500 mA. A transistor lets the weak pin control the strong current safely.</p></div>
     <div class="card"><div class="ico">🔊</div><h3>Amplifying</h3><p><b>Why:</b> a guitar pickup or microphone gives a tiny signal. Transistors make it big enough to drive a speaker. Your Ruby amp's LM386 chip has a dozen inside!</p></div>
@@ -22,20 +22,20 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>The water analogy: a big valve opened by a small flow</h2>
+  <h2><span class="num">#</span>The water analogy: a big valve opened by a small flow</h2>
   <p>A <b>big pipe</b> (collector → emitter) has a heavy gate in it. A <b>small side pipe</b> (the base) pushes a piston that lifts the gate. A trickle in the small pipe lets a river through the big one.</p>
   <ul>
     <li><b>Off (cutoff):</b> no base flow, gate closed, nothing flows.</li>
     <li><b>Amplifying (active):</b> the main flow = <b>gain × base flow</b>. With a gain of 100, 50 µA in gives 5 mA through. Double the base flow and you double the main flow.</li>
     <li><b>Fully on (saturated):</b> the gate is wide open. More base flow can't help, because the rest of the circuit (the load) now limits the flow. This is the "switch on" state.</li>
   </ul>
-  <div class="controls"><label class="slider grow">Small base flow (base current)<input id="tIb" type="range" min="0" max="150" step="1" value="40"></label><b id="tIbt" style="min-width:70px"></b></div>
+  <div class="controls"><x-slider id="tIb" min="0" max="150" step="1" value="40" grow="1">Small base flow (base current)</x-slider><b id="tIbt" style="min-width:70px"></b></div>
   <canvas id="cTV" width="800" height="330"></canvas>
   <p class="hint">One more detail: the base-emitter junction is a <b>diode</b> inside the transistor, so the base needs about <b>0.7 V</b> before any base current flows (see the <a data-page="diode" class="navlink">diode page</a>). That's also why you always put a <b>resistor in front of the base</b>: to limit that current, just like with an LED.</p>
 </section>
 
 <section>
-  <h2><span class="num">4</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
 
   <h3>A. Switching a motor from a microcontroller</h3>
   <p>A microcontroller pin (Arduino, ESP32…) can give about <b>20 mA</b>. A small motor needs <b>~500 mA</b>. Connected directly, the pin can't deliver, the motor barely twitches, and the chip overheats. With a transistor, the pin only supplies a few mA into the base, and the transistor switches the 500 mA from the battery.
@@ -53,13 +53,13 @@
     <li><b>Rc (collector resistor):</b> turns the transistor's changing <i>current</i> into a changing <i>voltage</i>. More current means a bigger voltage drop across Rc, so the collector goes <b>down</b>, which is why the output is upside down.</li>
     <li><b>Re (emitter resistor):</b> sets the gain: <b>gain ≈ Rc ÷ Re</b>. The slider changes Re: a smaller Re gives more gain.</li>
   </ul>
-  <div class="controls"><label class="slider grow">Gain<input id="amG" type="range" min="1" max="40" step="1" value="12"></label><b id="amGt" class="val"></b></div>
+  <div class="controls"><x-slider id="amG" min="1" max="40" step="1" value="12" grow="1">Gain</x-slider><b id="amGt" class="val"></b></div>
   <canvas id="cAmp" width="800" height="525"></canvas>
   <p class="hint">🎸 In your Ruby amp, the first part (the <b>J310 JFET</b>) is a transistor used as a <b>buffer</b>: it doesn't add much gain, but it lets the guitar's weak, fragile signal drive the rest of the circuit without being loaded down. Then the LM386 chip, made of transistors inside, provides gain of 20 to 200×.</p>
 
   <h3>C. Automatic night light</h3>
   <p>An <b>LDR</b> (light-dependent resistor) and a resistor form a voltage divider on the base. In daylight the LDR's resistance is low and pulls the base below 0.7 V, so the transistor is off. When it gets dark, the LDR's resistance shoots up, the base voltage rises above 0.7 V, and the transistor turns the LED on.</p>
-  <div class="controls"><label class="slider grow">🌙 Dark ←→ Bright ☀️<input id="nlL" type="range" min="0" max="1" step="0.01" value="0.9"></label></div>
+  <div class="controls"><x-slider id="nlL" min="0" max="1" step="0.01" value="0.9" grow="1">🌙 Dark ←→ Bright ☀️</x-slider></div>
   <canvas id="cNL" width="800" height="260"></canvas>
 
   <h3>D. Logic gates: how computers think</h3>
@@ -69,7 +69,7 @@
 </section>
 
 <section>
-  <h2><span class="num">5</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <div class="grid2">
     <div><canvas id="cSymT" width="380" height="180"></canvas>
     <p class="hint center">NPN symbol: the arrow on the emitter points <b>out</b> (the direction current leaves). On PNP it points in.</p></div>
@@ -93,7 +93,7 @@
 </section>
 
 <section>
-  <h2><span class="num">6</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>A transistor is a <b>valve opened by a small current</b> (or a voltage, for a MOSFET).</li>
     <li>Three states: <b>off</b>, <b>amplifying</b> (main flow = gain × base flow) and <b>fully on</b> (limited by the load).</li>

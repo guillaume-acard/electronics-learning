@@ -144,7 +144,7 @@ function drawDigit(ctx,x,y,sc,on,o={}){const pad=o.pad??10,glow=o.glow||0,col=o.
 
 const cv=id=>{const c=$(id),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);return ctx;};
 // ===== left menu: one section at a time =====
-sectionMenu('paMenu',{first:'rpstart'});
+sectionMenu('parts-menu',{first:'rpstart'});
 
 // ===== 7-segment helpers =====
 const PINS={1:'e',2:'d',3:'COM',4:'c',5:'dp',6:'b',7:'a',8:'COM',9:'f',10:'g'};

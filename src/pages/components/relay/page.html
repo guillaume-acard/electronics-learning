@@ -1,12 +1,12 @@
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">A relay is a <b>switch flipped by an electromagnet</b>. A small current through its <b>coil</b> makes a magnet that pulls a metal arm, which closes (or opens) a <b>completely separate</b> circuit. You hear it go <i>click</i>.</p>
   <p>The two sides are <b>not electrically connected</b>: a 5 V microcontroller can safely switch a 12 V motor or even a 230 V lamp. It combines the <a data-page="inductor" class="navlink">inductor</a> (the coil) with a mechanical switch.</p>
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <div class="cards">
     <div class="card"><div class="ico">🏠</div><h3>Switching mains appliances</h3><p><b>Why:</b> an Arduino can't touch 230 V, but a relay can switch a lamp, heater or pump while keeping the low-voltage side fully isolated.</p></div>
     <div class="card"><div class="ico">🚗</div><h3>Cars</h3><p><b>Why:</b> headlights, horn and starter need big currents. A thin wire from the dashboard switch drives a relay near the battery, which carries the heavy current.</p></div>
@@ -16,19 +16,19 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>How it works (and the water analogy)</h2>
+  <h2><span class="num">#</span>How it works (and the water analogy)</h2>
   <ul>
     <li><b>COM</b> (common) is the moving arm. <b>NC</b> (normally closed) is touched by the arm at rest. <b>NO</b> (normally open) is touched only when the coil is powered.</li>
     <li>The coil needs a minimum voltage to <b>pull in</b> (e.g. ~3.75 V for a 5 V relay). Once pulled in, it holds until the voltage drops much lower (<b>drop-out</b>, ~1 V). This gap makes it snap cleanly instead of chattering.</li>
     <li><b>Water analogy:</b> a small pipe drives a little turbine that pulls a lever. The lever opens a valve on a <b>completely separate</b> big pipe. The two waters never mix.</li>
   </ul>
-  <div class="controls"><label class="slider grow">Coil voltage<input id="rlV" type="range" min="0" max="6" step="0.05" value="0"></label><b id="rlVt" class="val"></b></div>
+  <div class="controls"><x-slider id="rlV" min="0" max="6" step="0.05" value="0" grow="1">Coil voltage</x-slider><b id="rlVt" class="val"></b></div>
   <canvas id="cRelay" width="800" height="320"></canvas>
   <p class="hint">Slide up slowly: nothing until about 3.75 V, then <b>click</b>. Now slide back down: it stays on until about 1 V. The NC lamp (red) and NO lamp (green) swap.</p>
 </section>
 
 <section>
-  <h2><span class="num">4</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
 
   <h3>A. A microcontroller switching a lamp through a relay</h3>
   <p>The relay coil needs ~70 mA, too much for a pin (20 mA). So we use a <b>transistor</b> to drive the coil (see the <a data-page="transistor" class="navlink">transistor page</a>), plus a <b>flyback diode</b> across the coil because it's an inductor and kicks back when switched off. The lamp circuit is completely separate.</p>
@@ -43,7 +43,7 @@
 </section>
 
 <section>
-  <h2><span class="num">5</span>Relay or transistor?</h2>
+  <h2><span class="num">#</span>Relay or transistor?</h2>
   <table>
     <tr><td></td><td><b>Relay</b></td><td><b>Transistor / MOSFET</b></td></tr>
     <tr><td>Isolation</td><td>✓ Full: the sides are not connected</td><td>✗ Shared ground</td></tr>
@@ -55,7 +55,7 @@
 </section>
 
 <section>
-  <h2><span class="num">6</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <table>
     <tr><td>Coil voltage</td><td>5 V, 12 V, 24 V… Choose one that matches your control supply.</td></tr>
     <tr><td>Coil current</td><td>Typically 30–100 mA, so drive it with a transistor.</td></tr>
@@ -67,7 +67,7 @@
 </section>
 
 <section>
-  <h2><span class="num">7</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>A relay is a <b>switch moved by an electromagnet</b>.</li>
     <li><b>COM</b> touches <b>NC</b> at rest and <b>NO</b> when the coil is powered.</li>

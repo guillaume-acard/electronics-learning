@@ -1,13 +1,13 @@
 
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">A resistor <b>resists</b> the flow of electricity. It's a deliberately <b>narrow pipe</b> in the circuit. The narrower the pipe (the bigger the resistance), the <b>less current</b> flows for the same push.</p>
   <p>Its strength is measured in <b>ohms (Ω)</b>. A resistor doesn't store anything (that's the capacitor's job). It simply slows the flow down and turns the "lost" energy into a little <b>heat</b>.</p>
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <p>A battery pushes as hard as it can. Many parts would take far too much current and burn, or would get the wrong voltage. Resistors are how we <b>control</b> the flow. They do six main jobs:</p>
   <div class="cards">
     <div class="card"><div class="ico">🛡️</div><h3>1. Limit current</h3><p><b>Why:</b> an LED connected straight to a battery takes too much current and burns in a second. A resistor in series keeps the current safe.<br><i>Water:</i> a narrow section so the flow can't rush.</p></div>
@@ -20,7 +20,7 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>The water analogy: a narrow pipe</h2>
+  <h2><span class="num">#</span>The water analogy: a narrow pipe</h2>
   <p>The <b>pump</b> (battery) creates <b>pressure</b> (voltage). The water <b>flow</b> is the current. The <b>narrow section</b> is the resistor.</p>
   <ul>
     <li>Stronger pump → <b>more flow</b>.</li>
@@ -29,8 +29,8 @@
     <li>The squeezing creates friction, which becomes <b>heat</b>.</li>
   </ul>
   <div class="controls">
-    <label class="slider">Pump pressure (voltage)<input id="fV" type="range" min="0" max="12" step="0.5" value="9"></label>
-    <label class="slider">Resistance (narrowness)<input id="fR" type="range" min="1" max="10" step="0.5" value="3"></label>
+    <x-slider id="fV" min="0" max="12" step="0.5" value="9">Pump pressure (voltage)</x-slider>
+    <x-slider id="fR" min="1" max="10" step="0.5" value="3">Resistance (narrowness)</x-slider>
   </div>
   <div class="readout"><span>Voltage: <b id="fVt"></b></span><span>Resistance: <b id="fRt"></b></span><span>Current = V ÷ R = <b id="fIt"></b></span><span>Heat: <b id="fPt"></b></span></div>
   <canvas id="cFlow" width="800" height="300"></canvas>
@@ -38,7 +38,7 @@
 </section>
 
 <section>
-  <h2><span class="num">4</span>Ohm's law: the one formula to remember</h2>
+  <h2><span class="num">#</span>Ohm's law: the one formula to remember</h2>
   <p class="tldr" style="text-align:center;font-size:1.6rem"><b>V = I × R</b></p>
   <p style="text-align:center;margin-top:-6px" class="hint">Voltage (volts) = Current (amps) × Resistance (ohms)</p>
   <p>In water terms: <b>pressure needed = flow × narrowness</b>. Cover the one you want to find, and the other two tell you how to compute it:</p>
@@ -49,15 +49,15 @@
 </section>
 
 <section>
-  <h2><span class="num">5</span>Combining resistors: in a row or side by side</h2>
+  <h2><span class="num">#</span>Combining resistors: in a row or side by side</h2>
   <ul>
     <li><b>Series (one after the other):</b> the water must squeeze through <b>both</b> narrow sections, so it's harder. The resistances <b>add up</b>: R = R1 + R2.</li>
     <li><b>Parallel (side by side):</b> the water has <b>two paths</b> to choose from, so it's easier. The total is <b>smaller than either one</b>: 1/R = 1/R1 + 1/R2.</li>
   </ul>
   <div class="controls">
     <span id="spChoices"></span>
-    <label class="slider">R1<input id="sR1" type="range" min="1" max="10" step="1" value="2"></label>
-    <label class="slider">R2<input id="sR2" type="range" min="1" max="10" step="1" value="4"></label>
+    <x-slider id="sR1" min="1" max="10" step="1" value="2">R1</x-slider>
+    <x-slider id="sR2" min="1" max="10" step="1" value="4">R2</x-slider>
   </div>
   <div class="readout"><span>Total resistance: <b id="spR"></b></span><span>Total current from 9 V: <b id="spI"></b></span></div>
   <canvas id="cSP" width="800" height="270"></canvas>
@@ -65,11 +65,11 @@
 </section>
 
 <section>
-  <h2><span class="num">6</span>The other "strength": the power rating (how much heat it can take)</h2>
+  <h2><span class="num">#</span>The other "strength": the power rating (how much heat it can take)</h2>
   <p>Like the capacitor's voltage rating, a resistor has a limit, but this one is about <b>heat</b>. The heat produced is <b>P = V × I</b>, in watts. Most small resistors are rated <b>¼ W (0.25 W)</b>. Go above it and the resistor gets too hot: it discolours, smokes, and finally burns open, breaking the circuit.</p>
   <p>Here is a <b>100 Ω, ¼ W</b> resistor. Increase the voltage across it:</p>
   <div class="controls">
-    <label class="slider grow">Voltage across it<input id="hV" type="range" min="0" max="12" step="0.5" value="3"></label>
+    <x-slider id="hV" min="0" max="12" step="0.5" value="3" grow="1">Voltage across it</x-slider>
     <b id="hVt" style="min-width:50px"></b><button id="hNew">🔧 Replace resistor</button>
   </div>
   <div class="readout"><span>Current: <b id="hI"></b></span><span>Heat (power): <b id="hP"></b></span><span>Status: <b id="hS"></b></span></div>
@@ -78,7 +78,7 @@
 </section>
 
 <section>
-  <h2><span class="num">7</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
 
   <h3>A. Protecting an LED (current limiting)</h3>
   <p>An LED needs about <b>2 V</b> and at most <b>20 mA</b>. A 9 V battery would push far too much current through it. The resistor takes the extra 7 V and limits the current to: <code>I = (9 V − 2 V) ÷ R</code>.
@@ -90,7 +90,7 @@
   <h3>B. Voltage divider and the volume knob (potentiometer)</h3>
   <p>Two resistors in a row split the voltage: <code>Vout = Vin × R2 ÷ (R1 + R2)</code>. A <b>potentiometer</b> is one long resistor with a sliding contact, so turning it moves the split point.
   <b>Why:</b> volume and tone knobs (including on a guitar), sensor readings, and setting reference levels.</p>
-  <div class="controls"><label class="slider grow">Turn the knob<input id="pot" type="range" min="0" max="1" step="0.01" value="0.5"></label></div>
+  <div class="controls"><x-slider id="pot" min="0" max="1" step="0.01" value="0.5" grow="1">Turn the knob</x-slider></div>
   <canvas id="cDiv" width="800" height="260"></canvas>
 
   <h3>C. Pull-up resistor (giving a chip a default value)</h3>
@@ -103,12 +103,12 @@
   <h3>D. Timing with a capacitor (the blinker)</h3>
   <p>A resistor controls how fast a capacitor fills (see the <a data-page="capacitor" class="navlink">capacitor page</a>). Here a 100 µF capacitor fills through the resistor. When it reaches ⅔ full, the LED flashes and it empties back to ⅓.
   The time scales with <b>R × C</b>, so a bigger resistor gives slower blinking. <b>Why:</b> blinkers, delays, oscillators and the classic 555 timer chip.</p>
-  <div class="controls"><label class="slider grow">Resistor<input id="rcR" type="range" min="0" max="1.7" step="0.01" value="0.7"></label><b id="rcRt" style="min-width:150px"></b></div>
+  <div class="controls"><x-slider id="rcR" min="0" max="1.7" step="0.01" value="0.7" grow="1">Resistor</x-slider><b id="rcRt" style="min-width:150px"></b></div>
   <canvas id="cRC" width="800" height="230"></canvas>
 </section>
 
 <section>
-  <h2><span class="num">8</span>Reading the colour code</h2>
+  <h2><span class="num">#</span>Reading the colour code</h2>
   <p>Small resistors are too tiny for printed numbers, so they use <b>coloured bands</b>. The first two bands are <b>digits</b>, the third is the <b>multiplier</b> (how many zeros), and the fourth is the <b>tolerance</b> (how accurate it is).</p>
   <div class="controls" id="ccSel"></div>
   <canvas id="cCC" width="800" height="150"></canvas>
@@ -116,7 +116,7 @@
 </section>
 
 <section>
-  <h2><span class="num">9</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <div class="grid2">
     <div>
       <canvas id="cSymR" width="380" height="150"></canvas>
@@ -142,7 +142,7 @@
 </section>
 
 <section>
-  <h2><span class="num">10</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>A resistor is a <b>narrow pipe</b>: it limits how much current flows.</li>
     <li><b>V = I × R</b>: more voltage gives more current, and more resistance gives less current.</li>

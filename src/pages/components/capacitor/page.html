@@ -1,7 +1,7 @@
 
 
 <section>
-  <h2><span class="num">1</span>The short version</h2>
+  <h2><span class="num">#</span>The short version</h2>
   <p class="tldr">A capacitor is <b>two metal plates separated by an insulator</b>.
   Electricity can't pass through the gap, but charge can <b>pile up</b> on the plates. It fills up quickly, holds the charge,
   and can release it all at once.</p>
@@ -10,7 +10,7 @@
 </section>
 
 <section>
-  <h2><span class="num">2</span>What is it for, and why use one?</h2>
+  <h2><span class="num">#</span>What is it for, and why use one?</h2>
   <p>Batteries and power supplies are great at giving <b>steady</b> energy, but they are slow to react, and the electricity they deliver is never perfectly clean.
   Capacitors fix those problems. They do <b>five main jobs</b>:</p>
   <div class="cards">
@@ -25,7 +25,7 @@
 </section>
 
 <section>
-  <h2><span class="num">3</span>The water analogy: a rubber sheet in a pipe</h2>
+  <h2><span class="num">#</span>The water analogy: a rubber sheet in a pipe</h2>
   <p>Picture a water pipe with a <b>stretchy rubber sheet</b> sealed across the middle. Water <i>cannot</i> pass through the sheet.</p>
   <ul>
     <li>Turn on the <b>pump</b> (the battery). Water rushes in on one side and stretches the sheet. The same amount of water is pushed out of the other side, so water flows around the whole loop.</li>
@@ -39,8 +39,8 @@
     <button id="bHold">⏸ Hold (close valve)</button>
     <button id="bDis">↩ Discharge</button>
     <button id="bReset">Reset</button>
-    <label class="slider">Pump pressure (voltage)<input id="sV" type="range" min="0.3" max="1" step="0.05" value="0.9"></label>
-    <label class="slider">Capacitor size<input id="sC" type="range" min="0.5" max="4" step="0.1" value="1.5"></label>
+    <x-slider id="sV" min="0.3" max="1" step="0.05" value="0.9">Pump pressure (voltage)</x-slider>
+    <x-slider id="sC" min="0.5" max="4" step="0.1" value="1.5">Capacitor size</x-slider>
   </div>
   <div class="readout">
     <span>Mode: <span id="rMode" class="pill" style="background:#e5e9f2">idle</span></span>
@@ -60,7 +60,7 @@
 </section>
 
 <section>
-  <h2><span class="num">4</span>Translating water ↔ electricity</h2>
+  <h2><span class="num">#</span>Translating water ↔ electricity</h2>
   <div class="map">
     <div class="h">Water</div><div></div><div class="h">Electricity</div>
     <div class="w">Pump</div><div class="arrow">→</div><div class="e">Battery / power supply</div>
@@ -76,7 +76,7 @@
 </section>
 
 <section>
-  <h2><span class="num">5</span>Its superpower: blocks steady flow, lets wiggles through</h2>
+  <h2><span class="num">#</span>Its superpower: blocks steady flow, lets wiggles through</h2>
   <div style="border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 14px;background:#101827">
   <h4 style="margin:0 0 6px;font-size:1.05rem">📖 First: what are DC and AC?</h4>
   <table>
@@ -98,7 +98,7 @@
 </section>
 
 <section>
-  <h2><span class="num">6</span>Where you'll find capacitors</h2>
+  <h2><span class="num">#</span>Where you'll find capacitors</h2>
   <div class="cards">
     <div class="card"><div class="ico">📸</div><h3>Camera flash</h3><p>A capacitor charges slowly (that whine you hear), then dumps everything in one bright burst.</p></div>
     <div class="card"><div class="ico">🔌</div><h3>Power supplies</h3><p>They smooth out bumpy voltage. Like a water tower, they top up the dips and absorb the peaks.</p></div>
@@ -110,7 +110,7 @@
 </section>
 
 <section>
-  <h2><span class="num">7</span>Different sizes ("strengths") and what each is used for</h2>
+  <h2><span class="num">#</span>Different sizes ("strengths") and what each is used for</h2>
   <p>Capacitors come in a huge range of sizes, from tiny to enormous. The "strength" of a capacitor means two different things:</p>
   <ul>
     <li><b>Capacitance (size)</b>, in farads: <i>how much</i> charge it holds. In water terms, how big and stretchy the rubber sheet is.</li>
@@ -121,7 +121,7 @@
   <p class="tldr" style="font-size:1rem"><b>Rule of thumb:</b> <b>small</b> capacitors fill and empty in a flash, so they deal with <b>fast</b> things like high frequencies and noise.
   <b>Big</b> capacitors hold more energy and react slowly, so they deal with <b>slow</b> things like power, smoothing and long delays.</p>
   <p class="hint">Drag the slider to see how size changes the job. The fill time assumes the capacitor fills through the same 1 kΩ resistor every time.</p>
-  <div class="controls"><label class="slider grow">Capacitor size<input id="sSize" type="range" min="-11" max="0" step="0.05" value="-7"></label></div>
+  <div class="controls"><x-slider id="sSize" min="-11" max="0" step="0.05" value="-7" grow="1">Capacitor size</x-slider></div>
   <canvas id="cSize" width="800" height="230"></canvas>
 
   <table class="mt-m">
@@ -148,7 +148,7 @@
     <li><b>Above 16 V:</b> the sheet is overstretched. After a moment it <b>tears</b>, and water then flows straight through the hole <i>non-stop</i>. That isn't charging, it's a broken capacitor acting like a short circuit.</li>
   </ul>
   <div class="controls">
-    <label class="slider grow">Battery voltage<input id="bV" type="range" min="0" max="30" step="0.5" value="9"></label>
+    <x-slider id="bV" min="0" max="30" step="0.5" value="9" grow="1">Battery voltage</x-slider>
     <b id="bVlab" style="min-width:52px">9 V</b>
     <button id="bNew">🔧 Replace capacitor</button>
   </div>
@@ -163,7 +163,7 @@
 </section>
 
 <section>
-  <h2><span class="num">8</span>Simple example circuits</h2>
+  <h2><span class="num">#</span>Simple example circuits</h2>
   <p>Here are four small circuits you'll meet again and again. In each one you can <b>swap the capacitor size</b> and see what changes.</p>
 
   <h3>A. LED that fades out slowly (energy reserve)</h3>
@@ -271,7 +271,7 @@
 </section>
 
 <section>
-  <h2><span class="num">9</span>Key facts</h2>
+  <h2><span class="num">#</span>Key facts</h2>
   <div class="grid2">
     <div>
       <canvas id="cSym" width="380" height="170"></canvas>
@@ -295,7 +295,7 @@
 </section>
 
 <section>
-  <h2><span class="num">10</span>Recap</h2>
+  <h2><span class="num">#</span>Recap</h2>
   <ul>
     <li>Two plates and a gap: charge <b>piles up</b> but never crosses.</li>
     <li>Charging: big flow at first, then it slows to zero as it fills.</li>
