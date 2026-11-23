@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<nav class="topbar"><a href="#home" class="brand">⚡ Electronics</a><div class="links"><a href="#resistor" data-nav="components">Components</a><a href="#formulas" data-nav="formulas">Formulas</a><a href="#sensors" data-nav="sensors">Sensors</a><a href="#chips" data-nav="chips">Microchips</a><a href="#parts" data-nav="parts">Real parts</a><a href="#circuits" data-nav="circuits">Circuits</a><a href="#quiz" data-nav="quiz">Quiz</a></div></nav>
+<nav class="topbar"><a href="#home" class="brand">⚡ Electronics</a><div class="links"><a href="#resistor" data-nav="components">Components</a><a href="#formulas" data-nav="formulas">Formulas</a><a href="#sensors" data-nav="sensors">Sensors</a><a href="#chips" data-nav="chips">Microchips</a><a href="#parts" data-nav="parts">Real parts</a><a href="#circuits" data-nav="circuits">Circuits</a><a href="#build" data-nav="build">Build</a><a href="#quiz" data-nav="quiz">Quiz</a></div></nav>
 
 <div class="page" id="page-home" style="--accent:#60a5fa" hidden>
 <div class="hero"><div class="hero-inner">
@@ -47,7 +47,7 @@
     <div class="comp"><svg viewBox="0 0 120 50"><path d="M35 5L85 25L35 45Z" fill="none" stroke="#94a3b8" stroke-width="3"/><path d="M5 15H35M5 35H35M85 25H115" stroke="#94a3b8" stroke-width="3"/></svg><div><h3>Op-amp (deep dive)</h3><p class="analogy">💧 A smart pump that copies a pressure, but bigger</p></div></div>
     
   </div>
-  <p class="hint">Suggested order: resistor → capacitor → diode → LED → transistor → inductor → relay → sound &amp; motion → formulas → sensors → microchips → build the circuits → take the quiz.</p>
+  <p class="hint">Suggested order: resistor → capacitor → diode → LED → transistor → inductor → relay → sound &amp; motion → formulas → sensors → microchips → build the circuits → try your own circuits in the Build lab → take the quiz.</p>
 </section>
 
 <section>
@@ -58,7 +58,7 @@
 
 <section>
   <h2>🔧 Build it yourself</h2>
-  <div class="comp-grid"><a class="comp" data-page="circuits"><svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg><div><h3>Circuits to build</h3><p>26 breadboard projects grouped by theme (electronic dice, police siren, fuzz pedal, 00–99 counter, thermometers, infrared alarm, motors and more) with parts lists and variants to try, plus real-life builds: a <b>Li-ion battery charger</b> and a <b>light detector that switches a lamp</b>.</p><span class="open">Open →</span></div></a></div>
+  <div class="comp-grid"><a class="comp" data-page="circuits"><svg viewBox="0 0 120 60"><rect x="10" y="10" width="100" height="40" rx="4" fill="#e5e7eb"/><path d="M14 16h92M14 44h92" stroke="#ef4444" stroke-width="1.5"/><rect x="40" y="24" width="24" height="10" rx="4" fill="#d9b98a"/><circle cx="84" cy="29" r="6" fill="#ef4444"/></svg><div><h3>Circuits to build</h3><p>26 breadboard projects grouped by theme (electronic dice, police siren, fuzz pedal, 00–99 counter, thermometers, infrared alarm, motors and more) with parts lists and variants to try, plus real-life builds: a <b>Li-ion battery charger</b> and a <b>light detector that switches a lamp</b>.</p><span class="open">Open →</span></div></a><a class="comp" data-page="build" style="--accent:#22d3ee"><svg viewBox="0 0 120 60"><rect x="8" y="12" width="104" height="38" rx="4" fill="#e5e7eb"/><path d="M12 18h96M12 44h96" stroke="#ef4444" stroke-width="1.5"/><path d="M30 31h22" stroke="#cbd5e1" stroke-width="2"/><rect x="34" y="27" width="14" height="8" rx="3" fill="#d9b98a"/><circle cx="70" cy="28" r="6" fill="#22d3ee"/><path d="M86 8l10 22-6-2-3 7-3-1 3-7-6 1z" fill="#f8fafc" stroke="#0b1120"/></svg><div><h3>The Build Lab</h3><p>An empty breadboard and a box of parts: drag, wire, press Play and watch your circuit work (or burn). Check it for mistakes, read voltages with the multimeter, save it, or open any Circuits project in it.</p><span class="open">Open →</span></div></a></div>
 </section>
 
 <section>
@@ -2285,7 +2285,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The battery pushes current around one single loop: <b>+ → resistor → LED → −</b>. The resistor is the narrow pipe that sets how much current can flow, and the LED glows brighter with more current.</p><p>The red LED always "uses" about 2 V of the 9 V. The other 7 V is dropped across the resistor, so the current is <b>I = 7 V ÷ R</b>: 220 Ω gives 32 mA (too much!), 470 Ω gives 15 mA, 1 kΩ gives 7 mA, and 10 kΩ gives 0.7 mA (a faint glow).</p><p>Series resistors add up (harder to flow, dimmer). Parallel resistors give the current two paths (easier, brighter).</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p1" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p1" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2304,7 +2304,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>While you hold the button, the battery feeds two things at once: the LED (through its resistor) and the big <b>capacitor</b>, which fills up to 9 V almost instantly.</p><p>When you let go, the battery is disconnected. The capacitor now acts like a small water tank: it empties <b>through the resistor and the LED</b>, so the LED keeps glowing.</p><p>As the capacitor empties, its voltage drops, the current drops, and the LED fades. A bigger capacitor (more water) or a bigger resistor (narrower pipe) makes the fade last longer: roughly <b>time ≈ R × C</b>.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p2" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p2" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2323,7 +2323,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Each LED is a <b>one-way valve</b> that lights. The two LEDs are connected side by side but pointing <b>opposite ways</b>, so whichever way the current flows, exactly one of them can conduct.</p><p>If + is on test wire A, current flows A → resistor → red LED → B. Swap the wires and it flows B → green LED → resistor → A. The 1 kΩ protects both LEDs (≈ 7 mA).</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p3" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p3" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2342,7 +2342,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Three identical, independent loops share the same battery: <b>+ → button → 470 Ω → LED → −</b>. Each button closes its own loop.</p><p>Because each LED has its <b>own</b> resistor, each gets its own ≈ 15 mA no matter how many are on. With one shared resistor, the LED with the lowest forward voltage would hog the current.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p4" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p4" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2377,7 +2377,7 @@ void loop() {
     <p>💧 <b>Water analogy:</b> the 470 Ω is a narrow section at the entrance. Both valves drink from after it, so neither can ever get a flood.</p>
     <p class="hint">Small cost: the pair keeps ~0.9 V across itself instead of 0.2 V, so the LED gets ~13 mA instead of 14. Ready-made Darlingtons like the TIP120 are wired exactly this way inside.</p>
   </div>
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p5" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p5" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2396,7 +2396,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>While the button is pressed, current flows through the coil and builds a magnetic field (the heavy water wheel spinning up). The LED is connected <b>backwards</b>, so it stays dark.</p><p>When you release the button, the coil's current can't stop instantly. It forces a voltage spike in the <b>opposite direction</b>, which makes the backwards LED conduct for a split second: a <b>flash</b>.</p><p>A flyback diode in the same position absorbs that spike silently: that's exactly why relays and motors need one.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p6" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p6" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2415,7 +2415,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The button sends a small current through the 1 kΩ into the transistor's base. The transistor switches on and lets the bigger coil current (≈ 70 mA) flow through the relay coil.</p><p>The coil becomes an electromagnet and pulls the switch arm: <b>COM</b> leaves <b>NC</b> (red LED off) and touches <b>NO</b> (green LED on). <i>Click!</i></p><p>When you release, the coil's field collapses. The <b>flyback diode</b> catches the spike so the transistor isn't damaged. The 10 kΩ pull-down keeps the base firmly off when the button isn't pressed.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p7" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p7" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2436,7 +2436,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Two transistors, each one able to switch the other <b>off</b> for a moment. When Q1 turns on, its collector drops from ~9 V to ~0 V. The capacitor linking it to Q2's base passes that sudden drop on, and pushes Q2's base <b>below 0 V</b>: Q2 is slammed off.</p><p>Then Q2's base slowly climbs back up as its 47 kΩ resistor refills the capacitor. When it reaches ~0.6 V, Q2 turns on, its collector drops, and the other capacitor slams <b>Q1</b> off. And so on, forever: a <b>see-saw</b> that tips itself.</p><p><b>Water analogy:</b> two buckets on a see-saw, each slowly filled by a thin pipe (the 47 kΩ). When one is full it tips the see-saw, which empties the other bucket. Time per side ≈ 0.7 × R × C = 0.7 × 47 kΩ × 10 µF ≈ <b>0.33 s</b>.</p><p>This is exactly the job a 555 does (project 8), but built from loose parts. It's also the oldest oscillator in electronics: the "astable multivibrator" from 1917, then with vacuum tubes.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p16" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p16" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2455,7 +2455,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The 10 µF capacitor fills through <b>R1 + R2</b>. Inside the 555, two comparators watch its voltage.</p><p>When it reaches <b>⅔ of 9 V</b>, the 555 turns its output (pin 3) <b>off</b> and opens the discharge pin 7, which empties the capacitor through R2. When it falls to <b>⅓</b>, the output turns back <b>on</b> and filling starts again.</p><p>That endless fill/empty cycle makes the LED blink. Frequency ≈ 1.44 ÷ ((R1 + 2·R2) × C): with 1 kΩ, 47 kΩ and 10 µF, about <b>1.5 blinks per second</b>.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p8" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p8" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2474,7 +2474,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The 555 from project 8 produces clock pulses. Each pulse arrives on the CD4017's <b>clock</b> input (pin 14).</p><p>Inside, the 4017 counts the pulses and turns on <b>exactly one</b> of its 10 outputs: Q0, then Q1… up to Q9, then back to Q0. Each output lights its LED, so the light runs along the row.</p><p>Only one LED is ever on, so a single shared resistor on the LEDs' common side is enough. Wiring an output to <b>reset</b> (pin 15) makes it count to a smaller number.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p9" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p9" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2495,7 +2495,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>A <b>quartz</b> is a tiny slice of crystal that vibrates at one single frequency, like a tuning fork. A watch quartz vibrates at <b>32,768 times per second</b>. Inside the CD4060, an inverter (a NOT gate) keeps it vibrating: the 10 MΩ biases it, the two 22 pF and the 100 kΩ make the crystal the only thing that sets the rhythm.</p><p>Why 32,768? Because it's 2¹⁵: divide it by 2 fifteen times and you get exactly 1 Hz. The CD4060 contains a chain of 14 dividers (flip-flops): 32,768 → 16,384 → 8,192 → … → its last output Q14 gives <b>2 Hz</b>. The CD4013 is one more divider: each time its clock rises, its output flips (because Q̅ is fed back to D). 2 Hz → <b>1 Hz</b>.</p><p>The 1 Hz goes into the counter of project 19 instead of the 555. The NE555's rhythm depends on a resistor and a capacitor (5–10 % tolerance, and it drifts with temperature and battery). The quartz is accurate to about ±20 ppm: <b>less than 2 seconds per day</b>.</p><p>💧 <b>Analogy:</b> the 555 is a bucket that fills and empties: roughly regular, depending on the tap. The quartz is a pendulum clock's pendulum: it always swings at the same pace. The dividers are the gears that turn its fast ticks into seconds.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p26" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p26" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2537,7 +2537,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p><b>Active buzzer:</b> it contains its own oscillator, so steady DC is enough. The button simply turns its power on.</p><p><b>Passive buzzer:</b> it is just a membrane that flexes when the voltage changes. It needs a square wave. The 555 makes one (same circuit as the blinker, but with a <b>47 nF</b> capacitor, so it oscillates ~1,000 times faster: an audible tone).</p><p>The <b>10 µF</b> in series lets the wave through but blocks the DC, so the buzzer only sees the back-and-forth part.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p11" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p11" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2558,7 +2558,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Two 555 timers, one controlling the other. <b>555 #2</b> makes the sound: ~600–900 pulses per second, which the speaker turns into a tone. <b>555 #1</b> is slow: it flips its output between 9 V and 0 V about 1.5 times per second (the LED shows it).</p><p>The trick is <b>pin 5 (CTRL)</b> of 555 #2: it's the ⅔ point of its internal divider (see the <a class="navlink" href="#s555">555 pinout</a>). Pull it up through 10 kΩ and the capacitor must fill higher before flipping, so each cycle is longer: a <b>lower note</b>. Pull it down and the note goes <b>higher</b>. Result: two alternating notes, the French "pin-pon".</p><p><b>Water analogy:</b> the tone 555 is a tank that empties each time it reaches the high mark. 555 #1 keeps sliding that high mark up and down, so the tank takes longer or shorter to fill: the rhythm (the pitch) changes.</p><p>Want the American "wail" instead? Add a <b>100 µF</b> from 555 #2 pin 5 to −. It smooths the jumps, so the pitch <b>glides</b> up and down instead of switching.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p17" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p17" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2577,7 +2577,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The volume pot is a <b>voltage divider</b>: it sends a chosen fraction of the input signal to the LM386's + input (pin 3).</p><p>The LM386 amplifies it 20× and drives the speaker with its <b>push-pull</b> output (pin 5). That output sits at 4.5 V and swings up and down around it.</p><p>The <b>220 µF</b> blocks that steady 4.5 V and passes only the music to the speaker (the coupling trick). The <b>10 Ω + 47 nF</b> (Zobel) stops high-frequency oscillation, and the <b>100 µF</b> is a local energy reserve for loud notes.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p10" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p10" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2598,7 +2598,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>This is a silicon <b>"Fuzz Face"</b>, the 1966 pedal heard on countless 60s/70s records. It's just two transistors in a row, with so much gain (~100 × 100) that a guitar note is amplified far beyond what the 9 V supply can hold.</p><p>So the wave gets <b>clipped</b>: its tops and bottoms are sliced flat, and a smooth vibrating string turns into an almost <b>square</b> wave. Square waves are full of extra harmonics: that's the buzzy, sustaining fuzz sound. Same idea as the Ruby's overdrive, pushed much further.</p><p><b>Water analogy:</b> a powerful pump (the transistors) pushing water through a pipe with a ceiling and a floor (9 V and 0 V). Small waves pass, but the pump makes them so big they bang against the ceiling and floor and come out flat-topped.</p><p>The <b>100 kΩ feedback</b> resistor holds both transistors at the right resting point, the <b>22 µF</b> on Q2's emitter sets how much gain the music sees (more capacitance = more fuzz), and the <b>trimmer</b> sets Q2's resting voltage: too high or too low and the fuzz becomes thin, gated and "sputtery". The 2.2 µF and 10 nF are the usual coupling capacitors that pass the music but block DC.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p18" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p18" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2665,7 +2665,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The two displays share the same 8 segment wires, so the Arduino can't light them both with different numbers at the same moment. Instead it shows display 1 for 4 ms, then display 2 for 4 ms, again and again. Your eye blends it into two steady numbers: <b>multiplexing</b>.</p><p>Each display's COM (the shared cathode) goes to ground through its own <b>BC547</b>. The Arduino turns one transistor on at a time (D10 or D11). The transistors carry the whole digit's current (up to 8 × 9 mA), which a single Arduino pin couldn't.</p><p>When you press the button (D12, internal pull-up so it reads LOW when pressed), the code picks random numbers faster at first, then slower, until it stops: like a real die rolling to a stop.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p12" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p12" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2686,7 +2686,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>555</b> runs only while the button is pressed (its reset pin 4 is pulled up by the button and held down by the 10 kΩ otherwise), producing ~1,500 pulses per second. The <b>CD4017</b> moves its single "on" output one step per pulse: Q0 → Q1 → … → Q5, and when it reaches Q6 that output resets it to Q0, so it cycles through exactly <b>6 states</b>. Nobody can stop it on purpose at that speed, so when you release the button it freezes on a random state.</p><p>A dice face only ever uses <b>4 groups</b> of dots: the centre (faces 1, 3, 5), one diagonal pair (2–6), the other diagonal pair (4, 5, 6) and the middle pair (6). Each group is an <b>OR</b>: it must light if <i>any</i> of its outputs is on.</p><p>That's what the <b>diodes</b> do: several outputs feed one line through one-way valves, so an active output lights the group without pushing current back into the other (inactive) outputs. This is a tiny <b>diode logic</b> circuit.</p><p>The 4017 can only supply a few mA, so each group drives a <b>BC547</b> through 10 kΩ, and the transistor switches its LEDs (pairs in series) with a 470 Ω resistor: ≈ 10–15 mA, nice and bright.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p13" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p13" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2707,7 +2707,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>555</b> runs only while the button is pressed (its reset pin 4 is pulled up by the button and held down by the 10 kΩ otherwise), producing ~1,500 pulses per second. The <b>CD4017</b> moves its single "on" output one step per pulse: Q0 → Q1 → … → Q5, and when it reaches Q6 that output resets it to Q0, so it cycles through exactly <b>6 states</b>. Nobody can stop it on purpose at that speed, so when you release the button it freezes on a random state.</p><p>Each output must light a different set of segments: Q0 → "1" (b, c), Q1 → "2" (a, b, d, e, g), and so on up to Q5 → "6". The <b>diode matrix</b> is a hand-built lookup table, or <b>ROM</b> (read-only memory). Each diode says "when this output is on, light this segment".</p><p>Every segment line collects diodes from all the outputs that need it (that's an OR again), then goes through a 2.2 kΩ resistor to the display. Count them: 2 + 5 + 5 + 4 + 5 + 6 = <b>27 diodes</b>.</p><p>The 4017 has to light up to 6 segments from one output, so each segment gets only ~2–3 mA: it works, but it's a bit dim. That's the price of the simple approach. Project 15 does the same job with only 9 diodes.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p14" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p14" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2728,7 +2728,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>555</b> runs only while the button is pressed (its reset pin 4 is pulled up by the button and held down by the 10 kΩ otherwise), producing ~1,500 pulses per second. The <b>CD4017</b> moves its single "on" output one step per pulse: Q0 → Q1 → … → Q5, and when it reaches Q6 that output resets it to Q0, so it cycles through exactly <b>6 states</b>. Nobody can stop it on purpose at that speed, so when you release the button it freezes on a random state.</p><p>Instead of 27 diodes, we turn the 6 outputs into a <b>binary number</b> (BCD) with only 9 diodes: bit A (1) is on for 1, 3, 5; bit B (2) for 2, 3, 6; bit C (4) for 4, 5, 6. For example Q4 ("5") lights A and C: 1 + 4 = 5. The 10 kΩ pull-downs make a bit read 0 when no diode is pushing it up.</p><p>The <b>CD4511</b> decoder (see <a class="navlink" href="#parts">Using real parts</a>) reads that 4-bit number and drives the right segments itself, with plenty of current: much brighter than project 14.</p><p>Why not a ready-made counter that counts 1–6 in binary? The ideal chip (CD4510, a presettable BCD counter) isn't sold at Gotronic, and the CD4518 can only reset to 0. Using the 4017 + a diode encoder is a neat workaround with parts you already have.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p15" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p15" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2749,7 +2749,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>555</b> ticks about 1.5 times per second. The <b>CD4518</b> contains two counters that count in <b>BCD</b> (binary-coded decimal): 0000, 0001 … 1001 (9), then back to 0000. Its 4 outputs Q1–Q4 are worth 1, 2, 4 and 8: for a "6", Q2 and Q3 are on (2 + 4).</p><p><b>Carrying over:</b> the units counter's Q4 (the "8") is on for 8 and 9, and drops when it rolls over from 9 to 0. Wired to the tens counter's ENABLE, that drop counts as one tick: exactly like 09 → 10 on paper.</p><p>Each 4-bit number goes into a <b>CD4511</b>, which lights the right segments of its display (with 1 kΩ per segment). Same decoder as dice project 15, just twice.</p><p><b>Water analogy:</b> a bucket (the units) fills one cup per tick. When it holds the 10th cup it tips over, pours one cup into the next bucket (the tens), and starts empty again.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p19" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p19" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2821,7 +2821,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>LM35</b> is a chip that gives a voltage proportional to temperature: exactly <b>10 mV per °C</b>. At 23 °C its S pin sits at 0.23 V. The module just puts it on a small board with 3 pins.</p><p>The Arduino's <b>A0</b> pin contains an <b>analog-to-digital converter</b> (ADC): it compares the voltage with a reference and gives a number from 0 to 1023. With the normal 5 V reference, one step is 4.9 mV, so ~0.5 °C. The code switches to the chip's internal <b>1.1 V reference</b>: one step is 1.07 mV, about <b>0.1 °C</b>, and 0–110 °C still fits.</p><p><b>Water analogy:</b> the ADC is a measuring jug with 1024 marks. A 5 V jug for a few drops of water (0.23 V) is hard to read; the small 1.1 V jug has its marks much closer together.</p><p>Then it's the same as the dice: 20 readings are averaged (less jitter), converted to °C, rounded, split into tens and units, and shown on the two displays with <b>multiplexing</b> (each one lit 4 ms at a time, too fast for your eye).</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p20" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p20" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2843,7 +2843,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>LM35</b> gives 10 mV per °C (0.22 V at 22 °C). Each <b>comparator</b> in the LM339 answers one question: "is the temperature signal (−) higher than my threshold (+)?". If yes, its output connects to ground and its LED lights. Three LM339 = 12 comparators; we use 10.</p><p>The <b>ladder</b> makes the 10 thresholds: a small current (0.2 mA) flows from +5 V through 20 kΩ + the trimmer, then nine 100 Ω, then 800 Ω to ground. Each 100 Ω drops 0.2 mA × 100 Ω = <b>20 mV</b> = 2 °C. The 800 Ω at the bottom lifts the first step to 160 mV = 16 °C. The trimmer adjusts the current, so it stretches or shrinks the whole scale.</p><p>Warmer → higher signal → it passes more rungs → more comparators say "yes" → <b>a longer bar</b>. This is exactly what is inside an LM3914, built by hand. The difference: the LM339 doesn't limit the LED current, so each LED gets its own 470 Ω (≈ 6 mA). Eight of them come in one <b>resistor network</b>: 8 resistors in one flat package, all joined on one side (pin 1, marked with a dot), which goes to +5 V.</p><p>💧 <b>Water analogy:</b> a tall tank with 10 overflow holes at equal heights (the ladder), each feeding a little light. The warmer it is, the higher the water rises, and the more holes spill over.</p><p>Right at a threshold, the signal wobbles by a fraction of a mV and the last segment may flicker. That's normal: a real product adds a little <b>hysteresis</b> (a 1 MΩ from each output back to its + input).</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p21" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p21" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2864,7 +2864,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p><b>The problem:</b> everything glows in infrared: the sun, lamps, radiators, your body. A plain IR sensor would be fooled all the time. <b>The trick:</b> the IR LED blinks <b>38,000 times per second</b>, and the <b>TSOP</b> contains a filter that only reacts to light blinking at exactly that speed. Like hearing your own name in a noisy room: everything else is ignored. TV remotes use the same trick.</p><p><b>555 #2</b> makes the 38 kHz (1 kΩ, 3.53 kΩ and 4.7 nF). <b>555 #1</b> switches it on and off about 690 times per second, in <b>bursts</b>, through 555 #2's reset pin. Why? The TSOP slowly gets used to a signal that never stops (it treats it as noise) and goes deaf. Bursts keep it listening.</p><p>The TSOP's <b>OUT</b> goes <b>low</b> during each burst it receives. The diode lets it empty the 10 µF "bucket" at every burst, while the 4.7 kΩ slowly refills it. Beam present: the bucket is emptied 690 times a second and stays near 0.8 V. <b>Beam blocked:</b> nothing empties it, it fills to ~3.6 V in a few hundredths of a second, the BC547 turns on and the red LED lights.</p><p>💧 <b>Water analogy:</b> a bucket under a small tap (4.7 kΩ), with a drain that opens at every burst (the TSOP). As long as the bursts arrive, the bucket stays empty. Block the beam: the drain stays shut, the bucket fills up and overflows into the alarm.</p><p>The two 10 kΩ resistors form a <b>divider</b>: the base only gets enough voltage when the bucket is above ~1.3 V. That stops the 0.8 V "empty" level from half-lighting the LED. See the <a class="navlink" href="#seir">infrared sensors</a> page for more on the TSOP.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p22" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p22" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2885,7 +2885,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>A motor's speed depends on the <b>average voltage</b> it gets. We could waste the extra voltage in a big resistor (it would get hot), but there's a smarter trick: switch the full 9 V <b>on and off very fast</b>, about 13,000 times per second. That's <b>PWM</b> (pulse-width modulation). On 30 % of the time = like 30 % of 9 V ≈ 2.7 V on average. The motor is far too heavy to follow each pulse: it just feels the average.</p><p>The <b>555</b> makes the pulses. The trimmer splits its 10 kΩ in two: the capacitor <b>charges</b> through one side and <b>discharges</b> through the other (each diode lets only one direction through). Turn the knob: one side grows as the other shrinks, so the on-time changes but the total period stays the same.</p><p>The 555 can't feed a motor (it would need ~200 mA, more when starting). So it drives a transistor, like in the <a class="navlink" href="#p7">relay clicker</a>. But the BC547 only takes 100 mA, so we use an <b>SS8050</b>: same job, up to 1.5 A. The 1N4007 handles the coil kick, exactly like for a relay.</p><p>💧 <b>Water analogy:</b> instead of half-closing a tap (which wastes pressure), you open it fully and close it fully, very fast. A heavy water wheel can't follow the flicker: it turns at the average flow.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p23" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p23" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2906,7 +2906,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>To reverse a DC motor, you reverse the current through it: swap its two wires. The <b>L293D</b> does that electronically with an <b>H-bridge</b>: four switches arranged like the letter H, with the motor as the middle bar.</p><p>Each output (1Y, 2Y) connects the motor end either to <b>+</b> or to <b>−</b>, copying its input (1A, 2A). FORWARD: 1Y = +, 2Y = −, the current flows left → right. REVERSE: 1Y = −, 2Y = +, right → left. Both equal (both buttons or none): no voltage across the motor, it stops (and even brakes).</p><p>The two LEDs are wired head-to-tail, like the polarity tester (<a class="navlink" href="#p3">project 3</a>): the red one lights for one current direction, the green one for the other.</p><p>💧 <b>Water analogy:</b> a water wheel in a pipe between two tanks. Raise the left tank and lower the right: it turns one way. Swap them: it turns the other way. The L293D is the one lifting the tanks.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p24" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p24" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2927,7 +2927,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p><b>Why not 9 V on a small 3–6 V motor?</b> Too much voltage = too much speed and current: the coil heats up, the brushes spark and wear out, and its life drops from hundreds of hours to a few. It won't explode, but it dies early. (The RE140/1 you're buying is rated 3–9 V, so 9 V is fine for <i>it</i>. This page is for smaller motors, like one from an old toy.)</p><p><b>A resistor?</b> A resistor drops U = R × I, so the drop <b>depends on the current</b>. A motor's current changes all the time: ~1 A when starting, 0.1 A spinning freely, more when you brake it. So the voltage it gets changes too: too little exactly when it needs it most (starting, or under load), and too much when spinning freely. And it heats up: 3 V × 0.25 A = 0.75 W burns a 1/4 W resistor.</p><p><b>Diodes!</b> A silicon diode drops about <b>0.7 V almost whatever the current</b> (0.65 V at 10 mA, 0.85 V at 1 A). Four in series take about 3 V off: 9 V → ~6 V, steady from start-up to full load. Each 1N4007 handles 1 A. It's the cheapest "voltage reducer" for motors. (They still turn the 3 V into heat, but spread over 4 diodes it's fine.)</p><p><b>And the capacitor?</b> A capacitor does <b>not</b> lower a voltage. It's a bucket that fills up to <b>the same level</b> as what feeds it: on 9 V it charges to 9 V. What it does: it <b>smooths</b> (fills the dips), and gives a short <b>boost</b> of current at start-up. With a diode in front, a diode + capacitor make a <b>rectifier</b> (turn AC into DC, as in a phone charger): that's probably the combination you heard about. To really <i>control</i> a voltage, you need either diodes (fixed drops), a zener diode + transistor, or a regulator like the 7805, which is exactly that inside a chip.</p><p>💧 <b>Water analogy:</b> the resistor is a narrow pipe: the more water flows, the more pressure it loses. Each diode is a <b>small step</b> of fixed height (0.7 V): the water always loses the same height, whatever the flow. The capacitor is a tank on the side: it can't lower the water level, it can only keep it steady.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="p25" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_p25" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2954,7 +2954,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>TP4056</b> takes 5 V from USB and charges the cell in two phases. First <b>constant current</b> (1 A) while the cell voltage rises, then <b>constant voltage</b> (exactly 4.2 V) while the current fades. It stops at about 100 mA.</p><p>The <b>BMS</b> sits between the cell and everything else. It contains a tiny chip and two MOSFET switches that disconnect the cell if it's over-charged, over-discharged (below ~2.5 V) or short-circuited.</p><p>The charger and the load both connect to the BMS's <b>P+ / P−</b> side, so they're always protected. The cell itself only touches <b>B+ / B−</b>.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="rl1" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_rl1" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2980,7 +2980,7 @@ void loop() {
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>10 kΩ + LDR</b> divider gives a voltage that rises as it gets darker (the LDR's resistance shoots up). The trimmer gives an adjustable <b>threshold</b> voltage.</p><p>The <b>LM358</b> compares them. Sensor above threshold means dark, so its output jumps HIGH. The <b>1 MΩ</b> feeds a little of the output back to the + input (<b>hysteresis</b>), so once it switches it stays switched, and the lamp doesn't flicker at dusk.</p><p>The HIGH output drives the <b>BC547</b> through 1 kΩ, the transistor powers the <b>relay coil</b>, and the relay's contact closes the separate <b>12 V lamp</b> circuit. The 1N4007 protects the transistor from the coil's switch-off spike.</p></div>
   
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="rl2" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_rl2" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>
@@ -2996,7 +2996,70 @@ void loop() {
 
 
 </div></div>
-<div class="pager"><a href="#parts"><small>← Previous</small>Real parts</a><a class="next" href="#quiz"><small>Next →</small>Quiz</a></div>
+<div class="pager"><a href="#parts"><small>← Previous</small>Real parts</a><a class="next" href="#build"><small>Next →</small>Build</a></div>
+</main>
+</div>
+
+<div class="page wide" id="page-build" style="--accent:#22d3ee" hidden>
+<div class="hero"><div class="hero-inner">
+  <div><span class="eyebrow">Virtual breadboard</span><h1>The Build Lab</h1><p class="tag">Drag parts onto a breadboard, wire them, press Play: LEDs light up, motors spin, and parts burn when you overload them. Try a circuit here before you build it for real.</p><div class="facts"><span>🧲 Drag & drop</span><span>▶ Live simulation</span><span>🔥 Burn, then replace</span></div></div>
+  <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
+  <defs><radialGradient id="bdglow"><stop offset="0" stop-color="#22d3ee" stop-opacity=".9"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient></defs>
+  <rect x="20" y="58" width="280" height="118" rx="8" fill="#e5e7eb"/>
+  <rect x="24" y="112" width="272" height="8" fill="#d1d5db"/>
+  <path d="M30 68h260M30 166h260" stroke="#ef4444" stroke-width="1.5"/><path d="M30 76h260M30 158h260" stroke="#3b82f6" stroke-width="1.5"/>
+  <g fill="#9ca3af">
+    <rect x="36" y="88" width="3" height="3"/><rect x="48" y="88" width="3" height="3"/><rect x="60" y="88" width="3" height="3"/><rect x="72" y="88" width="3" height="3"/><rect x="84" y="88" width="3" height="3"/><rect x="96" y="88" width="3" height="3"/><rect x="108" y="88" width="3" height="3"/><rect x="120" y="88" width="3" height="3"/><rect x="132" y="88" width="3" height="3"/><rect x="144" y="88" width="3" height="3"/><rect x="156" y="88" width="3" height="3"/><rect x="168" y="88" width="3" height="3"/><rect x="180" y="88" width="3" height="3"/><rect x="192" y="88" width="3" height="3"/><rect x="204" y="88" width="3" height="3"/><rect x="216" y="88" width="3" height="3"/><rect x="228" y="88" width="3" height="3"/><rect x="240" y="88" width="3" height="3"/><rect x="252" y="88" width="3" height="3"/><rect x="264" y="88" width="3" height="3"/><rect x="276" y="88" width="3" height="3"/>
+    <rect x="36" y="136" width="3" height="3"/><rect x="48" y="136" width="3" height="3"/><rect x="60" y="136" width="3" height="3"/><rect x="72" y="136" width="3" height="3"/><rect x="84" y="136" width="3" height="3"/><rect x="96" y="136" width="3" height="3"/><rect x="108" y="136" width="3" height="3"/><rect x="120" y="136" width="3" height="3"/><rect x="132" y="136" width="3" height="3"/><rect x="144" y="136" width="3" height="3"/><rect x="156" y="136" width="3" height="3"/><rect x="168" y="136" width="3" height="3"/><rect x="180" y="136" width="3" height="3"/><rect x="192" y="136" width="3" height="3"/><rect x="204" y="136" width="3" height="3"/><rect x="216" y="136" width="3" height="3"/><rect x="228" y="136" width="3" height="3"/><rect x="240" y="136" width="3" height="3"/><rect x="252" y="136" width="3" height="3"/><rect x="264" y="136" width="3" height="3"/><rect x="276" y="136" width="3" height="3"/>
+  </g>
+  <path d="M50 68 Q60 50 74 89" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M74 89h52" stroke="#9ca3af" stroke-width="2"/><rect x="88" y="84" width="26" height="10" rx="4" fill="#e7c99a"/>
+  <rect x="93" y="84" width="3" height="10" fill="#7c3f12"/><rect x="99" y="84" width="3" height="10" fill="#111"/><rect x="105" y="84" width="3" height="10" fill="#dc2626"/>
+  <circle cx="146" cy="78" r="30" fill="url(#bdglow)"/><path d="M138 89v-9M154 89v-9" stroke="#9ca3af" stroke-width="2"/>
+  <path d="M138 80v-10a8 8 0 0 1 16 0v10z" fill="#22d3ee"/>
+  <path d="M154 89 Q190 40 230 76 T262 158" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
+  <g transform="translate(196 92) rotate(-14)"><path d="M-14 6h28" stroke="#9ca3af" stroke-width="2"/><rect x="-10" y="1" width="20" height="10" rx="2" fill="#111827"/><rect x="5" y="1" width="3" height="10" fill="#e5e7eb"/></g>
+  <path d="M206 98l16 34-9-3-5 11-5-2 5-11-10 1z" fill="#f8fafc" stroke="#0b1120" stroke-width="1.5"/>
+  <g font-family="ui-monospace,monospace" font-size="10" fill="#22d3ee"><text x="196" y="44">▶ PLAY</text><text x="40" y="196">I = 15 mA</text><text x="214" y="196">V = 9.00 V</text></g>
+</svg></div></div></div>
+<main>
+<div class="cl-layout bd-layout">
+  <aside class="cl-menu bd-catalog" id="bdCatalog"><!-- filled from parts.js --></aside>
+  <div class="cl-content">
+    <section class="bd-work">
+      <div class="bd-toolbar">
+        <button id="bdPlay" class="go">▶ Play</button>
+        <button id="bdCheck">✓ Check circuit</button>
+        <span class="bd-sep"></span>
+        <span class="bd-lab">Wire</span><span id="bdColors" class="bd-colors"></span>
+        <span class="bd-sep"></span>
+        <button id="bdUndo" title="Undo (Ctrl+Z)">↶</button><button id="bdRedo" title="Redo (Ctrl+Y)">↷</button>
+        <button id="bdRotate" title="Rotate the selected part (R)">↻</button>
+        <button id="bdDelete" title="Delete the selection (Del)">🗑</button>
+        <span class="bd-sep"></span>
+        <button id="bdSave">💾 Save</button><button id="bdOpen">📂 Open</button><button id="bdClear">✖ Clear</button>
+      </div>
+      <div class="bd-stage"><canvas id="bdBoard" class="bd-board" width="800" height="440"></canvas></div>
+      <div class="bd-status" id="bdStatus">Drag a part from the catalog onto the board.</div>
+    </section>
+    <div class="bd-panels">
+      <section id="bdProps" class="bd-panel"><h3 class="flush">Properties</h3><div id="bdPropsBody" class="hint">Click a part or a wire to see and change it.</div></section>
+      <section id="bdInfo" class="bd-panel"><h3 class="flush" id="bdInfoTitle">Multimeter</h3><div id="bdInfoBody" class="hint">Press Play, then hover a hole, a wire or a part.</div></section>
+    </div>
+    <section class="bd-help">
+      <h3 class="flush">How to use the lab</h3>
+      <div class="cards">
+        <div class="card"><div class="ico">🧲</div><h3>Place</h3><p>Drag a part from the catalog onto the board: it snaps to the most logical holes. Drag it again to move it, <b>R</b> to rotate, <b>Del</b> to remove.</p></div>
+        <div class="card"><div class="ico">🔌</div><h3>Wire</h3><p>Press on a hole (or a leg) and drag to another hole. Pick the colour first in the toolbar, or click a wire to change it.</p></div>
+        <div class="card"><div class="ico">▶</div><h3>Play</h3><p>The circuit comes alive: LEDs light, motors turn. Hover a hole to read its voltage. Too much current? The part burns: click it and press <b>Replace</b>.</p></div>
+        <div class="card"><div class="ico">✓</div><h3>Check</h3><p>Lists the usual mistakes: a short circuit, an LED without resistor, a part with both legs in the same strip, a loose leg…</p></div>
+      </div>
+      <p class="hint">The breadboard works like the real one: in each column, holes <b>a–e</b> are connected together, and so are <b>f–j</b>. The four long rails (+ and − at the top and bottom) run along the whole board. Open a project from the <a class="navlink" href="#circuits">Circuits</a> page with its <b>🔧 Build it</b> button.</p>
+    </section>
+  </div>
+</div>
+
+<div class="pager"><a href="#circuits"><small>← Previous</small>Circuits</a><a class="next" href="#quiz"><small>Next →</small>Quiz</a></div>
 </main>
 </div>
 
@@ -3048,7 +3111,7 @@ void loop() {
   <div class="qnav"><button id="qBack">← Back to the questions</button><button id="qRestart" class="active">🔄 Start over</button></div>
 </section>
 
-<div class="pager"><a href="#circuits"><small>← Previous</small>Circuits</a><a class="next" href="#home"><small>Back to</small>Home</a></div>
+<div class="pager"><a href="#build"><small>← Previous</small>Build</a><a class="next" href="#home"><small>Back to</small>Home</a></div>
 </main>
 </div>
 
@@ -3065,6 +3128,7 @@ void loop() {
 <script src="js/chips.js"></script>
 <script src="js/parts.js"></script>
 <script src="js/circuits.js"></script>
+<script src="js/build.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/app.js"></script>
 <script src="js/probe.js"></script>

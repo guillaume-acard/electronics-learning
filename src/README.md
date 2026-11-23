@@ -21,6 +21,7 @@ src/
     index.html          the page skeleton (top bar, scripts)
     css/                tokens.css (every colour), base.css, layout.css, components.css, probe.css
     js/                 core.js (loop, hold, heroSwap, sectionMenu), helpers.js + helpers2.js (canvas drawing),
+                        breadboard.js (BB, HP, drawBoard, partOn: the breadboard, shared by Circuits and Build),
                         router.js, probe_prelude.js + probe.js (click-a-wire probe)
   pages/
     home/                       page.html, hero.svg
@@ -30,12 +31,15 @@ src/
       chips/<id>.html, <id>.js  one pair per chip
     circuits/                   page.html (intro), page.py (the project template), themes.py (menu order), lib.js, init.js
       projects/<id>.py, <id>.js one pair per project: content data / breadboard layout + demo
+    build/                      the Build lab: parts.js (catalog), board.js (holes, strips, placement, drawing),
+                                sim.js (simulator), check.js ("Check circuit"), page.js (the UI), page.html, page.css
     shopping/                   items.py (the Gotronic list), shop.py (renders shopping.html), page.css
   legacy.zip            old one-time scripts and stale copies (history only, nothing uses it)
 ```
 
 Every page's scripts are bundled into `build/js/<page>.js`: the palette `PAL`, `core.js`, then the files listed
-under `js` in `sitemap.py` (`@helpers`/`@helpers2` = shared drawing helpers; globs like `chips/*.js` allowed).
+under `js` in `sitemap.py` (`@helpers`/`@helpers2` = shared drawing helpers, `@breadboard` = the breadboard;
+globs like `chips/*.js` allowed).
 
 ## Common changes
 
@@ -88,9 +92,26 @@ clock in seconds (advanced before the project loops run). Shared demo pieces liv
 **A shop item** – a row in `pages/shopping/items.py`. The build warns when a project's "You need" names a part
 whose "used in" doesn't list that project.
 
+## The Build lab (`pages/build/`)
+
+A breadboard where parts are dropped, wired and simulated.
+- **A new part** = one entry in `PARTS` (`parts.js`):
+  - `name`, `group` (catalog heading), `icon`;
+  - `foot` (hole offsets `[row, col]` from the first pin) and `pins`;
+  - `anchor` (`'e'` straddles the centre gap, `'rails'` for supplies), `rotate`, `props`, `edit` (Properties panel);
+  - `model(c, n, p)`: adds elements to the simulator (`c.R`, `c.D`, `c.Q`, `c.C`, `c.SW`, `c.Vs`, `c.Motor`, `c.T555`);
+  - `watch(el, p)`: what to show (`bright`, `spin`, `sound`, `info`) and `over` (the reason it burns);
+  - its look: a case in `drawPart` (`board.js`).
+- **Simulator** (`sim.js`, no DOM): nodal analysis + Newton (diodes, transistor), capacitors and motor stepped in time.
+  `node tools/simtest.js` checks it against known circuits (LED current, divider, RC, transistor, 555 frequency, motor).
+- **"🔧 Build it"** on a Circuits project converts its breadboard layout (`BBL`) with `importLayout` (`page.js`).
+  The button only shows when every part is supported. Chips other than the 555, relays, speakers and displays are not yet.
+- Boards are kept in the browser (`localStorage`: `buildlab:current` autosave, `buildlab:circuits` for saved ones).
+
 ## Checking a change
 
 - `python src/build.py` must end with `checks: OK`.
+- Build lab simulator: `node tools/simtest.js`.
 - Open the page in a browser and look at the console (F12): no errors.
 - Bigger refactors: `tools/snapshot.js` captures every section's text and canvas pixels deterministically.
   `python tools/snapprep.py build` writes `build/index.snap.html`; open it from the dev server

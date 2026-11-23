@@ -111,7 +111,7 @@ def build_site(site):
         main = components.section_menu(p['id'], main)
         if p.get('group'):
             main = f'<div class="cl-layout">{group_menu(pages, p)}<div class="cl-content">{main}</div></div>'
-        wide = ' wide' if 'class="cl-layout"' in main else ''      # pages with a left menu get a wider column
+        wide = ' wide' if re.search(r'class="cl-layout\b', main) else ''      # pages with a left menu get a wider column
         pages_html += f'\n<div class="page{wide}" id="page-{p["id"]}" style="--accent:{p["accent"]}" hidden>\n{hero(p)}\n<main>\n{main}\n{pager(pages, i)}\n</main>\n</div>\n'
         js = page_js(p)
         if js:

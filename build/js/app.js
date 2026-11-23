@@ -1,6 +1,6 @@
 
 (function(){
-const PAGES=["home", "resistor", "capacitor", "diode", "led", "transistor", "inductor", "relay", "motion", "formulas", "sensors", "chips", "parts", "circuits", "quiz"];
+const PAGES=["home", "resistor", "capacitor", "diode", "led", "transistor", "inductor", "relay", "motion", "formulas", "sensors", "chips", "parts", "circuits", "build", "quiz"];
 let prev=null;   // page shown before this hash change
 document.querySelectorAll('a[data-page]').forEach(a=>{const p=a.dataset.page==='hub'?'home':a.dataset.page;a.href='#'+p;a.removeAttribute('target');});
 function show(){let id=(location.hash||'#home').slice(1),target=null;

@@ -34,7 +34,7 @@ def section(p, group=None):
   <h3>💡 How it works</h3>
   <div class="howbox">{how}</div>
   {p.EXTRA}
-  <h3>🏁 Final breadboard setup</h3>
+  <h3>🏁 Final breadboard setup <button class="bd-open" data-project="{p.ID}" hidden title="Open this board in the Build lab, press Play and try it">🔧 Build it</button></h3>
   <p class="hint sub">This is what your board should look like when it's finished (and powered). Compare with it at the end.</p>
   <canvas id="bbF_{p.ID}" class="bbc" width="800" height="440"></canvas>
   <h3 class="wtitle">🔌 Step-by-step wiring <span class="wprog"></span> <button class="wreset">↺ reset</button></h3>

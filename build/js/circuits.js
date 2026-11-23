@@ -996,6 +996,7 @@ loop((dt,now)=>{drawLD(dt);});
 
 // ===== Circuits page: wiring checklists, breadboard drawing (loaded after projects/*.js) =====
 // wire up final + live canvases
+window.BBL_LAYOUTS=BBL;   // read by the Build lab ("🔧 Build it" buttons)
 const BBV=[];
 document.querySelectorAll('.cl-content section').forEach(sec=>{const id=sec.id;if(!BBL[id])return;const F=document.getElementById('bbF_'+id),S=document.getElementById('bbS_'+id);
   const boxes=[...sec.querySelectorAll('.wsteps input[type=checkbox]')];BBV.push({id,F,S,boxes});});

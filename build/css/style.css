@@ -221,6 +221,44 @@
   #probePanel canvas{width:100%;height:auto;display:block;border-radius:6px;margin-top:6px}#probePanel .pbleg{font-size:.75rem;color:var(--muted);margin:2px 0 6px}#probePanel .pbflow{display:block;font-size:.82rem;color:var(--ink-2);margin:4px 0}
   #probePanel .pclose{position:absolute;right:8px;top:6px;padding:2px 8px;background:transparent;color:var(--muted)}#probePanel .pn{color:var(--muted);font-size:.8rem;margin:4px 0}#probePanel .pq{color:#f59e0b}#probePanel .pa{color:var(--highlight);font-size:.8rem}
 
+/* Build page (the breadboard lab) */
+  .bd-catalog .bd-item{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
+  .bd-catalog .bd-item:active{cursor:grabbing}
+  .bd-catalog .bd-item .n{font-size:.8rem}
+  .bd-work{padding:14px 16px}
+  .bd-toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+  .bd-toolbar button{padding:6px 12px}
+  .bd-sep{width:1px;align-self:stretch;margin:2px 4px;background:var(--line)}
+  .bd-lab{font:600 .9rem var(--font-head);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .bd-colors{display:inline-flex;gap:4px}
+  .bd-colors button{width:24px;height:24px;padding:0;border-radius:50%;border:2px solid transparent}
+  .bd-colors button.active{border-color:var(--white);box-shadow:0 0 10px -1px var(--cyan)}
+  .bd-stage{position:relative}
+  .bd-board{cursor:crosshair;touch-action:none}
+  .bd-board.dragging{cursor:grabbing}
+  .bd-status{margin-top:8px;font:500 .85rem var(--font-mono);color:var(--muted);min-height:1.4em}
+  .bd-status.run{color:var(--good)}.bd-status.warn{color:var(--amber)}
+  .bd-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.bd-panels{grid-template-columns:1fr}}
+  .bd-panel{margin:0 0 14px;padding:14px 16px}
+  .bd-panel h3{font-size:1.15rem}
+  .bd-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  .bd-row label{font:600 .95rem var(--font-head);color:var(--muted);min-width:90px}
+  .bd-kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font:500 .9rem var(--font-mono)}
+  .bd-kv b{color:var(--ink)} .bd-kv span{color:var(--muted)}
+  .bd-burnt{color:var(--bad);font-weight:700}
+  .bd-issues{list-style:none;padding:0;margin:0}
+  .bd-issues li{display:flex;gap:8px;padding:7px 10px;margin:4px 0;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:var(--radius);background:var(--surface);cursor:pointer}
+  .bd-issues li.err{border-left-color:var(--bad)}.bd-issues li.ok{border-left-color:var(--good);cursor:default}
+  .bd-issues li:hover{box-shadow:var(--glow)}
+  .bd-modal{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(3,6,14,.7)}
+  .bd-modal[hidden]{display:none}
+  .bd-modal .box{width:min(420px,92vw);margin:0}
+  .bd-saved{list-style:none;padding:0;margin:8px 0;max-height:50vh;overflow:auto}
+  .bd-saved li{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+  .bd-saved li span{flex:1}
+  .bd-open{float:right;margin-top:-4px}
+
 /* chips page only */
   .pnout{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:10px 16px}.pnname{font:800 2rem ui-monospace,monospace;letter-spacing:.04em;margin:4px 0 6px}.pnname span{margin-right:4px;padding-bottom:2px}
   .cmfig{background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:6px;overflow-x:auto}.cmfig svg{min-width:640px}

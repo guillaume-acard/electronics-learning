@@ -1,0 +1,35 @@
+<div class="cl-layout bd-layout">
+  <aside class="cl-menu bd-catalog" id="bdCatalog"><!-- filled from parts.js --></aside>
+  <div class="cl-content">
+    <section class="bd-work">
+      <div class="bd-toolbar">
+        <button id="bdPlay" class="go">▶ Play</button>
+        <button id="bdCheck">✓ Check circuit</button>
+        <span class="bd-sep"></span>
+        <span class="bd-lab">Wire</span><span id="bdColors" class="bd-colors"></span>
+        <span class="bd-sep"></span>
+        <button id="bdUndo" title="Undo (Ctrl+Z)">↶</button><button id="bdRedo" title="Redo (Ctrl+Y)">↷</button>
+        <button id="bdRotate" title="Rotate the selected part (R)">↻</button>
+        <button id="bdDelete" title="Delete the selection (Del)">🗑</button>
+        <span class="bd-sep"></span>
+        <button id="bdSave">💾 Save</button><button id="bdOpen">📂 Open</button><button id="bdClear">✖ Clear</button>
+      </div>
+      <div class="bd-stage"><canvas id="bdBoard" class="bd-board" width="800" height="440"></canvas></div>
+      <div class="bd-status" id="bdStatus">Drag a part from the catalog onto the board.</div>
+    </section>
+    <div class="bd-panels">
+      <section id="bdProps" class="bd-panel"><h3 class="flush">Properties</h3><div id="bdPropsBody" class="hint">Click a part or a wire to see and change it.</div></section>
+      <section id="bdInfo" class="bd-panel"><h3 class="flush" id="bdInfoTitle">Multimeter</h3><div id="bdInfoBody" class="hint">Press Play, then hover a hole, a wire or a part.</div></section>
+    </div>
+    <section class="bd-help">
+      <h3 class="flush">How to use the lab</h3>
+      <div class="cards">
+        <div class="card"><div class="ico">🧲</div><h3>Place</h3><p>Drag a part from the catalog onto the board: it snaps to the most logical holes. Drag it again to move it, <b>R</b> to rotate, <b>Del</b> to remove.</p></div>
+        <div class="card"><div class="ico">🔌</div><h3>Wire</h3><p>Press on a hole (or a leg) and drag to another hole. Pick the colour first in the toolbar, or click a wire to change it.</p></div>
+        <div class="card"><div class="ico">▶</div><h3>Play</h3><p>The circuit comes alive: LEDs light, motors turn. Hover a hole to read its voltage. Too much current? The part burns: click it and press <b>Replace</b>.</p></div>
+        <div class="card"><div class="ico">✓</div><h3>Check</h3><p>Lists the usual mistakes: a short circuit, an LED without resistor, a part with both legs in the same strip, a loose leg…</p></div>
+      </div>
+      <p class="hint">The breadboard works like the real one: in each column, holes <b>a–e</b> are connected together, and so are <b>f–j</b>. The four long rails (+ and − at the top and bottom) run along the whole board. Open a project from the <a class="navlink" href="#circuits">Circuits</a> page with its <b>🔧 Build it</b> button.</p>
+    </section>
+  </div>
+</div>
