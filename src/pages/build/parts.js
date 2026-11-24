@@ -4,7 +4,7 @@
 // anchor: rows the anchor may use ('rails' = tp/bp only, 'e'/'f' = straddles the gap). props: default values.
 // edit: what the Properties panel shows ({k, label, opts | range | toggle | hold}; opts may be a function of the part,
 // show(p) hides a line, set(p) runs after a change). kind-style props (diode model, capacitor type) switch the model
-// of a placed part. label(p): its full name. pinNames: what each leg is (chips). supply/optional/tie: for "Check". model(): adds the part to the simulator. watch(): what we read back
+// of a placed part. probeI(el): the current a probe on it shows (default: its first element). label(p): its full name. pinNames: what each leg is (chips). supply/optional/tie: for "Check". model(): adds the part to the simulator. watch(): what we read back
 // (current, power, light...) and the limits that burn it.
 const RES_VALUES=[];for(let d=10;d<=100000;d*=10)E12.forEach(v=>RES_VALUES.push(Math.round(v*d)));RES_VALUES.push(1e6);   // E12 from helpers2.js
 const CAP_VALUES=[1e-9,2.2e-9,4.7e-9,10e-9,22e-9,47e-9,100e-9,220e-9,470e-9,1e-6,2.2e-6,4.7e-6,10e-6,22e-6,47e-6,100e-6,220e-6,470e-6,1000e-6];
@@ -43,7 +43,7 @@ const PARTS={
    props:{R:470},edit:[{k:'R',label:'Value',opts:RES_VALUES.map(v=>[v,fmtR(v)])}],
    model:(c,n,p)=>({r:c.R(n['1'],n['2'],p.props.R)}),
    watch:(el)=>({I:el.r.i,P:el.r.p,info:[['Current',fmtI(el.r.i)],['Voltage',fmtV(el.r.v)],['Power',fmtP(el.r.p)+' (max 250 mW)']],over:el.r.p>0.25?'more than ¼ W: it overheats':''})},
- pot:{name:'Trimmer / pot',group:'Passive',icon:'⟳',foot:[[0,0],[0,1],[0,2]],pins:['1','W','3'],rotate:true,
+ pot:{name:'Trimmer / pot',group:'Passive',icon:'⟳',foot:[[0,0],[0,1],[0,2]],pins:['1','W','3'],rotate:true,probeI:el=>el.a.i-el.b.i,
    props:{R:10000,pos:0.5},edit:[{k:'R',label:'Value',opts:[[1000,'1 kΩ'],[10000,'10 kΩ'],[47000,'47 kΩ'],[100000,'100 kΩ']]},{k:'pos',label:'Knob',range:[0,1,0.01],live:true}],
    model:(c,n,p)=>({a:c.R(n['1'],n['W'],Math.max(1,p.props.R*p.props.pos)),b:c.R(n['W'],n['3'],Math.max(1,p.props.R*(1-p.props.pos)))}),
    update:(el,p)=>{el.a.g=1/Math.max(1,p.props.R*p.props.pos);el.b.g=1/Math.max(1,p.props.R*(1-p.props.pos));},
@@ -70,7 +70,7 @@ const PARTS={
    edit:[{k:'kind',label:'Model',opts:[['1N4007','1N4007: rectifier, 1 A'],['1N4148','1N4148: small signal, 200 mA']]}],
    model:(c,n,p)=>{const D=DIODES[p.props.kind];return {d:c.D(n['A'],n['K'],diodeIs(D.vf,D.n),D.n)};},
    watch:(el,p)=>{const D=DIODES[p.props.kind];return {I:el.d.i,info:[['Current',fmtI(el.d.i)+' (max '+D.lab+')'],['Voltage',fmtV(el.d.v)]],over:el.d.i>D.Imax?'more than '+D.lab:''};}},
- npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},label:p=>'Transistor '+p.props.kind,
+ npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},probeI:el=>el.q.ic,label:p=>'Transistor '+p.props.kind,
    edit:[{k:'kind',label:'Model',opts:[['BC547','BC547 (small: 100 mA)'],['SS8050','SS8050 (stronger: 1.5 A)']]}],
    model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2),vpk:0}),
    tick:(el)=>{if(el.q.vce>el.vpk)el.vpk=el.q.vce;},
@@ -78,7 +78,7 @@ const PARTS={
      if(pk>Vmax)return {I:el.q.ic,kill:true,info:[],over:`a spike of ${Math.round(pk)} V between C and E (max ${Vmax} V): a coil was switched off with no flyback diode across it`};
      return {I:el.q.ic,P:el.q.p,info:[['Collector',fmtI(el.q.ic)+' (max '+(big?'1.5 A':'100 mA')+')'],['Base',fmtI(el.q.ib)],['C–E voltage',fmtV(el.q.vce)],['Power',fmtP(el.q.p)]],
      over:el.q.ic>Imax?'more than '+(big?'1.5 A':'100 mA')+' in the collector'+(big?'':' (for a motor, use the SS8050)'):el.q.p>Pmax?'more than '+Pmax+' W':el.q.ib>0.02?'more than 20 mA into the base: add a base resistor':''};}},
- btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],anchor:'e',rotate:false,
+ btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],probeI:el=>el.s.i,anchor:'e',rotate:false,
    props:{pressed:false},edit:[{k:'pressed',label:'Press',hold:true}],
    model:(c,n,p)=>({k1:c.SW(n['1a'],n['1b'],true),k2:c.SW(n['2a'],n['2b'],true),s:c.SW(n['1a'],n['2a'],p.props.pressed)}),
    update:(el,p)=>{el.s.on=p.props.pressed;},
@@ -99,7 +99,7 @@ const PARTS={
    model:(c,n)=>({r:c.R(n['1'],n['2'],120)}),                                  // 12 V, 100 mA when hot
    watch:(el)=>({I:el.r.i,P:el.r.p,bright:Math.min(1,el.r.p/1.2),info:[['Voltage',fmtV(Math.abs(el.r.v))+' (made for 12 V)'],['Current',fmtI(el.r.i)],['Power',fmtP(el.r.p)]],
      over:Math.abs(el.r.v)>15?'more than 15 V: the filament blows':''})},
- relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,
+ relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,probeI:el=>el.l.i,
    props:{kind:'12'},label:p=>RELAYS[p.props.kind].lab,optional:['COM','NC','NO'],
    legName:(p,pin)=>({C1:'coil',C2:'coil',COM:'COM (common)',NC:'NC (closed at rest)',NO:'NO (open at rest)'})[pin],
    edit:[{k:'kind',label:'Model',opts:[['12','12 V, coil 400 Ω (RWH-SS-112D)'],['5','5 V, coil 70 Ω (RWH-SS-105D)']]}],

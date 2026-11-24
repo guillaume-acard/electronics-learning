@@ -3024,7 +3024,16 @@ void loop() {
     </section>
     <div class="bd-panels">
       <section id="bdProps" class="bd-panel"><h3 class="flush">Properties</h3><div id="bdPropsBody" class="hint">Click a part or a wire to see and change it.</div></section>
-      <section id="bdInfo" class="bd-panel"><h3 class="flush" id="bdInfoTitle">Multimeter</h3><div id="bdInfoBody" class="hint">Press Play, then hover a hole, a wire or a part.</div></section>
+      <section id="bdInfo" class="bd-panel">
+        <div class="bd-tabs"><button id="bdTabMeter" class="active">📟 Multimeter</button><button id="bdTabCheck">✓ Check</button></div>
+        <div id="bdMeterPane">
+          <div class="bd-row bd-probebar"><button id="bdProbe1" class="bd-probe" style="--pc:var(--cyan)">📍 Probe 1</button><button id="bdProbe2" class="bd-probe" style="--pc:var(--pink)">📍 Probe 2</button>
+            <span class="bd-lab">Time</span><span id="bdSpan" class="bd-span"></span></div>
+          <div id="bdInfoBody" class="hint">Press Play, then hover a hole, a wire or a part. Or place a probe: its chart shows how the value changes with time.</div>
+          <div id="bdScopes"></div>
+        </div>
+        <div id="bdCheckPane" class="hint" hidden>Press ✓ Check circuit in the toolbar.</div>
+      </section>
     </div>
     <section class="bd-help">
       <h3 class="flush">How to use the lab</h3>
@@ -3032,6 +3041,7 @@ void loop() {
         <div class="card"><div class="ico">🧲</div><h3>Place</h3><p>Drag a part from the catalog onto the board: it snaps to the most logical holes. Drag its body to move it, or drag one leg of a 2-leg part (resistor, LED, capacitor…) to another hole. <b>R</b> to rotate, <b>Del</b> to remove. Click a part to change its value or model (diode 1N4007 or 1N4148, ceramic or electrolytic capacitor…).</p></div>
         <div class="card"><div class="ico">🔌</div><h3>Wire</h3><p>Press on a free hole (next to a leg, in the same strip) and drag to another hole. Pick the colour first in the toolbar, or click a wire to change it. To move a wire, drag one of its ends to another hole. To remove a part or a wire, drag it back onto the parts list.</p></div>
         <div class="card"><div class="ico">▶</div><h3>Play</h3><p>The circuit comes alive: LEDs light, motors turn, counters count, the speaker plays. Hover a hole to read its voltage. Too much current? The part burns: click it and press <b>Replace</b>.</p></div>
+        <div class="card"><div class="ico">📍</div><h3>Probes</h3><p>In the Multimeter card, press <b>Probe 1</b> (or 2), then click a hole: its chart shows the voltage over time. Click a part instead to see the current through it. Watch a capacitor charge, the 555 square wave, a tone.</p></div>
         <div class="card"><div class="ico">✓</div><h3>Check</h3><p>Lists the usual mistakes: a short circuit, an LED without resistor, a part with both legs in the same strip, a loose leg…</p></div>
       </div>
       <p class="hint">The breadboard works like the real one: in each column, holes <b>a–e</b> are connected together, and so are <b>f–j</b>. The four long rails (+ and − at the top and bottom) run along the whole board. Open a project from the <a class="navlink" href="#circuits">Circuits</a> page with its <b>🔧 Build it</b> button.</p>

@@ -217,7 +217,7 @@ const W_R=PAL.redDark,W_B='#111',W_G=PAL.greenDark,W_Y=PAL.gold,W_O=PAL.orangeDa
 // anchor: rows the anchor may use ('rails' = tp/bp only, 'e'/'f' = straddles the gap). props: default values.
 // edit: what the Properties panel shows ({k, label, opts | range | toggle | hold}; opts may be a function of the part,
 // show(p) hides a line, set(p) runs after a change). kind-style props (diode model, capacitor type) switch the model
-// of a placed part. label(p): its full name. pinNames: what each leg is (chips). supply/optional/tie: for "Check". model(): adds the part to the simulator. watch(): what we read back
+// of a placed part. probeI(el): the current a probe on it shows (default: its first element). label(p): its full name. pinNames: what each leg is (chips). supply/optional/tie: for "Check". model(): adds the part to the simulator. watch(): what we read back
 // (current, power, light...) and the limits that burn it.
 const RES_VALUES=[];for(let d=10;d<=100000;d*=10)E12.forEach(v=>RES_VALUES.push(Math.round(v*d)));RES_VALUES.push(1e6);   // E12 from helpers2.js
 const CAP_VALUES=[1e-9,2.2e-9,4.7e-9,10e-9,22e-9,47e-9,100e-9,220e-9,470e-9,1e-6,2.2e-6,4.7e-6,10e-6,22e-6,47e-6,100e-6,220e-6,470e-6,1000e-6];
@@ -256,7 +256,7 @@ const PARTS={
    props:{R:470},edit:[{k:'R',label:'Value',opts:RES_VALUES.map(v=>[v,fmtR(v)])}],
    model:(c,n,p)=>({r:c.R(n['1'],n['2'],p.props.R)}),
    watch:(el)=>({I:el.r.i,P:el.r.p,info:[['Current',fmtI(el.r.i)],['Voltage',fmtV(el.r.v)],['Power',fmtP(el.r.p)+' (max 250 mW)']],over:el.r.p>0.25?'more than ¼ W: it overheats':''})},
- pot:{name:'Trimmer / pot',group:'Passive',icon:'⟳',foot:[[0,0],[0,1],[0,2]],pins:['1','W','3'],rotate:true,
+ pot:{name:'Trimmer / pot',group:'Passive',icon:'⟳',foot:[[0,0],[0,1],[0,2]],pins:['1','W','3'],rotate:true,probeI:el=>el.a.i-el.b.i,
    props:{R:10000,pos:0.5},edit:[{k:'R',label:'Value',opts:[[1000,'1 kΩ'],[10000,'10 kΩ'],[47000,'47 kΩ'],[100000,'100 kΩ']]},{k:'pos',label:'Knob',range:[0,1,0.01],live:true}],
    model:(c,n,p)=>({a:c.R(n['1'],n['W'],Math.max(1,p.props.R*p.props.pos)),b:c.R(n['W'],n['3'],Math.max(1,p.props.R*(1-p.props.pos)))}),
    update:(el,p)=>{el.a.g=1/Math.max(1,p.props.R*p.props.pos);el.b.g=1/Math.max(1,p.props.R*(1-p.props.pos));},
@@ -283,7 +283,7 @@ const PARTS={
    edit:[{k:'kind',label:'Model',opts:[['1N4007','1N4007: rectifier, 1 A'],['1N4148','1N4148: small signal, 200 mA']]}],
    model:(c,n,p)=>{const D=DIODES[p.props.kind];return {d:c.D(n['A'],n['K'],diodeIs(D.vf,D.n),D.n)};},
    watch:(el,p)=>{const D=DIODES[p.props.kind];return {I:el.d.i,info:[['Current',fmtI(el.d.i)+' (max '+D.lab+')'],['Voltage',fmtV(el.d.v)]],over:el.d.i>D.Imax?'more than '+D.lab:''};}},
- npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},label:p=>'Transistor '+p.props.kind,
+ npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},probeI:el=>el.q.ic,label:p=>'Transistor '+p.props.kind,
    edit:[{k:'kind',label:'Model',opts:[['BC547','BC547 (small: 100 mA)'],['SS8050','SS8050 (stronger: 1.5 A)']]}],
    model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2),vpk:0}),
    tick:(el)=>{if(el.q.vce>el.vpk)el.vpk=el.q.vce;},
@@ -291,7 +291,7 @@ const PARTS={
      if(pk>Vmax)return {I:el.q.ic,kill:true,info:[],over:`a spike of ${Math.round(pk)} V between C and E (max ${Vmax} V): a coil was switched off with no flyback diode across it`};
      return {I:el.q.ic,P:el.q.p,info:[['Collector',fmtI(el.q.ic)+' (max '+(big?'1.5 A':'100 mA')+')'],['Base',fmtI(el.q.ib)],['C–E voltage',fmtV(el.q.vce)],['Power',fmtP(el.q.p)]],
      over:el.q.ic>Imax?'more than '+(big?'1.5 A':'100 mA')+' in the collector'+(big?'':' (for a motor, use the SS8050)'):el.q.p>Pmax?'more than '+Pmax+' W':el.q.ib>0.02?'more than 20 mA into the base: add a base resistor':''};}},
- btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],anchor:'e',rotate:false,
+ btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],probeI:el=>el.s.i,anchor:'e',rotate:false,
    props:{pressed:false},edit:[{k:'pressed',label:'Press',hold:true}],
    model:(c,n,p)=>({k1:c.SW(n['1a'],n['1b'],true),k2:c.SW(n['2a'],n['2b'],true),s:c.SW(n['1a'],n['2a'],p.props.pressed)}),
    update:(el,p)=>{el.s.on=p.props.pressed;},
@@ -312,7 +312,7 @@ const PARTS={
    model:(c,n)=>({r:c.R(n['1'],n['2'],120)}),                                  // 12 V, 100 mA when hot
    watch:(el)=>({I:el.r.i,P:el.r.p,bright:Math.min(1,el.r.p/1.2),info:[['Voltage',fmtV(Math.abs(el.r.v))+' (made for 12 V)'],['Current',fmtI(el.r.i)],['Power',fmtP(el.r.p)]],
      over:Math.abs(el.r.v)>15?'more than 15 V: the filament blows':''})},
- relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,
+ relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,probeI:el=>el.l.i,
    props:{kind:'12'},label:p=>RELAYS[p.props.kind].lab,optional:['COM','NC','NO'],
    legName:(p,pin)=>({C1:'coil',C2:'coil',COM:'COM (common)',NC:'NC (closed at rest)',NO:'NO (open at rest)'})[pin],
    edit:[{k:'kind',label:'Model',opts:[['12','12 V, coil 400 Ω (RWH-SS-112D)'],['5','5 V, coil 70 Ω (RWH-SS-105D)']]}],
@@ -681,7 +681,7 @@ const findPart=id=>S.parts.find(p=>p.id===id),findWire=id=>S.wires.find(w=>w.id=
 // ---------- history & storage ----------
 const snapState=()=>JSON.stringify(S);
 function commit(before,live){undoS.push(before);if(undoS.length>50)undoS.shift();redoS.length=0;changed(live);}
-function changed(live){try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run&&!live)run=makeRun(S);renderProps();}   // live: a knob moved while playing, the circuit keeps running
+function changed(live){if(probes.some(pr=>pr&&!probeOk(pr))){probes=probes.map(pr=>probeOk(pr)?pr:null);probeVer++;renderProbeBar();renderScopes();}try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run&&!live)run=makeRun(S);renderProps();}   // live: a knob moved while playing, the circuit keeps running
 function restore(json){S=JSON.parse(json);NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));if(sel&&!findPart(sel.id)&&!findWire(sel.id))sel=null;changed();}
 function undo(){if(!undoS.length)return;redoS.push(snapState());restore(undoS.pop());status('Undone.');}
 function redo(){if(!redoS.length)return;undoS.push(snapState());restore(redoS.pop());status('Redone.');}
@@ -740,6 +740,7 @@ function removeSel(){if(!sel)return;const before=snapState();
 
 // ---------- pointer events ----------
 cvs.addEventListener('pointerdown',e=>{const [x,y]=toBoard(e);if(e.button)return;
+  if(probeMode){placeProbe(x,y);return;}
   const p=partAt(x,y),h=nearestHole(x,y,6);
   if(run&&p&&p.type==='btn'&&!p.burnt){p.props.pressed=true;drag={mode:'press',id:p.id};sel={kind:'part',id:p.id};renderProps();return;}
   const we=wireEndAt(x,y);
@@ -791,7 +792,7 @@ document.addEventListener('keydown',e=>{if(!document.getElementById('page-build'
   else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();}
   else if(e.key==='Delete'||e.key==='Backspace'){if(sel){e.preventDefault();removeSel();}}
   else if(e.key==='r'||e.key==='R'){if(drag&&drag.mode==='new'){drag.rot=(drag.rot+1)%4;}else if(sel&&sel.kind==='part')rotate(findPart(sel.id));}
-  else if(e.key==='Escape'){drag=null;sel=null;renderProps();}});
+  else if(e.key==='Escape'){if(probeMode){probeMode=0;renderProbeBar();status('');return;}drag=null;sel=null;renderProps();}});
 
 // ---------- properties panel ----------
 function renderProps(){const body=$('bdPropsBody');
@@ -831,34 +832,38 @@ function makeRun(state){const N=nets(state),c=new Circuit(),node=new Map(),els=n
   const ticks=state.parts.filter(p=>PARTS[p.type].tick&&els.has(p.id)).map(p=>[PARTS[p.type].tick,els.get(p.id)]);
   return {c,N,gnd,node,els,ticks,w:new Map(),over:new Map(),dynamic:state.parts.some(p=>PARTS[p.type].dynamic&&!p.burnt)};}
 function stepRun(R,state,dt){state.parts.forEach(p=>{const T=PARTS[p.type],el=R.els.get(p.id);if(el&&T.update)T.update(el,p);});
-  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));}
+  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));if(R.onStep)R.onStep(R,h);}
   state.parts.forEach(p=>{const el=R.els.get(p.id);R.w.set(p.id,el?PARTS[p.type].watch(el,p):null);});}
 function nodeV(h){if(!run)return null;const n=run.N.of(h);if(n===run.gnd)return 0;const k=run.node.get(n);return k?run.c.v(k):null;}
 // a relay coil switched off with nothing to catch its spike kills the transistor that switched it
 function coilKicks(){S.parts.forEach(r=>{const w=run.w.get(r.id);if(!w||!w.kick)return;const coil=new Set([run.N.of(r.holes['C1']),run.N.of(r.holes['C2'])]);
   S.parts.forEach(q=>{if(q.type==='npn'&&!q.burnt&&coil.has(run.N.of(q.holes['C'])))run.w.set(q.id,{...(run.w.get(q.id)||{}),info:[],kill:true,
     over:'the coil of the '+pname(r)+' was switched off with no flyback diode: its spike (hundreds of volts) went through the transistor'});});});}
-function simFrame(dt){stepRun(run,S,dt);coilKicks();let burnt=false;
+function simFrame(dt){run.onStep=probeSample;stepRun(run,S,dt);coilKicks();let burnt=false;
   S.parts.forEach(p=>{const w=run.w.get(p.id);if(!w||!w.over){run.over.delete(p.id);return;}const t=(run.over.get(p.id)||0)+dt;run.over.set(p.id,t);
     if(t>0.25||w.kill){p.burnt=true;burnt=true;status(`💥 ${pname(p)} burnt: ${w.over}. Click it, then Replace.`,'warn');const [x,y,wd,ht]=partBox(p);for(let i=0;i<24;i++)smoke.push({x:x+wd/2,y:y+ht/2,vx:(Math.random()-0.5)*30,vy:-20-Math.random()*40,life:1.5+Math.random()});}});
   if(burnt){run=makeRun(S);try{localStorage.setItem('buildlab:current',snapState());}catch(e){}renderProps();}
   const live=$('bdLive');if(live&&sel&&sel.kind==='part'){const w=run.w.get(sel.id);live.innerHTML=w?w.info.map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join(''):'';}}
-function play(on){if(on){run=makeRun(S);$('bdPlay').textContent='■ Stop';$('bdPlay').className='stop';status('Running: hover a hole or a part to measure. Hold the push buttons with the mouse.','run');}
+function play(on){if(on){run=makeRun(S);probeReset();$('bdPlay').textContent='■ Stop';$('bdPlay').className='stop';status('Running: hover a hole or a part to measure. Hold the push buttons with the mouse.','run');}
   else{run=null;$('bdPlay').textContent='▶ Play';$('bdPlay').className='go';status('Stopped.');S.parts.forEach(p=>{if(p.type==='btn')p.props.pressed=false;});}renderProps();meter();}
 $('bdPlay').onclick=()=>play(!run);
+
+// ---------- the Multimeter / Check card ----------
+function showTab(t){$('bdMeterPane').hidden=t!=='meter';$('bdCheckPane').hidden=t!=='check';$('bdTabMeter').classList.toggle('active',t==='meter');$('bdTabCheck').classList.toggle('active',t==='check');}
+$('bdTabMeter').onclick=()=>showTab('meter');$('bdTabCheck').onclick=()=>showTab('check');
 
 // ---------- check ----------
 $('bdCheck').onclick=()=>{let trial=null;
   try{const R=makeRun(S);for(let i=0;i<10;i++)stepRun(R,S,0.016);trial=S.parts.map(p=>({p,w:R.w.get(p.id)}));}catch(e){console.error(e);}
-  const issues=checkCircuit(S,trial);$('bdInfoTitle').textContent='Check circuit';
-  $('bdInfoBody').className='';$('bdInfoBody').innerHTML='<ul class="bd-issues">'+issues.map((it,i)=>`<li class="${it.lvl}" data-i="${i}">${it.lvl==='err'?'⛔':it.lvl==='warn'?'⚠️':'✅'} <span>${it.msg}</span></li>`).join('')+'</ul>';
-  $('bdInfoBody').querySelectorAll('li').forEach(li=>li.onclick=()=>{const it=issues[+li.dataset.i];flashIds=new Set(it.ids);flashT=2.5;if(it.ids[0]){sel={kind:findPart(it.ids[0])?'part':'wire',id:it.ids[0]};renderProps();}});
+  const issues=checkCircuit(S,trial);showTab('check');
+  $('bdCheckPane').className='';$('bdCheckPane').innerHTML='<ul class="bd-issues">'+issues.map((it,i)=>`<li class="${it.lvl}" data-i="${i}">${it.lvl==='err'?'⛔':it.lvl==='warn'?'⚠️':'✅'} <span>${it.msg}</span></li>`).join('')+'</ul>';
+  $('bdCheckPane').querySelectorAll('li').forEach(li=>li.onclick=()=>{const it=issues[+li.dataset.i];flashIds=new Set(it.ids);flashT=2.5;if(it.ids[0]){sel={kind:findPart(it.ids[0])?'part':'wire',id:it.ids[0]};renderProps();}});
   status(issues.some(i=>i.lvl==='err')?'Check: problems found (see below).':issues.some(i=>i.lvl==='warn')?'Check: a few things to look at (see below).':'Check: all good.',issues.some(i=>i.lvl!=='ok')?'warn':'run');};
 
 // ---------- multimeter ----------
 let meterText=null;
-function meter(){const body=$('bdInfoBody');if($('bdInfoTitle').textContent!=='Multimeter')return;
-  if(!run){meterText=null;body.className='hint';body.innerHTML='Press Play, then hover a hole, a wire or a part.';return;}
+function meter(){const body=$('bdInfoBody');if($('bdMeterPane').hidden)return;
+  if(!run){meterText=null;body.className='hint';body.innerHTML='Press Play, then hover a hole, a wire or a part. Or place a probe: its chart shows how the value changes with time.';return;}
   if(!hov){meterText=null;return;}
   let h=nearestHole(hov.x,hov.y,7);const p=partAt(hov.x,hov.y);if(p&&h&&!Object.values(p.holes).includes(h.h))h=null;   // over a part: the part, except on its own legs
   const w=!h&&!p&&wireAt(hov.x,hov.y);body.className='';
@@ -887,18 +892,19 @@ function draw(dt){const ctx=bctx;ctx.clearRect(0,0,cvs.width,cvs.height);drawBoa
   if(drag&&(drag.mode==='new'||drag.mode==='move')&&!drag.trash&&drag.pl&&drag.pl.holes)drawGhost(ctx,drag.mode==='new'?drag.type:findPart(drag.id).type,drag.pl.holes,drag.pl.ok,drag.rot);
   if(drag&&drag.mode==='wire'){const A=HP(drag.a);ctx.strokeStyle=wireColor;ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([]);
     const t=nearestHole(drag.x,drag.y,10);if(t){const [x,y]=HP(t.h);ctx.strokeStyle=PAL.cyan;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.stroke();}}
+  drawProbeMarks(ctx);
   if(hov&&!drag){const h=nearestHole(hov.x,hov.y,6);if(h){const [x,y]=HP(h.h);ctx.strokeStyle='rgba(34,211,238,.8)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();}}
   for(let i=smoke.length-1;i>=0;i--){const s=smoke[i];s.life-=dt;if(s.life<=0){smoke.splice(i,1);continue;}s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy-=5*dt;
     ctx.fillStyle=`rgba(120,120,130,${Math.min(0.5,s.life*0.35)})`;ctx.beginPath();ctx.arc(s.x,s.y,6+(2.5-s.life)*6,0,7);ctx.fill();}
   if(meterText&&run){ctx.font='600 12px ui-monospace,monospace';const tw=ctx.measureText(meterText.t).width+12;let x=meterText.x+12,y=meterText.y-26;if(x+tw>cvs.width)x=meterText.x-tw-12;
     ctx.fillStyle='rgba(7,11,22,.92)';ctx.fillRect(x,y,tw,20);ctx.strokeStyle=PAL.cyan;ctx.strokeRect(x,y,tw,20);ctx.fillStyle=PAL.cyan;ctx.textAlign='left';ctx.fillText(meterText.t,x+6,y+14);}
   if(!S.parts.length&&!drag)txt(ctx,'Drag a part from the catalog and drop it here',cvs.width/2,380,PAL.muted,14);}
-loop(dt=>{if(run)simFrame(dt);draw(dt);});
+loop(dt=>{if(run)simFrame(dt);draw(dt);drawScopes();});
 
 // ---------- toolbar ----------
 $('bdUndo').onclick=undo;$('bdRedo').onclick=redo;$('bdDelete').onclick=removeSel;
 $('bdRotate').onclick=()=>{if(sel&&sel.kind==='part')rotate(findPart(sel.id));else status('Select a part first (click it).','warn');};
-$('bdClear').onclick=()=>{if(!S.parts.length&&!S.wires.length)return;const before=snapState();S={parts:[],wires:[]};sel=null;commit(before);status('Board cleared (Undo brings it back).');};
+$('bdClear').onclick=()=>{if(!S.parts.length&&!S.wires.length)return;const before=snapState();S={parts:[],wires:[]};sel=null;clearProbes();commit(before);status('Board cleared (Undo brings it back).');};
 
 // ---------- save / open (in this browser) ----------
 const STORE='buildlab:circuits';
@@ -912,7 +918,7 @@ $('bdSave').onclick=()=>{openModal(`<h3 class="flush">Save this circuit</h3><div
 $('bdOpen').onclick=()=>{const all=saved(),names=Object.keys(all).sort();
   openModal(`<h3 class="flush">Open a saved circuit</h3>${names.length?`<ul class="bd-saved">${names.map(n=>`<li><span>${n.replace(/</g,'&lt;')}</span><button data-n="${encodeURIComponent(n)}" class="bd-o">Open</button><button data-n="${encodeURIComponent(n)}" class="bd-d stop">🗑</button></li>`).join('')}</ul>`:'<p class="hint">Nothing saved yet: build a circuit and press 💾 Save.</p>'}<div class="bd-row"><button id="bdCancel">Close</button></div>`);
   $('bdCancel').onclick=()=>modal.hidden=true;
-  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=migrate(JSON.parse(JSON.stringify(all[n].s)));sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
+  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=migrate(JSON.parse(JSON.stringify(all[n].s)));clearProbes();sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
   modal.querySelectorAll('.bd-d').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const a2=saved();delete a2[n];try{localStorage.setItem(STORE,JSON.stringify(a2));}catch(e){}$('bdOpen').onclick();});};
 try{const cur=localStorage.getItem('buildlab:current');if(cur){S=migrate(JSON.parse(cur));NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));}}catch(e){}
 
@@ -957,9 +963,89 @@ function importLayout(L){if(!L||L.noBoard)return null;const out={parts:[],wires:
     for(const g of groups){let c=0;for(let k=59;k>=1&&!c;k-=2)if(!used.has('T'+k))c=k;if(!c)return null;used.add('T'+c);
       g.legs.forEach((l,i)=>{l.part.holes[l.pin]='abcde'[i]+c;});}}
   return out;}
-window.BUILD_LAB={canImport:L=>!!importLayout(L),load:(L,name)=>{const s=importLayout(L);if(!s)return false;const before=snapState();S=s;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));sel=null;commit(before);if(run)play(false);status(`Loaded ${name||'the project'}: press ▶ Play.`);return true;}};
+window.BUILD_LAB={canImport:L=>!!importLayout(L),load:(L,name)=>{const s=importLayout(L);if(!s)return false;const before=snapState();S=s;clearProbes();NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));sel=null;commit(before);if(run)play(false);status(`Loaded ${name||'the project'}: press ▶ Play.`);return true;}};
 document.querySelectorAll('.bd-open[data-project]').forEach(b=>{const L=window.BBL_LAYOUTS&&window.BBL_LAYOUTS[b.dataset.project];if(L&&window.BUILD_LAB.canImport(L)){b.hidden=false;
   b.onclick=()=>{window.BUILD_LAB.load(L,'project '+b.dataset.project.replace(/^p/,''));location.hash='#build';};}});
 renderProps();
+
+// ===== Build lab: multimeter probes with a time chart (like a small oscilloscope) =====
+// Up to two probes. On a hole (or a wire): its voltage against −. On a part: the current through it.
+// Every simulator step is recorded (0.2 ms), so fast signals (a 440 Hz tone) show as a band and slow ones as a line.
+const PROBE_COL=[PAL.cyan,PAL.pink],CAP_N=60000,SPANS=[[0.02,'20 ms'],[0.2,'0.2 s'],[2,'2 s'],[10,'10 s']];
+let probes=[null,null],probeMode=0,span=2,ptime=0,probeVer=0,frameN=0;
+const rec=[0,1].map(()=>({t:new Float64Array(CAP_N),v:new Float64Array(CAP_N),n:0,i:0}));
+const probeOk=pr=>pr&&(pr.kind==='v'||findPart(pr.id));
+const canCurrent=T=>T.probeI||T.pins.length===2;
+function probeLabel(pr){if(pr.kind==='v')return 'Voltage at '+pr.hole;const p=findPart(pr.id);return 'Current in the '+(p?pname(p):'part');}
+function probeReset(){rec.forEach(r=>{r.n=0;r.i=0;});}
+
+// ---- placing a probe: the next click on the board
+function armProbe(k){probeMode=probeMode===k?0:k;showTab('meter');renderProbeBar();
+  if(probeMode)status(`Probe ${k}: click a hole (or a wire) to see its voltage, or a part to see the current through it. Esc to cancel.`);else status('');}
+function placeProbe(x,y){const k=probeMode;probeMode=0;const h=nearestHole(x,y,7),p=partAt(x,y),w=!h&&!p&&wireAt(x,y);let pr=null;
+  if(p&&(!h||!Object.values(p.holes).includes(h.h))){const T=PARTS[p.type];
+    if(!canCurrent(T)){status(`${pname(p)}: put the probe on one of its legs (a hole) to read the voltage there.`,'warn');renderProbeBar();return;}
+    pr={kind:'i',id:p.id};}
+  else if(h)pr={kind:'v',hole:h.h};else if(w)pr={kind:'v',hole:w.a};
+  if(!pr){status('Not on a hole, a wire or a part: the probe was not placed.','warn');renderProbeBar();return;}
+  probes[k-1]=pr;probeVer++;rec[k-1].n=0;rec[k-1].i=0;renderProbeBar();renderScopes();
+  status(`Probe ${k}: ${probeLabel(pr)}.${run?'':' Press ▶ Play to record.'}`,run?'run':'');}
+function clearProbes(){probes=[null,null];probeVer++;probeReset();renderProbeBar();renderScopes();}   // a new board: its parts are not the old ones
+function removeProbe(k){probes[k-1]=null;probeVer++;renderProbeBar();renderScopes();}
+
+// ---- recording (called by the simulation after every step)
+function probeGetter(R,pr){
+  if(pr.kind==='v'){const n=R.N.of(pr.hole);if(n===R.gnd)return ()=>0;const k=R.node.get(n);return k?()=>R.c.v(k):()=>NaN;}
+  const p=findPart(pr.id),el=R.els.get(pr.id);if(!p||!el)return ()=>0;const T=PARTS[p.type];
+  if(T.probeI)return ()=>T.probeI(el);const e=Object.values(el).find(x=>x&&typeof x==='object'&&'t' in x&&'i' in x);return e?()=>e.i:()=>0;}
+function probeSample(R,h){if(!probes[0]&&!probes[1])return;ptime+=h;
+  if(R.pv!==probeVer){R.pg=probes.map(pr=>probeOk(pr)?probeGetter(R,pr):null);R.pv=probeVer;}
+  R.pg.forEach((g,k)=>{if(!g)return;const r=rec[k];r.t[r.i]=ptime;r.v[r.i]=g();r.i=(r.i+1)%CAP_N;if(r.n<CAP_N)r.n++;});}
+
+// ---- the card: probe buttons, time span, one chart per probe
+function renderProbeBar(){[1,2].forEach(k=>{const b=$('bdProbe'+k),pr=probes[k-1];if(pr&&!probeOk(pr)){probes[k-1]=null;}
+  b.classList.toggle('active',probeMode===k);b.textContent=probeMode===k?`🎯 Click the board…`:probes[k-1]?`📍 Probe ${k}: move`:`📍 Probe ${k}`;});
+  $('bdSpan').querySelectorAll('button').forEach(b=>b.classList.toggle('active',+b.dataset.s===span));}
+(function(){const box=$('bdSpan');SPANS.forEach(([s,l])=>{const b=document.createElement('button');b.textContent=l;b.dataset.s=s;b.onclick=()=>{span=s;renderProbeBar();};box.appendChild(b);});
+  [1,2].forEach(k=>{$('bdProbe'+k).onclick=()=>armProbe(k);});renderProbeBar();})();
+function renderScopes(){const box=$('bdScopes');box.innerHTML=probes.map((pr,k)=>!probeOk(pr)?'':`<div class="bd-scope" style="--pc:${PROBE_COL[k]}">
+    <div class="bd-scope-head"><span class="bd-pdot">${k+1}</span><span>${probeLabel(pr)}</span><b id="bdPv${k}">—</b><button class="bd-pdel" data-k="${k+1}" title="Remove this probe">✕</button></div>
+    <canvas id="bdPc${k}" height="120"></canvas><div class="bd-scope-stats" id="bdPs${k}"></div></div>`).join('');
+  box.querySelectorAll('.bd-pdel').forEach(b=>b.onclick=()=>removeProbe(+b.dataset.k));}
+const fmtSig=(v,kind)=>v==null||isNaN(v)?'—':(v<0?'−':'')+(kind==='v'?fmtV(Math.abs(v)):fmtI(v));
+function drawScopes(){frameN++;if($('bdMeterPane').hidden)return;
+  probes.forEach((pr,k)=>{const cvs2=$('bdPc'+k);if(!cvs2)return;if(!probeOk(pr)){renderScopes();return;}
+    const dpr=window.devicePixelRatio||1,W=Math.max(100,Math.round(cvs2.clientWidth*dpr)),H=Math.round(120*dpr);if(cvs2.width!==W||cvs2.height!==H){cvs2.width=W;cvs2.height=H;}
+    const c=cvs2.getContext('2d'),r=rec[k],L=46*dpr,PW=W-L-6*dpr,t1=ptime,t0=t1-span;c.clearRect(0,0,W,H);
+    // min/max per pixel column, newest sample first
+    const cols=Math.max(1,Math.floor(PW)),mn=new Float64Array(cols).fill(Infinity),mx=new Float64Array(cols).fill(-Infinity);
+    let lo=Infinity,hi=-Infinity,sum=0,cnt=0,m=0,last=null,rises=[],state=0;
+    for(let j=0;j<r.n;j++){const ix=(r.i-1-j+CAP_N)%CAP_N,t=r.t[ix];if(t<t0)break;m++;const v=r.v[ix];if(isNaN(v))continue;if(last==null)last=v;
+      const col=Math.min(cols-1,Math.floor((t-t0)/span*cols));if(v<mn[col])mn[col]=v;if(v>mx[col])mx[col]=v;if(v<lo)lo=v;if(v>hi)hi=v;sum+=v;cnt++;}
+    const unit=pr.kind==='v'?'V':'A';
+    // frequency: rising crossings of the middle (with 10 % hysteresis), oldest to newest
+    if(cnt>4&&hi-lo>(pr.kind==='v'?0.02:2e-5)){const mid=(lo+hi)/2,hy=(hi-lo)*0.1;let first=-1;
+      for(let j=m-1;j>=0;j--){const ix=(r.i-1-j+CAP_N)%CAP_N,t=r.t[ix],v=r.v[ix];if(isNaN(v))continue;
+        if(state<=0&&v>mid+hy){if(state<0)rises.push(t);state=1;}else if(state>=0&&v<mid-hy)state=-1;}}
+    const freq=rises.length>=2?(rises.length-1)/(rises[rises.length-1]-rises[0]):null;
+    // scale: keep 0 in view, a little margin
+    let a=Math.min(0,isFinite(lo)?lo:0),b=Math.max(0,isFinite(hi)?hi:0);if(b-a<(unit==='V'?0.1:1e-4)){b+=unit==='V'?0.05:5e-5;a-=a<0?(unit==='V'?0.05:5e-5):0;}
+    const pad=(b-a)*0.08;a-=a<0?pad:0;b+=pad;const Y=v=>6*dpr+(H-12*dpr)*(1-(v-a)/(b-a));
+    c.font=`${10*dpr}px ui-monospace,monospace`;c.textAlign='right';c.textBaseline='middle';
+    [b-pad,0,a<0?a+(a<0?pad:0):null].forEach(v=>{if(v==null)return;const y=Y(v);c.strokeStyle=v===0?'rgba(148,163,184,.45)':'rgba(148,163,184,.18)';c.lineWidth=1;c.beginPath();c.moveTo(L,y);c.lineTo(W,y);c.stroke();
+      c.fillStyle=PAL.muted;c.fillText(fmtSig(v,pr.kind),L-4*dpr,y);});
+    for(let q=1;q<5;q++){const x=L+PW*q/5;c.strokeStyle='rgba(148,163,184,.12)';c.beginPath();c.moveTo(x,4*dpr);c.lineTo(x,H-4*dpr);c.stroke();}
+    c.textAlign='left';c.fillStyle=PAL.muted;c.fillText('−'+SPANS.find(s=>s[0]===span)[1],L+3*dpr,H-8*dpr);c.textAlign='right';c.fillText('now',W-2*dpr,H-8*dpr);
+    c.strokeStyle=PROBE_COL[k];c.lineWidth=1.6*dpr;c.lineJoin='round';c.beginPath();let started=false;
+    for(let col=0;col<cols;col++){if(mn[col]===Infinity)continue;const x=L+col+0.5;if(!started){c.moveTo(x,Y(mn[col]));started=true;}else c.lineTo(x,Y(mn[col]));if(mx[col]!==mn[col])c.lineTo(x,Y(mx[col]));}
+    c.stroke();
+    if(!cnt){c.textAlign='center';c.fillStyle=PAL.muted;c.font=`${12*dpr}px system-ui`;c.fillText(run?'recording…':'Press ▶ Play to record',L+PW/2,H/2);}
+    if((frameN%6)===0||!run){$('bdPv'+k).textContent=fmtSig(last,pr.kind);
+      $('bdPs'+k).innerHTML=cnt?`<span>min <b>${fmtSig(lo,pr.kind)}</b></span><span>max <b>${fmtSig(hi,pr.kind)}</b></span><span>average <b>${fmtSig(sum/cnt,pr.kind)}</b></span>${freq?`<span>repeats <b>${freq>=100?Math.round(freq):freq.toPrecision(2)} times/s</b> (${freq>=1000?(freq/1000).toFixed(2)+' kHz':freq.toPrecision(3)+' Hz'})</span>`:''}`:'';}});}
+// ---- markers on the board: a numbered probe tip on the hole, or a badge on the part
+function drawProbeMarks(ctx){probes.forEach((pr,k)=>{if(!probeOk(pr))return;const col=PROBE_COL[k];
+  if(pr.kind==='v'){const [x,y]=HP(pr.hole),tx=x+14,ty=y-22;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();
+    ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+3,y-4);ctx.lineTo(tx,ty);ctx.stroke();ctx.fillStyle=col;ctx.beginPath();ctx.arc(tx,ty,8,0,7);ctx.fill();txt(ctx,String(k+1),tx,ty+4,'#0b1120',10);}
+  else{const p=findPart(pr.id),[bx,by,bw]=partBox(p),x=bx+bw,y=by;ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x-12,y-9,24,16,8);ctx.fill();txt(ctx,'A'+(k+1),x,y+3,'#0b1120',9);}});}
 
 })();

@@ -239,7 +239,7 @@ PAGES = [
            'tag': 'Drag parts onto a breadboard, wire them, press Play: LEDs light up, motors spin, and parts burn when you overload them. '
                   'Try a circuit here before you build it for real.',
            'facts': ['🧲 Drag & drop', '▶ Live simulation', '🔥 Burn, then replace']},
-  'js': ['@helpers', '@helpers2', '@breadboard', 'parts.js', 'board.js', 'sim.js', 'check.js', 'page.js'],
+  'js': ['@helpers', '@helpers2', '@breadboard', 'parts.js', 'board.js', 'sim.js', 'check.js', 'page.js', 'scope.js'],
   'card': {'svg': '<svg viewBox="0 0 120 60"><rect x="8" y="12" width="104" height="38" rx="4" fill="#e5e7eb"/><path d="M12 18h96M12 44h96" '
                   'stroke="#ef4444" stroke-width="1.5"/><path d="M30 31h22" stroke="#cbd5e1" stroke-width="2"/><rect x="34" y="27" width="14" height="8" rx="3" '
                   'fill="#d9b98a"/><circle cx="70" cy="28" r="6" fill="#22d3ee"/><path d="M86 8l10 22-6-2-3 7-3-1 3-7-6 1z" fill="#f8fafc" stroke="#0b1120"/></svg>',

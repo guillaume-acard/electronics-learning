@@ -32,7 +32,8 @@ src/
     circuits/                   page.html (intro), page.py (the project template), themes.py (menu order), lib.js, init.js
       projects/<id>.py, <id>.js one pair per project: content data / breadboard layout + demo
     build/                      the Build lab: parts.js (catalog), board.js (holes, strips, placement, drawing),
-                                sim.js (simulator), check.js ("Check circuit"), page.js (the UI), page.html, page.css
+                                sim.js (simulator), check.js ("Check circuit"), page.js (the UI), scope.js (probes + time
+                                charts in the Multimeter card), page.html, page.css
     shopping/                   items.py (the Gotronic list), shop.py (renders shopping.html), page.css
   legacy.zip            old one-time scripts and stale copies (history only, nothing uses it)
 ```
@@ -120,6 +121,9 @@ A breadboard where parts are dropped, wired and simulated.
   Displays and other chips are not yet.
 - The simulator steps every 0.2 ms, too slow for a real coil switch-off spike (microseconds): a relay whose coil voltage
   turns against its current by more than 3 V reports a `kick`, and the transistor switching it burns (`coilKicks`, `page.js`).
+- Probes (`scope.js`): on a hole = its voltage, on a part = its current (`probeI(el)` in `PARTS`, else its first element).
+  Every simulator step is recorded (ring buffer of 60 000 samples), drawn as min/max per pixel column, with min, max,
+  average and the frequency (rising crossings of the middle).
 - Boards are kept in the browser (`localStorage`: `buildlab:current` autosave, `buildlab:circuits` for saved ones).
 
 ## Checking a change

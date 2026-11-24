@@ -11,7 +11,7 @@ const findPart=id=>S.parts.find(p=>p.id===id),findWire=id=>S.wires.find(w=>w.id=
 // ---------- history & storage ----------
 const snapState=()=>JSON.stringify(S);
 function commit(before,live){undoS.push(before);if(undoS.length>50)undoS.shift();redoS.length=0;changed(live);}
-function changed(live){try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run&&!live)run=makeRun(S);renderProps();}   // live: a knob moved while playing, the circuit keeps running
+function changed(live){if(probes.some(pr=>pr&&!probeOk(pr))){probes=probes.map(pr=>probeOk(pr)?pr:null);probeVer++;renderProbeBar();renderScopes();}try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run&&!live)run=makeRun(S);renderProps();}   // live: a knob moved while playing, the circuit keeps running
 function restore(json){S=JSON.parse(json);NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));if(sel&&!findPart(sel.id)&&!findWire(sel.id))sel=null;changed();}
 function undo(){if(!undoS.length)return;redoS.push(snapState());restore(undoS.pop());status('Undone.');}
 function redo(){if(!redoS.length)return;undoS.push(snapState());restore(redoS.pop());status('Redone.');}
@@ -70,6 +70,7 @@ function removeSel(){if(!sel)return;const before=snapState();
 
 // ---------- pointer events ----------
 cvs.addEventListener('pointerdown',e=>{const [x,y]=toBoard(e);if(e.button)return;
+  if(probeMode){placeProbe(x,y);return;}
   const p=partAt(x,y),h=nearestHole(x,y,6);
   if(run&&p&&p.type==='btn'&&!p.burnt){p.props.pressed=true;drag={mode:'press',id:p.id};sel={kind:'part',id:p.id};renderProps();return;}
   const we=wireEndAt(x,y);
@@ -121,7 +122,7 @@ document.addEventListener('keydown',e=>{if(!document.getElementById('page-build'
   else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();}
   else if(e.key==='Delete'||e.key==='Backspace'){if(sel){e.preventDefault();removeSel();}}
   else if(e.key==='r'||e.key==='R'){if(drag&&drag.mode==='new'){drag.rot=(drag.rot+1)%4;}else if(sel&&sel.kind==='part')rotate(findPart(sel.id));}
-  else if(e.key==='Escape'){drag=null;sel=null;renderProps();}});
+  else if(e.key==='Escape'){if(probeMode){probeMode=0;renderProbeBar();status('');return;}drag=null;sel=null;renderProps();}});
 
 // ---------- properties panel ----------
 function renderProps(){const body=$('bdPropsBody');
@@ -161,34 +162,38 @@ function makeRun(state){const N=nets(state),c=new Circuit(),node=new Map(),els=n
   const ticks=state.parts.filter(p=>PARTS[p.type].tick&&els.has(p.id)).map(p=>[PARTS[p.type].tick,els.get(p.id)]);
   return {c,N,gnd,node,els,ticks,w:new Map(),over:new Map(),dynamic:state.parts.some(p=>PARTS[p.type].dynamic&&!p.burnt)};}
 function stepRun(R,state,dt){state.parts.forEach(p=>{const T=PARTS[p.type],el=R.els.get(p.id);if(el&&T.update)T.update(el,p);});
-  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));}
+  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));if(R.onStep)R.onStep(R,h);}
   state.parts.forEach(p=>{const el=R.els.get(p.id);R.w.set(p.id,el?PARTS[p.type].watch(el,p):null);});}
 function nodeV(h){if(!run)return null;const n=run.N.of(h);if(n===run.gnd)return 0;const k=run.node.get(n);return k?run.c.v(k):null;}
 // a relay coil switched off with nothing to catch its spike kills the transistor that switched it
 function coilKicks(){S.parts.forEach(r=>{const w=run.w.get(r.id);if(!w||!w.kick)return;const coil=new Set([run.N.of(r.holes['C1']),run.N.of(r.holes['C2'])]);
   S.parts.forEach(q=>{if(q.type==='npn'&&!q.burnt&&coil.has(run.N.of(q.holes['C'])))run.w.set(q.id,{...(run.w.get(q.id)||{}),info:[],kill:true,
     over:'the coil of the '+pname(r)+' was switched off with no flyback diode: its spike (hundreds of volts) went through the transistor'});});});}
-function simFrame(dt){stepRun(run,S,dt);coilKicks();let burnt=false;
+function simFrame(dt){run.onStep=probeSample;stepRun(run,S,dt);coilKicks();let burnt=false;
   S.parts.forEach(p=>{const w=run.w.get(p.id);if(!w||!w.over){run.over.delete(p.id);return;}const t=(run.over.get(p.id)||0)+dt;run.over.set(p.id,t);
     if(t>0.25||w.kill){p.burnt=true;burnt=true;status(`💥 ${pname(p)} burnt: ${w.over}. Click it, then Replace.`,'warn');const [x,y,wd,ht]=partBox(p);for(let i=0;i<24;i++)smoke.push({x:x+wd/2,y:y+ht/2,vx:(Math.random()-0.5)*30,vy:-20-Math.random()*40,life:1.5+Math.random()});}});
   if(burnt){run=makeRun(S);try{localStorage.setItem('buildlab:current',snapState());}catch(e){}renderProps();}
   const live=$('bdLive');if(live&&sel&&sel.kind==='part'){const w=run.w.get(sel.id);live.innerHTML=w?w.info.map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join(''):'';}}
-function play(on){if(on){run=makeRun(S);$('bdPlay').textContent='■ Stop';$('bdPlay').className='stop';status('Running: hover a hole or a part to measure. Hold the push buttons with the mouse.','run');}
+function play(on){if(on){run=makeRun(S);probeReset();$('bdPlay').textContent='■ Stop';$('bdPlay').className='stop';status('Running: hover a hole or a part to measure. Hold the push buttons with the mouse.','run');}
   else{run=null;$('bdPlay').textContent='▶ Play';$('bdPlay').className='go';status('Stopped.');S.parts.forEach(p=>{if(p.type==='btn')p.props.pressed=false;});}renderProps();meter();}
 $('bdPlay').onclick=()=>play(!run);
+
+// ---------- the Multimeter / Check card ----------
+function showTab(t){$('bdMeterPane').hidden=t!=='meter';$('bdCheckPane').hidden=t!=='check';$('bdTabMeter').classList.toggle('active',t==='meter');$('bdTabCheck').classList.toggle('active',t==='check');}
+$('bdTabMeter').onclick=()=>showTab('meter');$('bdTabCheck').onclick=()=>showTab('check');
 
 // ---------- check ----------
 $('bdCheck').onclick=()=>{let trial=null;
   try{const R=makeRun(S);for(let i=0;i<10;i++)stepRun(R,S,0.016);trial=S.parts.map(p=>({p,w:R.w.get(p.id)}));}catch(e){console.error(e);}
-  const issues=checkCircuit(S,trial);$('bdInfoTitle').textContent='Check circuit';
-  $('bdInfoBody').className='';$('bdInfoBody').innerHTML='<ul class="bd-issues">'+issues.map((it,i)=>`<li class="${it.lvl}" data-i="${i}">${it.lvl==='err'?'⛔':it.lvl==='warn'?'⚠️':'✅'} <span>${it.msg}</span></li>`).join('')+'</ul>';
-  $('bdInfoBody').querySelectorAll('li').forEach(li=>li.onclick=()=>{const it=issues[+li.dataset.i];flashIds=new Set(it.ids);flashT=2.5;if(it.ids[0]){sel={kind:findPart(it.ids[0])?'part':'wire',id:it.ids[0]};renderProps();}});
+  const issues=checkCircuit(S,trial);showTab('check');
+  $('bdCheckPane').className='';$('bdCheckPane').innerHTML='<ul class="bd-issues">'+issues.map((it,i)=>`<li class="${it.lvl}" data-i="${i}">${it.lvl==='err'?'⛔':it.lvl==='warn'?'⚠️':'✅'} <span>${it.msg}</span></li>`).join('')+'</ul>';
+  $('bdCheckPane').querySelectorAll('li').forEach(li=>li.onclick=()=>{const it=issues[+li.dataset.i];flashIds=new Set(it.ids);flashT=2.5;if(it.ids[0]){sel={kind:findPart(it.ids[0])?'part':'wire',id:it.ids[0]};renderProps();}});
   status(issues.some(i=>i.lvl==='err')?'Check: problems found (see below).':issues.some(i=>i.lvl==='warn')?'Check: a few things to look at (see below).':'Check: all good.',issues.some(i=>i.lvl!=='ok')?'warn':'run');};
 
 // ---------- multimeter ----------
 let meterText=null;
-function meter(){const body=$('bdInfoBody');if($('bdInfoTitle').textContent!=='Multimeter')return;
-  if(!run){meterText=null;body.className='hint';body.innerHTML='Press Play, then hover a hole, a wire or a part.';return;}
+function meter(){const body=$('bdInfoBody');if($('bdMeterPane').hidden)return;
+  if(!run){meterText=null;body.className='hint';body.innerHTML='Press Play, then hover a hole, a wire or a part. Or place a probe: its chart shows how the value changes with time.';return;}
   if(!hov){meterText=null;return;}
   let h=nearestHole(hov.x,hov.y,7);const p=partAt(hov.x,hov.y);if(p&&h&&!Object.values(p.holes).includes(h.h))h=null;   // over a part: the part, except on its own legs
   const w=!h&&!p&&wireAt(hov.x,hov.y);body.className='';
@@ -217,18 +222,19 @@ function draw(dt){const ctx=bctx;ctx.clearRect(0,0,cvs.width,cvs.height);drawBoa
   if(drag&&(drag.mode==='new'||drag.mode==='move')&&!drag.trash&&drag.pl&&drag.pl.holes)drawGhost(ctx,drag.mode==='new'?drag.type:findPart(drag.id).type,drag.pl.holes,drag.pl.ok,drag.rot);
   if(drag&&drag.mode==='wire'){const A=HP(drag.a);ctx.strokeStyle=wireColor;ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([]);
     const t=nearestHole(drag.x,drag.y,10);if(t){const [x,y]=HP(t.h);ctx.strokeStyle=PAL.cyan;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.stroke();}}
+  drawProbeMarks(ctx);
   if(hov&&!drag){const h=nearestHole(hov.x,hov.y,6);if(h){const [x,y]=HP(h.h);ctx.strokeStyle='rgba(34,211,238,.8)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();}}
   for(let i=smoke.length-1;i>=0;i--){const s=smoke[i];s.life-=dt;if(s.life<=0){smoke.splice(i,1);continue;}s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy-=5*dt;
     ctx.fillStyle=`rgba(120,120,130,${Math.min(0.5,s.life*0.35)})`;ctx.beginPath();ctx.arc(s.x,s.y,6+(2.5-s.life)*6,0,7);ctx.fill();}
   if(meterText&&run){ctx.font='600 12px ui-monospace,monospace';const tw=ctx.measureText(meterText.t).width+12;let x=meterText.x+12,y=meterText.y-26;if(x+tw>cvs.width)x=meterText.x-tw-12;
     ctx.fillStyle='rgba(7,11,22,.92)';ctx.fillRect(x,y,tw,20);ctx.strokeStyle=PAL.cyan;ctx.strokeRect(x,y,tw,20);ctx.fillStyle=PAL.cyan;ctx.textAlign='left';ctx.fillText(meterText.t,x+6,y+14);}
   if(!S.parts.length&&!drag)txt(ctx,'Drag a part from the catalog and drop it here',cvs.width/2,380,PAL.muted,14);}
-loop(dt=>{if(run)simFrame(dt);draw(dt);});
+loop(dt=>{if(run)simFrame(dt);draw(dt);drawScopes();});
 
 // ---------- toolbar ----------
 $('bdUndo').onclick=undo;$('bdRedo').onclick=redo;$('bdDelete').onclick=removeSel;
 $('bdRotate').onclick=()=>{if(sel&&sel.kind==='part')rotate(findPart(sel.id));else status('Select a part first (click it).','warn');};
-$('bdClear').onclick=()=>{if(!S.parts.length&&!S.wires.length)return;const before=snapState();S={parts:[],wires:[]};sel=null;commit(before);status('Board cleared (Undo brings it back).');};
+$('bdClear').onclick=()=>{if(!S.parts.length&&!S.wires.length)return;const before=snapState();S={parts:[],wires:[]};sel=null;clearProbes();commit(before);status('Board cleared (Undo brings it back).');};
 
 // ---------- save / open (in this browser) ----------
 const STORE='buildlab:circuits';
@@ -242,7 +248,7 @@ $('bdSave').onclick=()=>{openModal(`<h3 class="flush">Save this circuit</h3><div
 $('bdOpen').onclick=()=>{const all=saved(),names=Object.keys(all).sort();
   openModal(`<h3 class="flush">Open a saved circuit</h3>${names.length?`<ul class="bd-saved">${names.map(n=>`<li><span>${n.replace(/</g,'&lt;')}</span><button data-n="${encodeURIComponent(n)}" class="bd-o">Open</button><button data-n="${encodeURIComponent(n)}" class="bd-d stop">🗑</button></li>`).join('')}</ul>`:'<p class="hint">Nothing saved yet: build a circuit and press 💾 Save.</p>'}<div class="bd-row"><button id="bdCancel">Close</button></div>`);
   $('bdCancel').onclick=()=>modal.hidden=true;
-  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=migrate(JSON.parse(JSON.stringify(all[n].s)));sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
+  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=migrate(JSON.parse(JSON.stringify(all[n].s)));clearProbes();sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
   modal.querySelectorAll('.bd-d').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const a2=saved();delete a2[n];try{localStorage.setItem(STORE,JSON.stringify(a2));}catch(e){}$('bdOpen').onclick();});};
 try{const cur=localStorage.getItem('buildlab:current');if(cur){S=migrate(JSON.parse(cur));NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));}}catch(e){}
 
@@ -287,7 +293,7 @@ function importLayout(L){if(!L||L.noBoard)return null;const out={parts:[],wires:
     for(const g of groups){let c=0;for(let k=59;k>=1&&!c;k-=2)if(!used.has('T'+k))c=k;if(!c)return null;used.add('T'+c);
       g.legs.forEach((l,i)=>{l.part.holes[l.pin]='abcde'[i]+c;});}}
   return out;}
-window.BUILD_LAB={canImport:L=>!!importLayout(L),load:(L,name)=>{const s=importLayout(L);if(!s)return false;const before=snapState();S=s;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));sel=null;commit(before);if(run)play(false);status(`Loaded ${name||'the project'}: press ▶ Play.`);return true;}};
+window.BUILD_LAB={canImport:L=>!!importLayout(L),load:(L,name)=>{const s=importLayout(L);if(!s)return false;const before=snapState();S=s;clearProbes();NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));sel=null;commit(before);if(run)play(false);status(`Loaded ${name||'the project'}: press ▶ Play.`);return true;}};
 document.querySelectorAll('.bd-open[data-project]').forEach(b=>{const L=window.BBL_LAYOUTS&&window.BBL_LAYOUTS[b.dataset.project];if(L&&window.BUILD_LAB.canImport(L)){b.hidden=false;
   b.onclick=()=>{window.BUILD_LAB.load(L,'project '+b.dataset.project.replace(/^p/,''));location.hash='#build';};}});
 renderProps();
