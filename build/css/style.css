@@ -276,6 +276,14 @@
   .bd-pdel{padding:1px 7px}
   .bd-scope-stats{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:5px;font:500 .8rem var(--font-mono);color:var(--muted)}
   .bd-scope-stats b{color:var(--ink)}
+  /* wide screens: a wider page, the board on the left, Properties + Multimeter in a column on the right */
+  #page-build main{max-width:1900px}
+  .bd-main{display:grid;grid-template-columns:minmax(0,1fr);gap:0 16px;align-items:start}
+  .bd-stage canvas{max-width:calc((100vh - 200px)*800/440);margin:0 auto}   /* the whole board stays on screen */
+  @media(min-width:1280px){
+    .bd-main{grid-template-columns:minmax(0,1fr) clamp(340px,25vw,480px)}
+    .bd-main .bd-panels{grid-template-columns:1fr;position:sticky;top:62px;max-height:calc(100vh - 76px);overflow:auto;scrollbar-width:thin}
+    .bd-main .bd-work{margin-bottom:14px}}
 
 /* chips page only */
   .pnout{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:10px 16px}.pnname{font:800 2rem ui-monospace,monospace;letter-spacing:.04em;margin:4px 0 6px}.pnname span{margin-right:4px;padding-bottom:2px}
