@@ -17,6 +17,7 @@ class Circuit{
   Vac(p,m,amp,f,r){return this.add({t:'V',a:p,b:m,V:0,amp,f,g:1/r});}             // audio signal: amp·sin(2πft)
   SW(a,b,on){return this.add({t:'SW',a,b,on,g:1/0.05});}                          // switch / button contact
   C(a,b,C,vmax){return this.add({t:'C',a,b,C,vp:0});}                               // vp: voltage at the previous step
+  L(a,b,L){return this.add({t:'L',a,b,L,ip:0});}                                     // inductor (relay coil): ip = current at the previous step
   // ---- non-linear parts
   D(a,b,Is,n){return this.add({t:'D',a,b,Is,nv:n*VT,vd:0});}                      // diode / LED: anode a, cathode b
   Q(c,b,e,Is,bf,br){return this.add({t:'Q',c,b,e,Is,bf,br,vbe:0,vbc:0});}           // NPN (Ebers–Moll)
@@ -57,6 +58,7 @@ class Circuit{
         case 'SW':if(e.on)G(e.a,e.b,e.g);break;
         case 'V':G(e.a,e.b,e.g);Iin(e.a,e.b,-e.V*e.g);break;                           // pushes V/R out of +
         case 'C':{const g=e.C/dt;G(e.a,e.b,g);Iin(e.a,e.b,-g*e.vp);break;}
+        case 'L':{G(e.a,e.b,dt/e.L);Iin(e.a,e.b,e.ip);break;}                         // i = ip + (dt/L)·v: the current can't stop at once
         case 'M':{G(e.a,e.b,e.g);Iin(e.a,e.b,-e.g*e.k*e.w);break;}
         case 'D':{const raw=this.v(e.a)-this.v(e.b);let vd=pnlim(raw,e.vd,e.nv,e.Is);if(Math.abs(vd-raw)>1e-6)lim=true;e.vd=vd;
           const ex=Math.exp(Math.min(vd/e.nv,80)),id=e.Is*(ex-1),gd=e.Is/e.nv*ex+GMIN;G(e.a,e.b,gd);Iin(e.a,e.b,id-gd*vd);break;}
@@ -101,6 +103,7 @@ class Circuit{
         case 'SW':e.v=va-vb;e.i=e.on?e.v*e.g:0;break;
         case 'V':e.v=va-vb;e.i=(e.V-e.v)*e.g;break;                                     // current delivered out of +
         case 'C':e.v=va-vb;e.i=e.C*(e.v-e.vp)/dt;e.vp=e.v;break;
+        case 'L':e.v=va-vb;e.i=e.ip+dt/e.L*e.v;e.ip=e.i;break;
         case 'D':e.v=va-vb;e.i=e.Is*(Math.exp(Math.min(e.v/e.nv,80))-1);break;
         case 'M':e.v=va-vb;e.i=(e.v-e.k*e.w)*e.g;e.w+=dt*(e.k*e.i-e.f*e.w)/e.J;break;
         case 'Q':{const vbe=this.v(e.b)-this.v(e.e),vbc=this.v(e.b)-this.v(e.c);

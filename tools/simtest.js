@@ -54,4 +54,11 @@ function battery(c,V=9){const p=c.node();c.Vs(p,0,V,1.5);return p;}
   for(let k=0;k<=400;k++){vs.V=9*(k<=200?k:400-k)/200;for(let j=0;j<40;j++)c.step(2e-4);const hi=c.v(o)>4?1:0;
     if(hi&&!prev)up=vs.V;if(!hi&&prev)down=vs.V;prev=hi;}
   check('comparator switches on near (V)',up||0,4.5,0.15);check('comparator switches off near (V)',down||0,4.45,0.15);}
+{ // 12. relay coil (400 Ω + 0.5 H) on 12 V through a switch: current builds up with τ = L/R, and a flyback diode
+  //     catches it at switch-off (the switch node goes only ~0.7 V above +); without the diode it spikes far above
+  const run=diode=>{const c=new Circuit(),p=c.node();c.Vs(p,0,12,0.1);const k=c.node(),x=c.node();c.R(p,x,400);const L=c.L(x,k,0.5);const sw=c.SW(k,0,true);
+    if(diode)c.D(k,p,diodeIs(0.72,1.8),1.8);let i1=0;for(let n=0;n<200;n++){c.step(2e-4);if(n===6)i1=L.i;}   // 1.4 ms ≈ τ
+    const iOn=L.i;sw.on=false;let vpk=0;for(let n=0;n<50;n++){c.step(2e-4);vpk=Math.max(vpk,c.v(k));}return {i1,iOn,vpk,iEnd:L.i};};
+  const a=run(true),b=run(false);check('coil current after one τ (mA)',a.i1*1e3,30*(1-Math.exp(-1.4/1.25)),2.5);check('coil current on (mA)',a.iOn*1e3,30,0.5);
+  check('with flyback diode: switch node peak (V)',a.vpk,12.7,0.4);check('without diode: spike above 45 V (BC547 limit)',b.vpk>45?1:0,1,0);check('coil current dies out (mA)',a.iEnd*1e3,0,0.5);}
 console.log(fails?`${fails} failure(s)`:'all simulator tests passed');process.exit(fails?1:0);

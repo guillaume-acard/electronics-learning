@@ -19,17 +19,21 @@ const capValues=p=>CAP_VALUES.filter(v=>p.props.kind==='electrolytic'?v>=1e-6:v<
 // a DIP chip straddling the centre gap: pins 1…n/2 on row f (left to right), n/2+1…n back along row e
 const dip=n=>{const f=[];for(let i=0;i<n/2;i++)f.push([0,i]);for(let i=n/2-1;i>=0;i--)f.push([-1,i]);return f;};
 const pinList=n=>Array.from({length:n},(_,i)=>String(i+1));
+const RELAYS={'12':{R:400,L:0.5,on:0.022,off:0.005,Vn:12,lab:'12 V relay'},'5':{R:70,L:0.08,on:0.053,off:0.01,Vn:5,lab:'5 V relay'}};
 const Q_PINS=['3','2','4','7','10','1','5','6','9','11'];   // CD4017: pins of Q0 … Q9
 
 const PARTS={
- batt:{name:'9 V battery',group:'Power',icon:'🔋',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,
+ batt:{name:'9 V battery',group:'Power',icon:'🔋',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,source:true,
    props:{V:9},edit:[{k:'V',label:'Voltage',opts:[[9,'9 V'],[4.5,'4.5 V (3 × AA)'],[3,'3 V (2 × AA)']]}],
    model:(c,n,p)=>({bat:c.Vs(n['+'],n['−'],p.props.V,1.5)}),
    watch:(el)=>({I:el.bat.i,P:Math.abs(el.bat.i*el.bat.v),info:[['Delivers',fmtI(el.bat.i)],['Voltage',fmtV(el.bat.v)]]})},
- usb:{name:'USB 5 V module',group:'Power',icon:'⚡',foot:null,pins:['+','−'],fixed:{'+':'tp1','−':'tn1'},rotate:false,unique:true,
+ usb:{name:'USB 5 V module',group:'Power',icon:'⚡',foot:null,pins:['+','−'],fixed:{'+':'tp1','−':'tn1'},rotate:false,unique:true,source:true,
    props:{},edit:[],
    model:(c,n)=>({src:c.Vs(n['+'],n['−'],5,0.2)}),
    watch:(el)=>({I:el.src.i,info:[['Delivers',fmtI(el.src.i)],['Voltage',fmtV(el.src.v)]],over:el.src.i>0.8?'more than 0.8 A: the module cuts out':''})},
+ adapter:{name:'12 V adapter',group:'Power',icon:'🔌',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,source:true,props:{},edit:[],
+   model:(c,n)=>({src:c.Vs(n['+'],n['−'],12,0.3)}),
+   watch:(el)=>({I:el.src.i,info:[['Delivers',fmtI(el.src.i)+' (max 500 mA)'],['Voltage',fmtV(el.src.v)]],over:el.src.i>0.5?'more than 500 mA: the adapter cuts out':''})},
  sig:{name:'Audio signal (phone)',group:'Power',icon:'♪',foot:[[0,0],[0,2]],pins:['tip','sleeve'],rotate:true,dynamic:true,
    props:{f:440,vol:0.5},legName:(p,pin)=>pin==='tip'?'tip (signal)':'sleeve (ground)',
    edit:[{k:'f',label:'Tone',opts:[[110,'110 Hz (low)'],[440,'440 Hz (the note A)'],[1000,'1 kHz (high)']]},{k:'vol',label:'Volume',range:[0,1,0.01],live:true}],
@@ -57,9 +61,10 @@ const PARTS={
      over:Math.abs(el.c.v)>p.props.Vmax?`more than its ${p.props.Vmax} V rating`:ele&&el.c.v<-1.5?'connected backwards (+ on the − side)':''};}},
  led:{name:'LED',label:p=>'LED ('+p.props.color+')',group:'Semiconductors',icon:'💡',foot:[[0,0],[0,1]],pins:['+','−'],rotate:true,
    props:{color:'red'},edit:[{k:'color',label:'Colour',opts:Object.keys(LEDS).map(k=>[k,k])}],
-   model:(c,n,p)=>{const L=LEDS[p.props.color];return {d:c.D(n['+'],n['−'],diodeIs(L.vf,2),2)};},
-   watch:(el)=>({I:el.d.i,vrev:-el.d.v,bright:Math.min(1,Math.max(0,el.d.i)/0.012),info:[['Current',fmtI(el.d.i)+' (max 30 mA)'],['Voltage',fmtV(el.d.v)]],
-     over:el.d.i>0.03?'more than 30 mA: add or increase its resistor':''})},
+   model:(c,n,p)=>{const L=LEDS[p.props.color];return {d:c.D(n['+'],n['−'],diodeIs(L.vf,2),2),q:0,t:0,b:0};},
+   tick:(el,dt)=>{el.q+=el.d.i*dt;el.t+=dt;},                                     // average current since the last look
+   watch:(el)=>{const I=el.t?el.q/el.t:el.d.i;el.q=0;el.t=0;el.b=Math.max(Math.min(1,Math.max(0,I)/0.012),el.b*0.85);
+     return {I,vrev:-el.d.v,bright:el.b,info:[['Current',fmtI(I)+' (max 30 mA)'],['Voltage',fmtV(el.d.v)]],over:I>0.03?'more than 30 mA: add or increase its resistor':''};}},
  diode:{name:'Diode',group:'Semiconductors',icon:'▷|',foot:[[0,0],[0,4]],pins:['A','K'],rotate:true,props:{kind:'1N4007'},
    label:p=>'Diode '+p.props.kind,legName:(p,pin)=>pin==='A'?'A (anode)':'K (stripe)',
    edit:[{k:'kind',label:'Model',opts:[['1N4007','1N4007: rectifier, 1 A'],['1N4148','1N4148: small signal, 200 mA']]}],
@@ -67,11 +72,13 @@ const PARTS={
    watch:(el,p)=>{const D=DIODES[p.props.kind];return {I:el.d.i,info:[['Current',fmtI(el.d.i)+' (max '+D.lab+')'],['Voltage',fmtV(el.d.v)]],over:el.d.i>D.Imax?'more than '+D.lab:''};}},
  npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},label:p=>'Transistor '+p.props.kind,
    edit:[{k:'kind',label:'Model',opts:[['BC547','BC547 (small: 100 mA)'],['SS8050','SS8050 (stronger: 1.5 A)']]}],
-   model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2)}),
-   watch:(el,p)=>{const big=p.props.kind==='SS8050',Imax=big?1.5:0.1,Pmax=big?1:0.5;
+   model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2),vpk:0}),
+   tick:(el)=>{if(el.q.vce>el.vpk)el.vpk=el.q.vce;},
+   watch:(el,p)=>{const big=p.props.kind==='SS8050',Imax=big?1.5:0.1,Pmax=big?1:0.5,Vmax=big?25:45,pk=el.vpk;el.vpk=0;
+     if(pk>Vmax)return {I:el.q.ic,kill:true,info:[],over:`a spike of ${Math.round(pk)} V between C and E (max ${Vmax} V): a coil was switched off with no flyback diode across it`};
      return {I:el.q.ic,P:el.q.p,info:[['Collector',fmtI(el.q.ic)+' (max '+(big?'1.5 A':'100 mA')+')'],['Base',fmtI(el.q.ib)],['C–E voltage',fmtV(el.q.vce)],['Power',fmtP(el.q.p)]],
      over:el.q.ic>Imax?'more than '+(big?'1.5 A':'100 mA')+' in the collector'+(big?'':' (for a motor, use the SS8050)'):el.q.p>Pmax?'more than '+Pmax+' W':el.q.ib>0.02?'more than 20 mA into the base: add a base resistor':''};}},
- btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],anchor:'e',rotate:false,
+ btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],anchor:'e',rotate:false,
    props:{pressed:false},edit:[{k:'pressed',label:'Press',hold:true}],
    model:(c,n,p)=>({k1:c.SW(n['1a'],n['1b'],true),k2:c.SW(n['2a'],n['2b'],true),s:c.SW(n['1a'],n['2a'],p.props.pressed)}),
    update:(el,p)=>{el.s.on=p.props.pressed;},
@@ -88,6 +95,26 @@ const PARTS={
  motor:{name:'DC motor',group:'Output',icon:'M',foot:[[0,0],[0,3]],pins:['1','2'],rotate:true,props:{},edit:[],
    dynamic:true,model:(c,n)=>({m:c.Motor(n['1'],n['2'],4.5,0.0086,3.3e-6,1.34e-6)}),
    watch:(el)=>({I:el.m.i,spin:el.m.w,info:[['Speed',Math.round(Math.abs(el.m.w)*60/6.283)+' rpm'],['Current',fmtI(el.m.i)]],over:Math.abs(el.m.i)>2.5?'more than 2.5 A (stalled at too high a voltage)':''})},
+ lamp:{name:'Bulb 12 V',group:'Output',icon:'🔆',foot:[[0,0],[0,3]],pins:['1','2'],rotate:true,props:{},edit:[],
+   model:(c,n)=>({r:c.R(n['1'],n['2'],120)}),                                  // 12 V, 100 mA when hot
+   watch:(el)=>({I:el.r.i,P:el.r.p,bright:Math.min(1,el.r.p/1.2),info:[['Voltage',fmtV(Math.abs(el.r.v))+' (made for 12 V)'],['Current',fmtI(el.r.i)],['Power',fmtP(el.r.p)]],
+     over:Math.abs(el.r.v)>15?'more than 15 V: the filament blows':''})},
+ relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,
+   props:{kind:'12'},label:p=>RELAYS[p.props.kind].lab,optional:['COM','NC','NO'],
+   legName:(p,pin)=>({C1:'coil',C2:'coil',COM:'COM (common)',NC:'NC (closed at rest)',NO:'NO (open at rest)'})[pin],
+   edit:[{k:'kind',label:'Model',opts:[['12','12 V, coil 400 Ω (RWH-SS-112D)'],['5','5 V, coil 70 Ω (RWH-SS-105D)']]}],
+   model:(c,n,p)=>{const K=RELAYS[p.props.kind],x=c.node();
+     return {K,r:c.R(n['C1'],x,K.R),l:c.L(x,n['C2'],K.L),no:c.SW(n['COM'],n['NO'],false),nc:c.SW(n['COM'],n['NC'],true),on:false,flip:0,heat:0};},
+   // the contact moves when the coil current passes the pull-in value, and falls back well below it
+   // kick: the coil voltage turned against its current by more than 3 V = nothing catches the switch-off spike. The simulator's
+   // 0.2 ms steps are too slow to show its real height (hundreds of volts: a transistor cuts the current in microseconds).
+   tick:(el,dt)=>{const i=Math.abs(el.l.i);el.heat+=(el.r.v*el.r.v/el.K.R-el.heat)*Math.min(1,dt/5);   // coil power averaged over ~5 s
+     if(!el.on&&i>el.K.on||el.on&&i<el.K.off){el.on=!el.on;el.flip=typeof performance!=='undefined'?performance.now():0;}
+     el.no.on=el.on;el.nc.on=!el.on;if(i>0.001&&(el.r.v+el.l.v)*Math.sign(el.l.i)<-3)el.kick=true;},
+   watch:(el)=>{const K=el.K,ic=Math.abs(el.on?el.no.i:el.nc.i);
+     const kick=el.kick;el.kick=false;
+     return {I:el.l.i,on:el.on,flip:el.flip,kick,info:[['Coil',fmtI(el.l.i)+' (clicks in above '+fmtI(K.on)+')'],['Contact',el.on?'COM → NO closed':'COM → NC closed (at rest)'],['Contact current',fmtI(ic)]],
+     over:el.heat>4*K.Vn*K.Vn/K.R?`its coil had more than twice its ${K.Vn} V for too long: it overheated`:ic>10?'more than 10 A through the contact':''};}},
  spk:{name:'Speaker 8 Ω',group:'Output',icon:'🔊',foot:[[0,0],[0,3]],pins:['+','−'],rotate:true,props:{},edit:[],dynamic:true,
    model:(c,n)=>({r:c.R(n['+'],n['−'],8),ms:0,heat:0}),
    // mean square current over the last ~50 ms (what you hear) and over ~1 s (what heats the coil)

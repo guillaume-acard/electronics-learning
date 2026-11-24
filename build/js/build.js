@@ -232,17 +232,21 @@ const capValues=p=>CAP_VALUES.filter(v=>p.props.kind==='electrolytic'?v>=1e-6:v<
 // a DIP chip straddling the centre gap: pins 1…n/2 on row f (left to right), n/2+1…n back along row e
 const dip=n=>{const f=[];for(let i=0;i<n/2;i++)f.push([0,i]);for(let i=n/2-1;i>=0;i--)f.push([-1,i]);return f;};
 const pinList=n=>Array.from({length:n},(_,i)=>String(i+1));
+const RELAYS={'12':{R:400,L:0.5,on:0.022,off:0.005,Vn:12,lab:'12 V relay'},'5':{R:70,L:0.08,on:0.053,off:0.01,Vn:5,lab:'5 V relay'}};
 const Q_PINS=['3','2','4','7','10','1','5','6','9','11'];   // CD4017: pins of Q0 … Q9
 
 const PARTS={
- batt:{name:'9 V battery',group:'Power',icon:'🔋',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,
+ batt:{name:'9 V battery',group:'Power',icon:'🔋',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,source:true,
    props:{V:9},edit:[{k:'V',label:'Voltage',opts:[[9,'9 V'],[4.5,'4.5 V (3 × AA)'],[3,'3 V (2 × AA)']]}],
    model:(c,n,p)=>({bat:c.Vs(n['+'],n['−'],p.props.V,1.5)}),
    watch:(el)=>({I:el.bat.i,P:Math.abs(el.bat.i*el.bat.v),info:[['Delivers',fmtI(el.bat.i)],['Voltage',fmtV(el.bat.v)]]})},
- usb:{name:'USB 5 V module',group:'Power',icon:'⚡',foot:null,pins:['+','−'],fixed:{'+':'tp1','−':'tn1'},rotate:false,unique:true,
+ usb:{name:'USB 5 V module',group:'Power',icon:'⚡',foot:null,pins:['+','−'],fixed:{'+':'tp1','−':'tn1'},rotate:false,unique:true,source:true,
    props:{},edit:[],
    model:(c,n)=>({src:c.Vs(n['+'],n['−'],5,0.2)}),
    watch:(el)=>({I:el.src.i,info:[['Delivers',fmtI(el.src.i)],['Voltage',fmtV(el.src.v)]],over:el.src.i>0.8?'more than 0.8 A: the module cuts out':''})},
+ adapter:{name:'12 V adapter',group:'Power',icon:'🔌',foot:[[0,0],[1,1]],pins:['+','−'],anchor:'rails',rotate:false,source:true,props:{},edit:[],
+   model:(c,n)=>({src:c.Vs(n['+'],n['−'],12,0.3)}),
+   watch:(el)=>({I:el.src.i,info:[['Delivers',fmtI(el.src.i)+' (max 500 mA)'],['Voltage',fmtV(el.src.v)]],over:el.src.i>0.5?'more than 500 mA: the adapter cuts out':''})},
  sig:{name:'Audio signal (phone)',group:'Power',icon:'♪',foot:[[0,0],[0,2]],pins:['tip','sleeve'],rotate:true,dynamic:true,
    props:{f:440,vol:0.5},legName:(p,pin)=>pin==='tip'?'tip (signal)':'sleeve (ground)',
    edit:[{k:'f',label:'Tone',opts:[[110,'110 Hz (low)'],[440,'440 Hz (the note A)'],[1000,'1 kHz (high)']]},{k:'vol',label:'Volume',range:[0,1,0.01],live:true}],
@@ -270,9 +274,10 @@ const PARTS={
      over:Math.abs(el.c.v)>p.props.Vmax?`more than its ${p.props.Vmax} V rating`:ele&&el.c.v<-1.5?'connected backwards (+ on the − side)':''};}},
  led:{name:'LED',label:p=>'LED ('+p.props.color+')',group:'Semiconductors',icon:'💡',foot:[[0,0],[0,1]],pins:['+','−'],rotate:true,
    props:{color:'red'},edit:[{k:'color',label:'Colour',opts:Object.keys(LEDS).map(k=>[k,k])}],
-   model:(c,n,p)=>{const L=LEDS[p.props.color];return {d:c.D(n['+'],n['−'],diodeIs(L.vf,2),2)};},
-   watch:(el)=>({I:el.d.i,vrev:-el.d.v,bright:Math.min(1,Math.max(0,el.d.i)/0.012),info:[['Current',fmtI(el.d.i)+' (max 30 mA)'],['Voltage',fmtV(el.d.v)]],
-     over:el.d.i>0.03?'more than 30 mA: add or increase its resistor':''})},
+   model:(c,n,p)=>{const L=LEDS[p.props.color];return {d:c.D(n['+'],n['−'],diodeIs(L.vf,2),2),q:0,t:0,b:0};},
+   tick:(el,dt)=>{el.q+=el.d.i*dt;el.t+=dt;},                                     // average current since the last look
+   watch:(el)=>{const I=el.t?el.q/el.t:el.d.i;el.q=0;el.t=0;el.b=Math.max(Math.min(1,Math.max(0,I)/0.012),el.b*0.85);
+     return {I,vrev:-el.d.v,bright:el.b,info:[['Current',fmtI(I)+' (max 30 mA)'],['Voltage',fmtV(el.d.v)]],over:I>0.03?'more than 30 mA: add or increase its resistor':''};}},
  diode:{name:'Diode',group:'Semiconductors',icon:'▷|',foot:[[0,0],[0,4]],pins:['A','K'],rotate:true,props:{kind:'1N4007'},
    label:p=>'Diode '+p.props.kind,legName:(p,pin)=>pin==='A'?'A (anode)':'K (stripe)',
    edit:[{k:'kind',label:'Model',opts:[['1N4007','1N4007: rectifier, 1 A'],['1N4148','1N4148: small signal, 200 mA']]}],
@@ -280,11 +285,13 @@ const PARTS={
    watch:(el,p)=>{const D=DIODES[p.props.kind];return {I:el.d.i,info:[['Current',fmtI(el.d.i)+' (max '+D.lab+')'],['Voltage',fmtV(el.d.v)]],over:el.d.i>D.Imax?'more than '+D.lab:''};}},
  npn:{name:'NPN transistor',group:'Semiconductors',icon:'T',foot:[[0,0],[0,1],[0,2]],pins:['C','B','E'],rotate:true,props:{kind:'BC547'},label:p=>'Transistor '+p.props.kind,
    edit:[{k:'kind',label:'Model',opts:[['BC547','BC547 (small: 100 mA)'],['SS8050','SS8050 (stronger: 1.5 A)']]}],
-   model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2)}),
-   watch:(el,p)=>{const big=p.props.kind==='SS8050',Imax=big?1.5:0.1,Pmax=big?1:0.5;
+   model:(c,n,p)=>({q:c.Q(n['C'],n['B'],n['E'],p.props.kind==='SS8050'?2e-14:7e-15,200,2),vpk:0}),
+   tick:(el)=>{if(el.q.vce>el.vpk)el.vpk=el.q.vce;},
+   watch:(el,p)=>{const big=p.props.kind==='SS8050',Imax=big?1.5:0.1,Pmax=big?1:0.5,Vmax=big?25:45,pk=el.vpk;el.vpk=0;
+     if(pk>Vmax)return {I:el.q.ic,kill:true,info:[],over:`a spike of ${Math.round(pk)} V between C and E (max ${Vmax} V): a coil was switched off with no flyback diode across it`};
      return {I:el.q.ic,P:el.q.p,info:[['Collector',fmtI(el.q.ic)+' (max '+(big?'1.5 A':'100 mA')+')'],['Base',fmtI(el.q.ib)],['C–E voltage',fmtV(el.q.vce)],['Power',fmtP(el.q.p)]],
      over:el.q.ic>Imax?'more than '+(big?'1.5 A':'100 mA')+' in the collector'+(big?'':' (for a motor, use the SS8050)'):el.q.p>Pmax?'more than '+Pmax+' W':el.q.ib>0.02?'more than 20 mA into the base: add a base resistor':''};}},
- btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],anchor:'e',rotate:false,
+ btn:{name:'Push button',group:'Switches & sensors',icon:'⏺',foot:[[0,0],[0,2],[1,0],[1,2]],pins:['1a','2a','1b','2b'],pairs:[['1a','1b'],['2a','2b']],anchor:'e',rotate:false,
    props:{pressed:false},edit:[{k:'pressed',label:'Press',hold:true}],
    model:(c,n,p)=>({k1:c.SW(n['1a'],n['1b'],true),k2:c.SW(n['2a'],n['2b'],true),s:c.SW(n['1a'],n['2a'],p.props.pressed)}),
    update:(el,p)=>{el.s.on=p.props.pressed;},
@@ -301,6 +308,26 @@ const PARTS={
  motor:{name:'DC motor',group:'Output',icon:'M',foot:[[0,0],[0,3]],pins:['1','2'],rotate:true,props:{},edit:[],
    dynamic:true,model:(c,n)=>({m:c.Motor(n['1'],n['2'],4.5,0.0086,3.3e-6,1.34e-6)}),
    watch:(el)=>({I:el.m.i,spin:el.m.w,info:[['Speed',Math.round(Math.abs(el.m.w)*60/6.283)+' rpm'],['Current',fmtI(el.m.i)]],over:Math.abs(el.m.i)>2.5?'more than 2.5 A (stalled at too high a voltage)':''})},
+ lamp:{name:'Bulb 12 V',group:'Output',icon:'🔆',foot:[[0,0],[0,3]],pins:['1','2'],rotate:true,props:{},edit:[],
+   model:(c,n)=>({r:c.R(n['1'],n['2'],120)}),                                  // 12 V, 100 mA when hot
+   watch:(el)=>({I:el.r.i,P:el.r.p,bright:Math.min(1,el.r.p/1.2),info:[['Voltage',fmtV(Math.abs(el.r.v))+' (made for 12 V)'],['Current',fmtI(el.r.i)],['Power',fmtP(el.r.p)]],
+     over:Math.abs(el.r.v)>15?'more than 15 V: the filament blows':''})},
+ relay:{name:'Relay',group:'Output',icon:'⎍',foot:[[-1,0],[-1,4],[0,0],[0,2],[0,4]],pins:['C1','C2','COM','NC','NO'],anchor:'f',rotate:false,leads:true,dynamic:true,
+   props:{kind:'12'},label:p=>RELAYS[p.props.kind].lab,optional:['COM','NC','NO'],
+   legName:(p,pin)=>({C1:'coil',C2:'coil',COM:'COM (common)',NC:'NC (closed at rest)',NO:'NO (open at rest)'})[pin],
+   edit:[{k:'kind',label:'Model',opts:[['12','12 V, coil 400 Ω (RWH-SS-112D)'],['5','5 V, coil 70 Ω (RWH-SS-105D)']]}],
+   model:(c,n,p)=>{const K=RELAYS[p.props.kind],x=c.node();
+     return {K,r:c.R(n['C1'],x,K.R),l:c.L(x,n['C2'],K.L),no:c.SW(n['COM'],n['NO'],false),nc:c.SW(n['COM'],n['NC'],true),on:false,flip:0,heat:0};},
+   // the contact moves when the coil current passes the pull-in value, and falls back well below it
+   // kick: the coil voltage turned against its current by more than 3 V = nothing catches the switch-off spike. The simulator's
+   // 0.2 ms steps are too slow to show its real height (hundreds of volts: a transistor cuts the current in microseconds).
+   tick:(el,dt)=>{const i=Math.abs(el.l.i);el.heat+=(el.r.v*el.r.v/el.K.R-el.heat)*Math.min(1,dt/5);   // coil power averaged over ~5 s
+     if(!el.on&&i>el.K.on||el.on&&i<el.K.off){el.on=!el.on;el.flip=typeof performance!=='undefined'?performance.now():0;}
+     el.no.on=el.on;el.nc.on=!el.on;if(i>0.001&&(el.r.v+el.l.v)*Math.sign(el.l.i)<-3)el.kick=true;},
+   watch:(el)=>{const K=el.K,ic=Math.abs(el.on?el.no.i:el.nc.i);
+     const kick=el.kick;el.kick=false;
+     return {I:el.l.i,on:el.on,flip:el.flip,kick,info:[['Coil',fmtI(el.l.i)+' (clicks in above '+fmtI(K.on)+')'],['Contact',el.on?'COM → NO closed':'COM → NC closed (at rest)'],['Contact current',fmtI(ic)]],
+     over:el.heat>4*K.Vn*K.Vn/K.R?`its coil had more than twice its ${K.Vn} V for too long: it overheated`:ic>10?'more than 10 A through the contact':''};}},
  spk:{name:'Speaker 8 Ω',group:'Output',icon:'🔊',foot:[[0,0],[0,3]],pins:['+','−'],rotate:true,props:{},edit:[],dynamic:true,
    model:(c,n)=>({r:c.R(n['+'],n['−'],8),ms:0,heat:0}),
    // mean square current over the last ~50 ms (what you hear) and over ~1 s (what heats the coil)
@@ -395,8 +422,11 @@ function holeXY(h){return HP(h);}
 function partBox(p){const pts=Object.values(p.holes).map(HP);const T=PARTS[p.type];
   if(p.type==='usb')return [14,96,46,236];
   let x0=Math.min(...pts.map(q=>q[0])),x1=Math.max(...pts.map(q=>q[0])),y0=Math.min(...pts.map(q=>q[1])),y1=Math.max(...pts.map(q=>q[1]));
-  if(p.type==='batt'){const up=y0<213;return up?[x0-22,24,x1-x0+58,y1-24]:[x0-22,y0,x1-x0+58,402-y0];}
+  if(PARTS[p.type].leads)return relayBody(p);
+  if(T.anchor==='rails'){const up=y0<213;return up?[x0-22,24,x1-x0+58,y1-24]:[x0-22,y0,x1-x0+58,402-y0];}
   return [x0-9,y0-24,x1-x0+18,y1-y0+32];}
+// a relay sits where its legs are (over the gap when placed from the catalog); its legs are flexible leads
+function relayBody(p){const pts=Object.values(p.holes).map(HP),cx=pts.reduce((s,q)=>s+q[0],0)/pts.length,cy=pts.reduce((s,q)=>s+q[1],0)/pts.length;return [cx-32,cy-17,64,34];}
 function drawPart(ctx,p,vis){const T=PARTS[p.type],H=p.holes,lit=vis&&vis.bright>0.02;
   switch(p.type){
     case 'res':partOn(ctx,{t:'res',a:H['1'],b:H['2'],v:p.props.R},false);break;
@@ -433,6 +463,20 @@ function drawPart(ctx,p,vis){const T=PARTS[p.type],H=p.holes,lit=vis&&vis.bright
     case 'ne555':case 'cd4017':case 'lm358':case 'lm386':{const q=parseHole(H['1']);partOn(ctx,{t:'chip',col:q.c,n:T.pins.length,lab:T.chip},false);break;}
     case 'batt':{const P=HP(H['+']),up=P[1]<213;partOn(ctx,{t:'batt',at:[P[0]-20,up?30:352],plus:H['+'],minus:H['−'],lab:p.props.V+' V'},false);break;}
     case 'usb':partOn(ctx,{t:'pm'},!!(vis&&vis.on));break;
+    case 'adapter':{const P=HP(H['+']),up=P[1]<213,x=P[0]-20,y=up?30:352,ty=up?y+38:y-5;ctx.fillStyle=PAL.chip;ctx.beginPath();ctx.roundRect(x,y,70,38,5);ctx.fill();
+      txt(ctx,'12 V ⎓',x+35,y+17,PAL.white,12);txt(ctx,'adapter',x+35,y+30,PAL.muted,8);ctx.fillStyle=PAL.gray;ctx.fillRect(x+16,ty,10,5);ctx.fillRect(x+44,ty,10,5);const wy=up?ty+5:ty;
+      partOn(ctx,{t:'wire',a:[x+21,wy],b:H['+'],c:PAL.redDark,freeA:1},false);partOn(ctx,{t:'wire',a:[x+49,wy],b:H['−'],c:'#111',freeA:1},false);break;}
+    case 'lamp':{const A=HP(H['1']),B=HP(H['2']);pin(ctx,A[0],A[1]);pin(ctx,B[0],B[1]);const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2-26,b=(vis&&vis.bright)||0;
+      leg(ctx,A,[mx-5,my+16]);leg(ctx,B,[mx+5,my+16]);ctx.fillStyle=PAL.gray;ctx.fillRect(mx-7,my+8,14,9);
+      if(b>0.02)glowAt(ctx,mx,my,0.3+0.7*b,'250,204,21',16+26*b);
+      ctx.fillStyle=b>0.02?`rgba(253,224,71,${0.35+0.6*b})`:'rgba(226,232,240,.25)';ctx.strokeStyle='rgba(226,232,240,.7)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx,my,11,0,7);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=b>0.02?PAL.amber:PAL.slate;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(mx-4,my+8);ctx.lineTo(mx-4,my);for(let k=0;k<4;k++)ctx.lineTo(mx-3+k*2,my+(k%2?-3:0));ctx.lineTo(mx+4,my);ctx.lineTo(mx+4,my+8);ctx.stroke();break;}
+    case 'relay':{const [x,y,w,h]=relayBody(p),cx=x+w/2,on=!!(vis&&vis.on),at={C1:[cx-20,y],C2:[cx+20,y],COM:[cx-20,y+h],NC:[cx,y+h],NO:[cx+20,y+h]};
+      T.pins.forEach(k=>partOn(ctx,{t:'wire',a:at[k],b:H[k],c:k[0]==='C'&&k!=='COM'?'#ea580c':'#a3a3a3',freeA:1},false));
+      ctx.fillStyle='#1d4ed8';ctx.beginPath();ctx.roundRect(x,y,w,h,5);ctx.fill();txt(ctx,RELAYS[p.props.kind].lab,cx,y+13,PAL.white,9);
+      ctx.strokeStyle=PAL.white;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx-20,y+h-3);ctx.lineTo(cx-20,y+h-9);ctx.lineTo(on?cx+18:cx+2,y+h-12);ctx.stroke();
+      ['COM','NC','NO'].forEach(k=>txt(ctx,k,at[k][0],y+h-1,PAL.ink,6));ctx.fillStyle=on?PAL.green:PAL.slate;ctx.beginPath();ctx.arc(x+w-7,y+7,3,0,7);ctx.fill();
+      if(vis&&vis.flip&&performance.now()-vis.flip<300)txt(ctx,'click!',cx,y-6,PAL.amber,10);break;}
   }
   if(p.burnt)drawBurnt(ctx,p);}
 function drawBurnt(ctx,p){const [x,y,w,h]=partBox(p);const cx=x+w/2,cy=y+h/2;
@@ -458,6 +502,7 @@ class Circuit{
   Vac(p,m,amp,f,r){return this.add({t:'V',a:p,b:m,V:0,amp,f,g:1/r});}             // audio signal: amp·sin(2πft)
   SW(a,b,on){return this.add({t:'SW',a,b,on,g:1/0.05});}                          // switch / button contact
   C(a,b,C,vmax){return this.add({t:'C',a,b,C,vp:0});}                               // vp: voltage at the previous step
+  L(a,b,L){return this.add({t:'L',a,b,L,ip:0});}                                     // inductor (relay coil): ip = current at the previous step
   // ---- non-linear parts
   D(a,b,Is,n){return this.add({t:'D',a,b,Is,nv:n*VT,vd:0});}                      // diode / LED: anode a, cathode b
   Q(c,b,e,Is,bf,br){return this.add({t:'Q',c,b,e,Is,bf,br,vbe:0,vbc:0});}           // NPN (Ebers–Moll)
@@ -498,6 +543,7 @@ class Circuit{
         case 'SW':if(e.on)G(e.a,e.b,e.g);break;
         case 'V':G(e.a,e.b,e.g);Iin(e.a,e.b,-e.V*e.g);break;                           // pushes V/R out of +
         case 'C':{const g=e.C/dt;G(e.a,e.b,g);Iin(e.a,e.b,-g*e.vp);break;}
+        case 'L':{G(e.a,e.b,dt/e.L);Iin(e.a,e.b,e.ip);break;}                         // i = ip + (dt/L)·v: the current can't stop at once
         case 'M':{G(e.a,e.b,e.g);Iin(e.a,e.b,-e.g*e.k*e.w);break;}
         case 'D':{const raw=this.v(e.a)-this.v(e.b);let vd=pnlim(raw,e.vd,e.nv,e.Is);if(Math.abs(vd-raw)>1e-6)lim=true;e.vd=vd;
           const ex=Math.exp(Math.min(vd/e.nv,80)),id=e.Is*(ex-1),gd=e.Is/e.nv*ex+GMIN;G(e.a,e.b,gd);Iin(e.a,e.b,id-gd*vd);break;}
@@ -542,6 +588,7 @@ class Circuit{
         case 'SW':e.v=va-vb;e.i=e.on?e.v*e.g:0;break;
         case 'V':e.v=va-vb;e.i=(e.V-e.v)*e.g;break;                                     // current delivered out of +
         case 'C':e.v=va-vb;e.i=e.C*(e.v-e.vp)/dt;e.vp=e.v;break;
+        case 'L':e.v=va-vb;e.i=e.ip+dt/e.L*e.v;e.ip=e.i;break;
         case 'D':e.v=va-vb;e.i=e.Is*(Math.exp(Math.min(e.v/e.nv,80))-1);break;
         case 'M':e.v=va-vb;e.i=(e.v-e.k*e.w)*e.g;e.w+=dt*(e.k*e.i-e.f*e.w)/e.J;break;
         case 'Q':{const vbe=this.v(e.b)-this.v(e.e),vbc=this.v(e.b)-this.v(e.c);
@@ -582,7 +629,7 @@ if(typeof module!=='undefined')module.exports={Circuit,diodeIs,VT,Q4017};
 // Each issue: {lvl:'err'|'warn'|'ok', msg, ids:[part or wire ids to highlight]}.
 function checkCircuit(S,trial){const out=[],N=nets(S),add=(lvl,msg,ids=[])=>out.push({lvl,msg,ids});
   const name=partName;
-  const supplies=S.parts.filter(p=>p.type==='batt'||p.type==='usb');
+  const supplies=S.parts.filter(p=>PARTS[p.type].source);
   if(!S.parts.length){add('warn','The board is empty: drag parts from the catalog.');return out;}
   if(!supplies.length)add('err','No power: add a 9 V battery or the USB 5 V module, and connect it to the rails.');
   const plus=new Set(supplies.map(p=>N.of(p.holes['+']))),minus=new Set(supplies.map(p=>N.of(p.holes['−'])));
@@ -595,13 +642,18 @@ function checkCircuit(S,trial){const out=[],N=nets(S),add=(lvl,msg,ids=[])=>out.
     const ns=Object.entries(p.holes).map(([pin,h])=>[pin,N.of(h)]);
     if(ns.length===2&&ns[0][1]===ns[1][1]&&p.type!=='btn'&&!plus.has(ns[0][1]))add('warn',`${name(p)}: both legs are in the same strip, so it is short-circuited (it does nothing). Move one leg to another column or row.`,[p.id]);
     const free=n=>(count.get(n)||0)<2&&!plus.has(n)&&!minus.has(n),opt=new Set([...(T.optional||[]),...(T.tie||[]).map(t=>t[0]),...(T.supply?[T.supply.plus,T.supply.minus]:[])]);   // those have their own message
-    ns.forEach(([pin,n])=>{if(free(n)&&!opt.has(pin))add('warn',`${name(p)}: leg ${legName(p,pin)} is not connected to anything.`,[p.id]);});
+    const mate=pin=>{const pr=(T.pairs||[]).find(q=>q.includes(pin));return pr&&pr.find(k=>k!==pin);};   // legs joined inside the part: one of them is enough
+    ns.forEach(([pin,n])=>{const m=mate(pin);if(m&&(!free(N.of(p.holes[m]))||T.pins.indexOf(m)<T.pins.indexOf(pin)))return;if(free(n)&&!opt.has(pin))add('warn',`${name(p)}: leg ${legName(p,pin)}${m?' (and '+m+')':''} is not connected to anything.`,[p.id]);});
     if(T.supply){const n=k=>N.of(p.holes[k]),pn=k=>'pin '+legName(p,k);
       if(plus.has(n(T.supply.minus))&&minus.has(n(T.supply.plus)))add('err',`${name(p)} is powered backwards: ${pn(T.supply.plus)} must go to + and ${pn(T.supply.minus)} to −.`,[p.id]);
       else{if(!plus.has(n(T.supply.plus)))add('warn',`${name(p)}: ${pn(T.supply.plus)} (supply) should go to +.`,[p.id]);
         if(!minus.has(n(T.supply.minus)))add('warn',`${name(p)}: ${pn(T.supply.minus)} (ground) should go to −.`,[p.id]);}
       (T.tie||[]).forEach(([k,msg])=>{if(free(n(k)))add('warn',`${name(p)}: ${msg}.`,[p.id]);});}
     if(p.type==='led'&&plus.has(N.of(p.holes['+']))&&minus.has(N.of(p.holes['−']))&&N.of(p.holes['+'])!==N.of(p.holes['−']))add('err',`${name(p)} is straight across the supply with no resistor: it will burn. Put a resistor (470 Ω on 9 V) in series.`,[p.id]);
+    if(p.type==='relay'){const a=N.of(p.holes['C1']),b=N.of(p.holes['C2']),coil=new Set([a,b]);
+      const flyback=S.parts.some(q=>q.type==='diode'&&!q.burnt&&coil.has(N.of(q.holes['A']))&&coil.has(N.of(q.holes['K']))&&N.of(q.holes['A'])!==N.of(q.holes['K']));
+      const switched=S.parts.some(q=>q.type==='npn'&&coil.has(N.of(q.holes['C'])));
+      if(switched&&!flyback)add('warn',`${name(p)}: a transistor switches its coil but there is no flyback diode. Put a 1N4007 across the coil, stripe towards +, or the transistor dies at the first switch-off.`,[p.id]);}
     if(p.type==='npn'&&plus.has(N.of(p.holes['B'])))add('err',`${name(p)}: its base is connected straight to +. Put a resistor (1–10 kΩ) between + and the base.`,[p.id]);
   });
   supplies.forEach(s=>{const used=S.parts.some(p=>p!==s&&Object.values(p.holes).some(h=>plus.has(N.of(h))))||S.wires.some(w=>plus.has(N.of(w.a))||plus.has(N.of(w.b)));
@@ -612,7 +664,7 @@ function checkCircuit(S,trial){const out=[],N=nets(S),add=(lvl,msg,ids=[])=>out.
     trial.forEach(({p,w})=>{if(!w)return;
       if(w.over)add('err',`${name(p)} would burn: ${w.over}.`,[p.id]);
       if(p.type==='led'&&w.vrev>1&&(minus.has(N.of(p.holes['+']))||plus.has(N.of(p.holes['−']))))add('warn',`${name(p)} is connected backwards (long leg = +): it stays off.`,[p.id]);});
-    const src=trial.find(t=>t.p.type==='batt'||t.p.type==='usb');if(src&&src.w&&Math.abs(src.w.I)>1)add('err',`The supply delivers ${fmtI(src.w.I)}: that is almost a short circuit.`,[src.p.id]);}
+    const src=trial.find(t=>PARTS[t.p.type].source);if(src&&src.w&&Math.abs(src.w.I)>1)add('err',`The supply delivers ${fmtI(src.w.I)}: that is almost a short circuit.`,[src.p.id]);}
   if(!out.length)add('ok','No problem found. Press ▶ Play.');
   return out;}
 
@@ -628,8 +680,8 @@ const findPart=id=>S.parts.find(p=>p.id===id),findWire=id=>S.wires.find(w=>w.id=
 
 // ---------- history & storage ----------
 const snapState=()=>JSON.stringify(S);
-function commit(before){undoS.push(before);if(undoS.length>50)undoS.shift();redoS.length=0;changed();}
-function changed(){try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run)run=makeRun(S);renderProps();}
+function commit(before,live){undoS.push(before);if(undoS.length>50)undoS.shift();redoS.length=0;changed(live);}
+function changed(live){try{localStorage.setItem('buildlab:current',snapState());}catch(e){}if(run&&!live)run=makeRun(S);renderProps();}   // live: a knob moved while playing, the circuit keeps running
 function restore(json){S=JSON.parse(json);NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));if(sel&&!findPart(sel.id)&&!findWire(sel.id))sel=null;changed();}
 function undo(){if(!undoS.length)return;redoS.push(snapState());restore(undoS.pop());status('Undone.');}
 function redo(){if(!redoS.length)return;undoS.push(snapState());restore(redoS.pop());status('Redone.');}
@@ -649,9 +701,13 @@ const catEl=$('bdCatalog');
 function overCatalog(e){const r=catEl.getBoundingClientRect();return r.width>0&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;}
 // a leg of a 2-leg part under the pointer (it can be dragged to another hole, like a wire end)
 const LEG_MAX=12*BB.dx;   // how far a leg can stretch from the other one
-function legAt(x,y){let best=null,bd=5;S.parts.forEach(p=>{const T=PARTS[p.type];if(T.fixed||T.pins.length!==2)return;
+const movableLegs=T=>!T.fixed&&(T.pins.length===2||T.leads);
+function legAt(x,y){let best=null,bd=5;S.parts.forEach(p=>{const T=PARTS[p.type];if(!movableLegs(T))return;
   T.pins.forEach(pin=>{const [hx,hy]=HP(p.holes[pin]),d=Math.hypot(hx-x,hy-y);if(d<bd){bd=d;best={p,pin};}});});return best;}
-function legTarget(d){const p=findPart(d.id),t=nearestHole(d.x,d.y,10);if(!p||!t)return null;const other=p.holes[PARTS[p.type].pins.find(k=>k!==d.pin)];
+function legTarget(d){const p=findPart(d.id),t=nearestHole(d.x,d.y,10);if(!p||!t)return null;
+  if(PARTS[p.type].leads){const others=Object.entries(p.holes).filter(([k])=>k!==d.pin).map(([,h])=>h);let h=freeInStrip(S,t.h,p.id);if(others.includes(h))h=freeInStrip(S,t.h);
+    return {h,ok:!others.includes(h),far:false,other:null};}
+  const other=p.holes[PARTS[p.type].pins.find(k=>k!==d.pin)];
   let h=freeInStrip(S,t.h,p.id);if(h===other)h=freeInStrip(S,t.h);const [ax,ay]=HP(h),[bx,by]=HP(other);
   return {h,ok:h!==other&&Math.hypot(ax-bx,ay-by)<=LEG_MAX,far:Math.hypot(ax-bx,ay-by)>LEG_MAX,other};}
 function wireEndAt(x,y){let best=null,bd=6;S.wires.forEach(w=>['a','b'].forEach(end=>{const [hx,hy]=HP(w[end]),d=Math.hypot(hx-x,hy-y);if(d<bd){bd=d;best={w,end};}}));return best;}
@@ -714,9 +770,10 @@ document.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null
   if(d.mode==='leg'){cvs.style.cursor='';if(!d.moved)return;const p=findPart(d.id),t=legTarget(d);
     if(!t){status('Not on a hole: the leg stays where it was.','warn');return;}
     if(t.h===p.holes[d.pin])return;
-    if(t.h===t.other){status('Both legs cannot go in the same hole.','warn');return;}
+    if(t.h===t.other||!t.ok&&!t.far){status('Two legs cannot go in the same hole.','warn');return;}
     if(t.far){status('Too far: a leg only stretches about 12 holes. Move the whole part instead (drag its body).','warn');return;}
     const before=snapState();p.holes[d.pin]=t.h;commit(before);
+    if(!t.other){status(`${pname(p)}: ${legName(p,d.pin)} moved to ${t.h}.`,run?'run':'');return;}
     status(stripOf(t.h)===stripOf(t.other)?`${pname(p)}: both legs are now in the same strip, so it is short-circuited.`:`${pname(p)}: leg ${d.pin} moved to ${t.h}.`,stripOf(t.h)===stripOf(t.other)?'warn':(run?'run':''));return;}
   if(d.mode==='wend'){cvs.style.cursor='';const w=findWire(d.id);if(!w||!d.moved)return;const t=nearestHole(d.x,d.y,10);
     if(!t){status('Not on a hole: the wire stays where it was.','warn');return;}
@@ -759,7 +816,7 @@ function renderProps(){const body=$('bdPropsBody');
   body.innerHTML=h;
   body.querySelectorAll('select[data-i]').forEach(s=>s.onchange=()=>{const ed=T.edit[+s.dataset.i],o=optsOf(ed).find(o=>String(o[0])===s.value);const before=snapState();p.props[ed.k]=o[0];if(ed.set)ed.set(p);commit(before);});
   body.querySelectorAll('input[type=range][data-i]').forEach(r=>{let before=null;r.oninput=()=>{if(!before)before=snapState();p.props[T.edit[+r.dataset.i].k]=+r.value;if(run){const pt=PARTS[p.type];const el=run.els.get(p.id);if(el&&pt.update)pt.update(el,p);}};
-    r.onchange=()=>{if(before)commit(before);before=null;};});
+    r.onchange=()=>{if(before)commit(before,!!T.edit[+r.dataset.i].live);before=null;};});
   body.querySelectorAll('.bd-tog').forEach(b=>b.onclick=()=>{const ed=T.edit[+b.dataset.i];const before=snapState();p.props[ed.k]=!p.props[ed.k];commit(before);});
   if($('bdHold'))hold('bdHold',on=>{p.props.pressed=on;});
   if($('bdReplace'))$('bdReplace').onclick=()=>{const before=snapState();p.burnt=false;commit(before);status(`New ${T.name} in place.`,run?'run':'');};
@@ -768,7 +825,7 @@ function renderProps(){const body=$('bdPropsBody');
 
 // ---------- simulation ----------
 function makeRun(state){const N=nets(state),c=new Circuit(),node=new Map(),els=new Map();
-  const sup=state.parts.find(p=>(p.type==='batt'||p.type==='usb')&&!p.burnt);const gnd=sup?N.of(sup.holes['−']):null;
+  const sup=state.parts.find(p=>PARTS[p.type].source&&!p.burnt);const gnd=sup?N.of(sup.holes['−']):null;
   const nd=h=>{const n=N.of(h);if(n===gnd)return 0;if(!node.has(n))node.set(n,c.node());return node.get(n);};
   state.parts.forEach(p=>{if(p.burnt)return;const n={};Object.entries(p.holes).forEach(([pin,h])=>{n[pin]=nd(h);});els.set(p.id,PARTS[p.type].model(c,n,p));});
   const ticks=state.parts.filter(p=>PARTS[p.type].tick&&els.has(p.id)).map(p=>[PARTS[p.type].tick,els.get(p.id)]);
@@ -777,9 +834,13 @@ function stepRun(R,state,dt){state.parts.forEach(p=>{const T=PARTS[p.type],el=R.
   const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));}
   state.parts.forEach(p=>{const el=R.els.get(p.id);R.w.set(p.id,el?PARTS[p.type].watch(el,p):null);});}
 function nodeV(h){if(!run)return null;const n=run.N.of(h);if(n===run.gnd)return 0;const k=run.node.get(n);return k?run.c.v(k):null;}
-function simFrame(dt){stepRun(run,S,dt);let burnt=false;
+// a relay coil switched off with nothing to catch its spike kills the transistor that switched it
+function coilKicks(){S.parts.forEach(r=>{const w=run.w.get(r.id);if(!w||!w.kick)return;const coil=new Set([run.N.of(r.holes['C1']),run.N.of(r.holes['C2'])]);
+  S.parts.forEach(q=>{if(q.type==='npn'&&!q.burnt&&coil.has(run.N.of(q.holes['C'])))run.w.set(q.id,{...(run.w.get(q.id)||{}),info:[],kill:true,
+    over:'the coil of the '+pname(r)+' was switched off with no flyback diode: its spike (hundreds of volts) went through the transistor'});});});}
+function simFrame(dt){stepRun(run,S,dt);coilKicks();let burnt=false;
   S.parts.forEach(p=>{const w=run.w.get(p.id);if(!w||!w.over){run.over.delete(p.id);return;}const t=(run.over.get(p.id)||0)+dt;run.over.set(p.id,t);
-    if(t>0.25){p.burnt=true;burnt=true;status(`💥 ${pname(p)} burnt: ${w.over}. Click it, then Replace.`,'warn');const [x,y,wd,ht]=partBox(p);for(let i=0;i<24;i++)smoke.push({x:x+wd/2,y:y+ht/2,vx:(Math.random()-0.5)*30,vy:-20-Math.random()*40,life:1.5+Math.random()});}});
+    if(t>0.25||w.kill){p.burnt=true;burnt=true;status(`💥 ${pname(p)} burnt: ${w.over}. Click it, then Replace.`,'warn');const [x,y,wd,ht]=partBox(p);for(let i=0;i<24;i++)smoke.push({x:x+wd/2,y:y+ht/2,vx:(Math.random()-0.5)*30,vy:-20-Math.random()*40,life:1.5+Math.random()});}});
   if(burnt){run=makeRun(S);try{localStorage.setItem('buildlab:current',snapState());}catch(e){}renderProps();}
   const live=$('bdLive');if(live&&sel&&sel.kind==='part'){const w=run.w.get(sel.id);live.innerHTML=w?w.info.map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join(''):'';}}
 function play(on){if(on){run=makeRun(S);$('bdPlay').textContent='■ Stop';$('bdPlay').className='stop';status('Running: hover a hole or a part to measure. Hold the push buttons with the mouse.','run');}
@@ -820,7 +881,7 @@ function draw(dt){const ctx=bctx;ctx.clearRect(0,0,cvs.width,cvs.height);drawBoa
       if(t){const [hx,hy]=HP(t.h);ctx.strokeStyle=t.ok?PAL.cyan:PAL.bad;ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx,hy,6,0,7);ctx.stroke();}return;}
     if(drag&&(drag.mode==='move'||drag.mode==='leg')&&drag.moved&&drag.id===p.id)ctx.globalAlpha=0.3;const w=run&&run.w.get(p.id);drawPart(ctx,p,p.type==='usb'?{on:!!run}:w);ctx.globalAlpha=1;});
   if(sel&&sel.kind==='wire'&&!(drag&&drag.mode==='wend'&&drag.moved)){const w=findWire(sel.id);if(w)[w.a,w.b].forEach(h=>{const [hx,hy]=HP(h);ctx.fillStyle=PAL.cyan;ctx.beginPath();ctx.arc(hx,hy,4,0,7);ctx.fill();});}
-  if(sel&&sel.kind==='part'&&!(drag&&drag.mode==='leg'&&drag.moved)){const p=findPart(sel.id);if(p&&PARTS[p.type].pins.length===2&&!PARTS[p.type].fixed)Object.values(p.holes).forEach(h=>{const [hx,hy]=HP(h);ctx.fillStyle=PAL.cyan;ctx.beginPath();ctx.arc(hx,hy,3.5,0,7);ctx.fill();});}
+  if(sel&&sel.kind==='part'&&!(drag&&drag.mode==='leg'&&drag.moved)){const p=findPart(sel.id);if(p&&movableLegs(PARTS[p.type]))Object.values(p.holes).forEach(h=>{const [hx,hy]=HP(h);ctx.fillStyle=PAL.cyan;ctx.beginPath();ctx.arc(hx,hy,3.5,0,7);ctx.fill();});}
   if(sel&&sel.kind==='part'){const p=findPart(sel.id);if(p){const [x,y,w,h]=partBox(p);ctx.setLineDash([4,3]);ctx.strokeStyle=PAL.cyan;ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}}
   if(flashT>0){flashT-=dt;if(Math.floor(flashT*4)%2===0)flashIds.forEach(id=>{const p=findPart(id);if(p){const [x,y,w,h]=partBox(p);ctx.strokeStyle=PAL.amber;ctx.lineWidth=3;ctx.strokeRect(x-3,y-3,w+6,h+6);}});}
   if(drag&&(drag.mode==='new'||drag.mode==='move')&&!drag.trash&&drag.pl&&drag.pl.holes)drawGhost(ctx,drag.mode==='new'?drag.type:findPart(drag.id).type,drag.pl.holes,drag.pl.ok,drag.rot);
@@ -859,7 +920,10 @@ try{const cur=localStorage.getItem('buildlab:current');if(cur){S=migrate(JSON.pa
 const LED_BY_RGB={'239,68,68':'red','34,197,94':'green','250,204,21':'yellow','59,130,246':'blue','226,232,240':'white','248,250,252':'white'};
 function capFrom(lab,dflt){const m=/([\d.]+)\s*([µunp])/.exec(lab||'');if(!m)return dflt;return +m[1]*{µ:1e-6,u:1e-6,n:1e-9,p:1e-12}[m[2]];}
 function importLayout(L){if(!L||L.noBoard)return null;const out={parts:[],wires:[]};let id=1;const H=h=>typeof h==='string'&&parseHole(h)?h:null;
+  const loose=[];   // legs the layout wires off the board (relay contact to a bulb...): {part, pin, pt:[x,y] or null}
   for(const p of L.parts){if(p.until)continue;const add=(type,holes,props={})=>{if(Object.values(holes).some(h=>!h))throw 0;out.parts.push({id:id++,type,holes,rot:0,props:{...JSON.parse(JSON.stringify(PARTS[type].props)),...props},burnt:false});};
+    const addLoose=(type,pins,props={})=>{const part={id:id++,type,holes:{},rot:0,props:{...JSON.parse(JSON.stringify(PARTS[type].props)),...props},burnt:false};
+      PARTS[type].pins.forEach(k=>{const q=pins[k];if(q&&H(q.to))part.holes[k]=q.to;else loose.push({part,pin:k,pt:!q?null:Array.isArray(q.to)?q.to:[p.at[0]+q.dx,p.at[1]+q.dy]});});out.parts.push(part);};
     try{switch(p.t){
       case 'wire':if(!H(p.a)||!H(p.b))return null;out.wires.push({id:id++,a:p.a,b:p.b,color:p.c||PAL.greenDark});break;
       case 'res':add('res',{'1':H(p.a),'2':H(p.b)},{R:p.v||470});break;
@@ -880,9 +944,18 @@ function importLayout(L){if(!L||L.noBoard)return null;const out={parts:[],wires:
         if(two&&/motor/i.test(lab)){add('motor',{'1':to(0),'2':to(1)});break;}
         if(two&&/🔊|speaker/i.test(lab)){add('spk',{'+':to(0),'−':to(1)});break;}
         if(two&&/audio jack/i.test(lab)){add('sig',{tip:to(0),sleeve:to(1)});break;}
+        if(two&&/12 V in|adapter|PCM10F/i.test(lab)){add('adapter',{'+':to(0),'−':to(1)});break;}
+        if(two&&/lamp|bulb/i.test(lab)){addLoose('lamp',{'1':p.pins[0],'2':p.pins[1]});break;}
+        if(/relay/i.test(lab)&&p.pins){const ps={},coils=p.pins.filter(q=>/coil/i.test(q.n));if(coils[0])ps.C1=coils[0];if(coils[1])ps.C2=coils[1];
+          p.pins.forEach(q=>{if(/^(COM|NC|NO)$/.test(q.n))ps[q.n]=q;});if(!ps.C1||!ps.C2)return null;addLoose('relay',ps,{kind:/12/.test(lab)?'12':'5'});break;}
         return null;}
       case 'note':break;
       default:return null;}}catch(e){return null;}}
+  if(loose.length){   // legs whose ends meet off the board share a free strip; the others get one each
+    const used=new Set();out.parts.forEach(q=>Object.values(q.holes).forEach(h=>used.add(stripOf(h))));out.wires.forEach(w=>{used.add(stripOf(w.a));used.add(stripOf(w.b));});
+    const groups=[];loose.forEach(l=>{const g=l.pt&&groups.find(g=>g.pt&&Math.hypot(g.pt[0]-l.pt[0],g.pt[1]-l.pt[1])<16);if(g)g.legs.push(l);else groups.push({pt:l.pt,legs:[l]});});
+    for(const g of groups){let c=0;for(let k=59;k>=1&&!c;k-=2)if(!used.has('T'+k))c=k;if(!c)return null;used.add('T'+c);
+      g.legs.forEach((l,i)=>{l.part.holes[l.pin]='abcde'[i]+c;});}}
   return out;}
 window.BUILD_LAB={canImport:L=>!!importLayout(L),load:(L,name)=>{const s=importLayout(L);if(!s)return false;const before=snapState();S=s;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));sel=null;commit(before);if(run)play(false);status(`Loaded ${name||'the project'}: press ▶ Play.`);return true;}};
 document.querySelectorAll('.bd-open[data-project]').forEach(b=>{const L=window.BBL_LAYOUTS&&window.BBL_LAYOUTS[b.dataset.project];if(L&&window.BUILD_LAB.canImport(L)){b.hidden=false;

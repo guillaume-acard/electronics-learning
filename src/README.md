@@ -104,17 +104,22 @@ A breadboard where parts are dropped, wired and simulated.
     `npn` (BC547/SS8050). `label(p)` gives the full name, `legName(p, pin)` what a leg is called;
   - chips: `chip` (label), `foot: dip(n)`, `pinNames`, and for "Check": `supply` ({plus, minus} pins), `optional`
     (pins that may stay unconnected), `tie` (inputs that must not float, with the message);
-  - `dynamic: true` when it needs small time steps (capacitors, chips, motor, audio); `tick(el, dt)` runs after every step;
+  - `dynamic: true` when it needs small time steps (capacitors, chips, motor, audio, relay); `tick(el, dt)` runs after every
+    step (averages, peaks, the relay contact); `source: true` for supplies; `leads: true` for legs on flexible wires (relay);
+    `pairs` for legs joined inside the part (push button); `watch` may return `kill: true` to burn it at once;
   - `model(c, n, p)`: adds elements to the simulator (`c.R`, `c.D`, `c.Q`, `c.C`, `c.SW`, `c.Vs`, `c.Vac`, `c.Motor`, `c.T555`,
-    `c.C4017`, `c.Amp` for op-amps and the LM386);
+    `c.C4017`, `c.Amp` for op-amps and the LM386, `c.L` for a relay coil);
   - `watch(el, p)`: what to show (`bright`, `spin`, `sound`, `info`) and `over` (the reason it burns);
   - its look: a case in `drawPart` (`board.js`).
   - Boards saved with an older part type are converted by `migrate()` (`parts.js`) when they are opened.
 - **Simulator** (`sim.js`, no DOM): nodal analysis + Newton (diodes, transistor), capacitors and motor stepped in time.
   `node tools/simtest.js` checks it against known circuits (LED current, divider, RC, transistor, 555 frequency, motor).
 - **"🔧 Build it"** on a Circuits project converts its breadboard layout (`BBL`) with `importLayout` (`page.js`).
-  The button only shows when every part is supported. Supported chips: NE555, CD4017, LM358, LM386 (plus the speaker
-  and the audio jack); relays, lamps, displays and other chips are not yet.
+  The button only shows when every part is supported. Supported chips: NE555, CD4017, LM358, LM386; boxes: motor,
+  speaker, audio jack, 12 V adapter, relay, bulb. Relay/bulb legs that the layout wires off the board get a free strip.
+  Displays and other chips are not yet.
+- The simulator steps every 0.2 ms, too slow for a real coil switch-off spike (microseconds): a relay whose coil voltage
+  turns against its current by more than 3 V reports a `kick`, and the transistor switching it burns (`coilKicks`, `page.js`).
 - Boards are kept in the browser (`localStorage`: `buildlab:current` autosave, `buildlab:circuits` for saved ones).
 
 ## Checking a change

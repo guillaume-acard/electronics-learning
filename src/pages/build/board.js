@@ -52,8 +52,11 @@ function holeXY(h){return HP(h);}
 function partBox(p){const pts=Object.values(p.holes).map(HP);const T=PARTS[p.type];
   if(p.type==='usb')return [14,96,46,236];
   let x0=Math.min(...pts.map(q=>q[0])),x1=Math.max(...pts.map(q=>q[0])),y0=Math.min(...pts.map(q=>q[1])),y1=Math.max(...pts.map(q=>q[1]));
-  if(p.type==='batt'){const up=y0<213;return up?[x0-22,24,x1-x0+58,y1-24]:[x0-22,y0,x1-x0+58,402-y0];}
+  if(PARTS[p.type].leads)return relayBody(p);
+  if(T.anchor==='rails'){const up=y0<213;return up?[x0-22,24,x1-x0+58,y1-24]:[x0-22,y0,x1-x0+58,402-y0];}
   return [x0-9,y0-24,x1-x0+18,y1-y0+32];}
+// a relay sits where its legs are (over the gap when placed from the catalog); its legs are flexible leads
+function relayBody(p){const pts=Object.values(p.holes).map(HP),cx=pts.reduce((s,q)=>s+q[0],0)/pts.length,cy=pts.reduce((s,q)=>s+q[1],0)/pts.length;return [cx-32,cy-17,64,34];}
 function drawPart(ctx,p,vis){const T=PARTS[p.type],H=p.holes,lit=vis&&vis.bright>0.02;
   switch(p.type){
     case 'res':partOn(ctx,{t:'res',a:H['1'],b:H['2'],v:p.props.R},false);break;
@@ -90,6 +93,20 @@ function drawPart(ctx,p,vis){const T=PARTS[p.type],H=p.holes,lit=vis&&vis.bright
     case 'ne555':case 'cd4017':case 'lm358':case 'lm386':{const q=parseHole(H['1']);partOn(ctx,{t:'chip',col:q.c,n:T.pins.length,lab:T.chip},false);break;}
     case 'batt':{const P=HP(H['+']),up=P[1]<213;partOn(ctx,{t:'batt',at:[P[0]-20,up?30:352],plus:H['+'],minus:H['−'],lab:p.props.V+' V'},false);break;}
     case 'usb':partOn(ctx,{t:'pm'},!!(vis&&vis.on));break;
+    case 'adapter':{const P=HP(H['+']),up=P[1]<213,x=P[0]-20,y=up?30:352,ty=up?y+38:y-5;ctx.fillStyle=PAL.chip;ctx.beginPath();ctx.roundRect(x,y,70,38,5);ctx.fill();
+      txt(ctx,'12 V ⎓',x+35,y+17,PAL.white,12);txt(ctx,'adapter',x+35,y+30,PAL.muted,8);ctx.fillStyle=PAL.gray;ctx.fillRect(x+16,ty,10,5);ctx.fillRect(x+44,ty,10,5);const wy=up?ty+5:ty;
+      partOn(ctx,{t:'wire',a:[x+21,wy],b:H['+'],c:PAL.redDark,freeA:1},false);partOn(ctx,{t:'wire',a:[x+49,wy],b:H['−'],c:'#111',freeA:1},false);break;}
+    case 'lamp':{const A=HP(H['1']),B=HP(H['2']);pin(ctx,A[0],A[1]);pin(ctx,B[0],B[1]);const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2-26,b=(vis&&vis.bright)||0;
+      leg(ctx,A,[mx-5,my+16]);leg(ctx,B,[mx+5,my+16]);ctx.fillStyle=PAL.gray;ctx.fillRect(mx-7,my+8,14,9);
+      if(b>0.02)glowAt(ctx,mx,my,0.3+0.7*b,'250,204,21',16+26*b);
+      ctx.fillStyle=b>0.02?`rgba(253,224,71,${0.35+0.6*b})`:'rgba(226,232,240,.25)';ctx.strokeStyle='rgba(226,232,240,.7)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx,my,11,0,7);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=b>0.02?PAL.amber:PAL.slate;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(mx-4,my+8);ctx.lineTo(mx-4,my);for(let k=0;k<4;k++)ctx.lineTo(mx-3+k*2,my+(k%2?-3:0));ctx.lineTo(mx+4,my);ctx.lineTo(mx+4,my+8);ctx.stroke();break;}
+    case 'relay':{const [x,y,w,h]=relayBody(p),cx=x+w/2,on=!!(vis&&vis.on),at={C1:[cx-20,y],C2:[cx+20,y],COM:[cx-20,y+h],NC:[cx,y+h],NO:[cx+20,y+h]};
+      T.pins.forEach(k=>partOn(ctx,{t:'wire',a:at[k],b:H[k],c:k[0]==='C'&&k!=='COM'?'#ea580c':'#a3a3a3',freeA:1},false));
+      ctx.fillStyle='#1d4ed8';ctx.beginPath();ctx.roundRect(x,y,w,h,5);ctx.fill();txt(ctx,RELAYS[p.props.kind].lab,cx,y+13,PAL.white,9);
+      ctx.strokeStyle=PAL.white;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx-20,y+h-3);ctx.lineTo(cx-20,y+h-9);ctx.lineTo(on?cx+18:cx+2,y+h-12);ctx.stroke();
+      ['COM','NC','NO'].forEach(k=>txt(ctx,k,at[k][0],y+h-1,PAL.ink,6));ctx.fillStyle=on?PAL.green:PAL.slate;ctx.beginPath();ctx.arc(x+w-7,y+7,3,0,7);ctx.fill();
+      if(vis&&vis.flip&&performance.now()-vis.flip<300)txt(ctx,'click!',cx,y-6,PAL.amber,10);break;}
   }
   if(p.burnt)drawBurnt(ctx,p);}
 function drawBurnt(ctx,p){const [x,y,w,h]=partBox(p);const cx=x+w/2,cy=y+h/2;
