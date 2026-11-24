@@ -552,6 +552,9 @@ function redo(){if(!redoS.length)return;undoS.push(snapState());restore(redoS.po
 function toBoard(e){const r=cvs.getBoundingClientRect();return [(e.clientX-r.left)*cvs.width/r.width,(e.clientY-r.top)*cvs.height/r.height,r.left<=e.clientX&&e.clientX<=r.right&&r.top<=e.clientY&&e.clientY<=r.bottom];}
 function inBox(x,y,[bx,by,bw,bh]){return x>=bx&&x<=bx+bw&&y>=by&&y<=by+bh;}
 function partAt(x,y){for(let i=S.parts.length-1;i>=0;i--)if(inBox(x,y,partBox(S.parts[i])))return S.parts[i];return null;}
+const catEl=$('bdCatalog');
+function overCatalog(e){const r=catEl.getBoundingClientRect();return r.width>0&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;}
+function wireEndAt(x,y){let best=null,bd=6;S.wires.forEach(w=>['a','b'].forEach(end=>{const [hx,hy]=HP(w[end]),d=Math.hypot(hx-x,hy-y);if(d<bd){bd=d;best={w,end};}}));return best;}
 function wireAt(x,y){let best=null,bd=7;S.wires.forEach(w=>{const A=HP(w.a),B=HP(w.b),d=Math.hypot(B[0]-A[0],B[1]-A[1]),mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2-Math.min(34,8+d*0.18);
   for(let t=0;t<=1;t+=0.05){const px=(1-t)*(1-t)*A[0]+2*(1-t)*t*mx+t*t*B[0],py=(1-t)*(1-t)*A[1]+2*(1-t)*t*my+t*t*B[1],dd=Math.hypot(px-x,py-y);if(dd<bd){bd=dd;best=w;}}});return best;}
 
@@ -583,6 +586,8 @@ function removeSel(){if(!sel)return;const before=snapState();
 cvs.addEventListener('pointerdown',e=>{const [x,y]=toBoard(e);if(e.button)return;
   const p=partAt(x,y),h=nearestHole(x,y,6);
   if(run&&p&&p.type==='btn'&&!p.burnt){p.props.pressed=true;drag={mode:'press',id:p.id};sel={kind:'part',id:p.id};renderProps();return;}
+  const we=wireEndAt(x,y);
+  if(we){sel={kind:'wire',id:we.w.id};drag={mode:'wend',id:we.w.id,end:we.end,x,y,x0:x,y0:y,moved:false};renderProps();return;}
   // off parts, any hole starts a wire. On a part: its own legs, and holes outside the legs' rows (e.g. above an LED), start a wire;
   // the rest of the part (its body over its own row) moves it.
   let wireOk=h&&!p;
@@ -590,18 +595,30 @@ cvs.addEventListener('pointerdown',e=>{const [x,y]=toBoard(e);if(e.button)return
   if(wireOk){drag={mode:'wire',a:freeInStrip(S,h.h),x,y};return;}
   if(p){sel={kind:'part',id:p.id};drag={mode:'move',id:p.id,x0:x,y0:y,gh:nearestHole(x,y,999),pl:null};renderProps();return;}
   const w=wireAt(x,y);sel=w?{kind:'wire',id:w.id}:null;renderProps();});
-document.addEventListener('pointermove',e=>{if(drag&&drag.mode!=='press'){if(drag.mode==='wire'){const [x,y]=toBoard(e);drag.x=x;drag.y=y;}else follow(e);}
-  else if(e.target===cvs){const [x,y]=toBoard(e);hov={x,y};meter();}});
+document.addEventListener('pointermove',e=>{if(drag&&(drag.mode==='move'||drag.mode==='wend')){drag.trash=drag.moved&&overCatalog(e);catEl.classList.toggle('bd-trash',!!drag.trash);}
+  if(drag&&drag.mode!=='press'){if(drag.mode==='wire'||drag.mode==='wend'){const [x,y]=toBoard(e);drag.x=x;drag.y=y;if(Math.hypot(x-drag.x0,y-drag.y0)>4)drag.moved=true;}else follow(e);}
+  else if(e.target===cvs){const [x,y]=toBoard(e);hov={x,y};cvs.style.cursor=wireEndAt(x,y)?'grab':'';meter();}});
 cvs.addEventListener('pointerleave',()=>{hov=null;});
-document.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;
+document.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;catEl.classList.remove('bd-trash');
+  if((d.mode==='move'||d.mode==='wend')&&d.moved&&overCatalog(e)){const before=snapState();
+    if(d.mode==='move'){const p=findPart(d.id);S.parts=S.parts.filter(q=>q.id!==d.id);status(`${p?pname(p):'Part'} removed (Undo brings it back).`);}
+    else{S.wires=S.wires.filter(w=>w.id!==d.id);status('Wire removed (Undo brings it back).');}
+    sel=null;cvs.style.cursor='';commit(before);return;}
   if(d.mode==='press'){const p=findPart(d.id);if(p)p.props.pressed=false;renderProps();return;}
   if(d.mode==='new'&&d.pl&&d.pl.ok&&d.over){const T=PARTS[d.type],before=snapState(),p={id:NID++,type:d.type,holes:d.pl.holes,rot:d.rot,props:JSON.parse(JSON.stringify(T.props)),burnt:false};
     S.parts.push(p);sel={kind:'part',id:p.id};commit(before);status(`${T.name} placed. Drag it to move it, R to turn it, or wire it: press on a hole and drag.`);return;}
   if(d.mode==='new'&&d.over)status('No room there (red holes): try another place.','warn');
   if(d.mode==='move'&&d.moved&&d.pl){if(d.pl.ok){const p=findPart(d.id),before=snapState();p.holes=d.pl.holes;commit(before);}else status('No room there: the part stays where it was.','warn');}
+  if(d.mode==='wend'){cvs.style.cursor='';const w=findWire(d.id);if(!w||!d.moved)return;const t=nearestHole(d.x,d.y,10);
+    if(!t){status('Not on a hole: the wire stays where it was.','warn');return;}
+    const other=w[d.end==='a'?'b':'a'],h=freeInStrip(S,t.h,w.id);
+    if(h===w[d.end])return;
+    if(h===other){status('Both ends of a wire cannot go in the same hole.','warn');return;}
+    const before=snapState();w[d.end]=h;commit(before);
+    status(stripOf(h)===stripOf(other)?'Wire moved, but both ends are now in the same strip: it does nothing.':`Wire end moved to ${h}.`,stripOf(h)===stripOf(other)?'warn':(run?'run':''));return;}
   if(d.mode==='wire'){const t=nearestHole(d.x,d.y,10);if(t){const b=freeInStrip(S,t.h);
     if(b&&d.a&&b!==d.a){const before=snapState(),w={id:NID++,a:d.a,b,color:wireColor};S.wires.push(w);sel={kind:'wire',id:w.id};commit(before);
-      if(stripOf(b)===stripOf(d.a))status('That wire joins two holes that are already connected (same strip): it does nothing.','warn');else status('Wire added. Click it to change its colour.');}}}});
+      if(stripOf(b)===stripOf(d.a))status('That wire joins two holes that are already connected (same strip): it does nothing.','warn');else status('Wire added. Click it to change its colour, or drag one of its ends to another hole.');}}}});
 document.addEventListener('keydown',e=>{if(!document.getElementById('page-build')||document.getElementById('page-build').hidden)return;
   if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();}
@@ -683,11 +700,15 @@ function meter(){const body=$('bdInfoBody');if($('bdInfoTitle').textContent!=='M
 function drawGhost(ctx,type,holes,ok,rot){const p={id:-1,type,holes,rot,props:PARTS[type].props};ctx.save();ctx.globalAlpha=0.55;drawPart(ctx,p,null);ctx.restore();
   Object.values(holes).forEach(h=>{const [x,y]=HP(h);ctx.strokeStyle=ok?PAL.green:PAL.bad;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();});}
 function draw(dt){const ctx=bctx;ctx.clearRect(0,0,cvs.width,cvs.height);drawBoard(ctx);
-  S.wires.forEach(w=>{if(sel&&sel.kind==='wire'&&sel.id===w.id){ctx.save();ctx.shadowColor=PAL.cyan;ctx.shadowBlur=12;partOn(ctx,{t:'wire',a:w.a,b:w.b,c:w.color},false);ctx.restore();}partOn(ctx,{t:'wire',a:w.a,b:w.b,c:w.color},false);});
+  S.wires.forEach(w=>{if(drag&&drag.mode==='wend'&&drag.moved&&drag.id===w.id){const o={t:'wire',a:w.a,b:w.b,c:w.color};o[drag.end]=[drag.x,drag.y];
+      ctx.save();ctx.globalAlpha=0.85;partOn(ctx,o,false);ctx.restore();const t=nearestHole(drag.x,drag.y,10);
+      if(t){const [hx,hy]=HP(t.h);ctx.strokeStyle=PAL.cyan;ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx,hy,6,0,7);ctx.stroke();}return;}
+    if(sel&&sel.kind==='wire'&&sel.id===w.id){ctx.save();ctx.shadowColor=PAL.cyan;ctx.shadowBlur=12;partOn(ctx,{t:'wire',a:w.a,b:w.b,c:w.color},false);ctx.restore();}partOn(ctx,{t:'wire',a:w.a,b:w.b,c:w.color},false);});
   S.parts.forEach(p=>{if(drag&&drag.mode==='move'&&drag.moved&&drag.id===p.id)ctx.globalAlpha=0.3;const w=run&&run.w.get(p.id);drawPart(ctx,p,p.type==='usb'?{on:!!run}:w);ctx.globalAlpha=1;});
+  if(sel&&sel.kind==='wire'&&!(drag&&drag.mode==='wend'&&drag.moved)){const w=findWire(sel.id);if(w)[w.a,w.b].forEach(h=>{const [hx,hy]=HP(h);ctx.fillStyle=PAL.cyan;ctx.beginPath();ctx.arc(hx,hy,4,0,7);ctx.fill();});}
   if(sel&&sel.kind==='part'){const p=findPart(sel.id);if(p){const [x,y,w,h]=partBox(p);ctx.setLineDash([4,3]);ctx.strokeStyle=PAL.cyan;ctx.lineWidth=1.5;ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}}
   if(flashT>0){flashT-=dt;if(Math.floor(flashT*4)%2===0)flashIds.forEach(id=>{const p=findPart(id);if(p){const [x,y,w,h]=partBox(p);ctx.strokeStyle=PAL.amber;ctx.lineWidth=3;ctx.strokeRect(x-3,y-3,w+6,h+6);}});}
-  if(drag&&(drag.mode==='new'||drag.mode==='move')&&drag.pl&&drag.pl.holes)drawGhost(ctx,drag.mode==='new'?drag.type:findPart(drag.id).type,drag.pl.holes,drag.pl.ok,drag.rot);
+  if(drag&&(drag.mode==='new'||drag.mode==='move')&&!drag.trash&&drag.pl&&drag.pl.holes)drawGhost(ctx,drag.mode==='new'?drag.type:findPart(drag.id).type,drag.pl.holes,drag.pl.ok,drag.rot);
   if(drag&&drag.mode==='wire'){const A=HP(drag.a);ctx.strokeStyle=wireColor;ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([]);
     const t=nearestHole(drag.x,drag.y,10);if(t){const [x,y]=HP(t.h);ctx.strokeStyle=PAL.cyan;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.stroke();}}
   if(hov&&!drag){const h=nearestHole(hov.x,hov.y,6);if(h){const [x,y]=HP(h.h);ctx.strokeStyle='rgba(34,211,238,.8)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();}}

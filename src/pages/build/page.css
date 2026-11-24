@@ -35,3 +35,5 @@
   .bd-saved li{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
   .bd-saved li span{flex:1}
   .bd-open{float:right;margin-top:-4px}
+  .bd-catalog.bd-trash{outline:2px dashed var(--bad);outline-offset:-2px;background:color-mix(in srgb,var(--bad) 12%,transparent)}
+  .bd-catalog.bd-trash::before{content:'🗑 Drop here to remove';display:block;padding:6px 10px;color:var(--bad);font-weight:700}

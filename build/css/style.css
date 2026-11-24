@@ -258,6 +258,8 @@
   .bd-saved li{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
   .bd-saved li span{flex:1}
   .bd-open{float:right;margin-top:-4px}
+  .bd-catalog.bd-trash{outline:2px dashed var(--bad);outline-offset:-2px;background:color-mix(in srgb,var(--bad) 12%,transparent)}
+  .bd-catalog.bd-trash::before{content:'🗑 Drop here to remove';display:block;padding:6px 10px;color:var(--bad);font-weight:700}
 
 /* chips page only */
   .pnout{background:var(--surface);border-left:4px solid var(--accent);border-radius:8px;padding:10px 16px}.pnname{font:800 2rem ui-monospace,monospace;letter-spacing:.04em;margin:4px 0 6px}.pnname span{margin-right:4px;padding-bottom:2px}
