@@ -233,6 +233,7 @@ PAGES = [
   'name': 'Build',
   'step': 'try your own circuits in the Build lab',
   'accent': '#22d3ee',
+  'no_hero': True,
   'hero': {'eyebrow': 'Virtual breadboard',
            'title': 'The Build Lab',
            'tag': 'Drag parts onto a breadboard, wire them, press Play: LEDs light up, motors spin, and parts burn when you overload them. '

@@ -10,7 +10,7 @@ function show(){let id=(location.hash||'#home').slice(1),target=null;
   document.querySelector('.topbar').style.setProperty('--accent',acc);
   const grp=["resistor", "capacitor", "diode", "led", "transistor", "inductor", "relay", "motion"].includes(id)?'components':id;document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===grp));
   const act=document.querySelector('[data-nav].active');if(act)act.scrollIntoView({block:'nearest',inline:'center'});
-  document.title=(id==='home'?'Electronics Learning':document.querySelector('#page-'+id+' h1').textContent+' · Electronics Learning');
+  document.title=(id==='home'?'Electronics Learning':document.getElementById('page-'+id).dataset.title+' · Electronics Learning');
   const ca=document.querySelector('#page-'+id+' .cl-menu:not([id]) a.active');if(ca&&window.innerWidth<820){const m=ca.parentElement;m.scrollLeft=ca.offsetLeft-m.clientWidth/2+ca.clientWidth/2;}
   // Scroll: a section of the same page, or another page of the same group (Components), keeps the hero out of
   // the way: the menu + content area goes right under the top bar, so the left menu stays where it is.

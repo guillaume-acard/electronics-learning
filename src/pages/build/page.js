@@ -5,7 +5,7 @@ const WIRE_COLORS=[['red',PAL.redDark],['black','#111'],['blue',PAL.blueDark],['
 let wireColor=WIRE_COLORS[0][1],sel=null,drag=null,hov=null,run=null,flashIds=new Set(),flashT=0;
 const undoS=[],redoS=[],smoke=[];
 const status=(msg,cls='')=>{const el=$('bdStatus');el.textContent=msg;el.className='bd-status '+cls;};
-const pname=p=>PARTS[p.type].name+(p.type==='res'?' '+fmtR(p.props.R):p.type==='led'?' ('+p.props.color+')':p.type==='npn'?' '+p.props.kind:'');
+const pname=partName;
 const findPart=id=>S.parts.find(p=>p.id===id),findWire=id=>S.wires.find(w=>w.id===id);
 
 // ---------- history & storage ----------
@@ -130,15 +130,16 @@ function renderProps(){const body=$('bdPropsBody');
   const p=findPart(sel.id);if(!p){sel=null;return renderProps();}const T=PARTS[p.type];
   let h=`<div class="bd-row"><b>${pname(p)}</b>${p.burnt?' <span class="bd-burnt">🔥 burnt</span>':''}</div>`;
   if(p.burnt)h+=`<div class="bd-row"><button class="go" id="bdReplace">♻ Replace (same part)</button></div>`;
-  T.edit.forEach((ed,i)=>{const v=p.props[ed.k];
-    if(ed.opts)h+=`<div class="bd-row"><label>${ed.label}</label><select class="fsel" data-i="${i}">${ed.opts.map(([val,lab])=>`<option value="${val}"${String(val)===String(v)?' selected':''}>${lab}</option>`).join('')}</select></div>`;
+  const optsOf=ed=>typeof ed.opts==='function'?ed.opts(p):ed.opts;
+  T.edit.forEach((ed,i)=>{const v=p.props[ed.k];if(ed.show&&!ed.show(p))return;
+    if(ed.opts)h+=`<div class="bd-row"><label>${ed.label}</label><select class="fsel" data-i="${i}">${optsOf(ed).map(([val,lab])=>`<option value="${val}"${String(val)===String(v)?' selected':''}>${lab}</option>`).join('')}</select></div>`;
     else if(ed.range)h+=`<div class="bd-row"><label>${ed.label}</label><input type="range" data-i="${i}" min="${ed.range[0]}" max="${ed.range[1]}" step="${ed.range[2]}" value="${v}" style="flex:1"></div>`;
     else if(ed.hold)h+=`<div class="bd-row"><label>${ed.label}</label><button id="bdHold">👆 Hold to press</button><span class="hint">or click the button on the board while playing</span></div>`;
     else if(ed.toggle)h+=`<div class="bd-row"><label>${ed.label}</label><button data-i="${i}" class="bd-tog${v?' active':''}">${v?ed.toggle[0]:ed.toggle[1]}</button></div>`;});
   h+=`<div class="bd-row">${T.rotate?'<button id="bdRotSel">↻ Rotate</button>':''}<button class="stop" id="bdDelSel">🗑 Delete</button></div>`;
-  h+=`<div class="bd-row hint">Legs: ${Object.entries(p.holes).filter(()=>!T.fixed).map(([k,v])=>`${k}→${v}`).join(' · ')||'on the rails'}</div><div id="bdLive" class="bd-kv"></div>`;
+  h+=`<div class="bd-row hint">Legs: ${Object.entries(p.holes).filter(()=>!T.fixed).map(([k,v])=>`${legName(p,k)} → ${v}`).join(' · ')||'on the rails'}</div><div id="bdLive" class="bd-kv"></div>`;
   body.innerHTML=h;
-  body.querySelectorAll('select[data-i]').forEach(s=>s.onchange=()=>{const ed=T.edit[+s.dataset.i],o=ed.opts.find(o=>String(o[0])===s.value);const before=snapState();p.props[ed.k]=o[0];commit(before);});
+  body.querySelectorAll('select[data-i]').forEach(s=>s.onchange=()=>{const ed=T.edit[+s.dataset.i],o=optsOf(ed).find(o=>String(o[0])===s.value);const before=snapState();p.props[ed.k]=o[0];if(ed.set)ed.set(p);commit(before);});
   body.querySelectorAll('input[type=range][data-i]').forEach(r=>{let before=null;r.oninput=()=>{if(!before)before=snapState();p.props[T.edit[+r.dataset.i].k]=+r.value;if(run){const pt=PARTS[p.type];const el=run.els.get(p.id);if(el&&pt.update)pt.update(el,p);}};
     r.onchange=()=>{if(before)commit(before);before=null;};});
   body.querySelectorAll('.bd-tog').forEach(b=>b.onclick=()=>{const ed=T.edit[+b.dataset.i];const before=snapState();p.props[ed.k]=!p.props[ed.k];commit(before);});
@@ -148,14 +149,14 @@ function renderProps(){const body=$('bdPropsBody');
   $('bdDelSel').onclick=removeSel;}
 
 // ---------- simulation ----------
-const DYNAMIC=new Set(['ccap','ecap','motor','ne555']);
 function makeRun(state){const N=nets(state),c=new Circuit(),node=new Map(),els=new Map();
   const sup=state.parts.find(p=>(p.type==='batt'||p.type==='usb')&&!p.burnt);const gnd=sup?N.of(sup.holes['−']):null;
   const nd=h=>{const n=N.of(h);if(n===gnd)return 0;if(!node.has(n))node.set(n,c.node());return node.get(n);};
   state.parts.forEach(p=>{if(p.burnt)return;const n={};Object.entries(p.holes).forEach(([pin,h])=>{n[pin]=nd(h);});els.set(p.id,PARTS[p.type].model(c,n,p));});
-  return {c,N,gnd,node,els,w:new Map(),over:new Map(),dynamic:state.parts.some(p=>DYNAMIC.has(p.type)&&!p.burnt)};}
+  const ticks=state.parts.filter(p=>PARTS[p.type].tick&&els.has(p.id)).map(p=>[PARTS[p.type].tick,els.get(p.id)]);
+  return {c,N,gnd,node,els,ticks,w:new Map(),over:new Map(),dynamic:state.parts.some(p=>PARTS[p.type].dynamic&&!p.burnt)};}
 function stepRun(R,state,dt){state.parts.forEach(p=>{const T=PARTS[p.type],el=R.els.get(p.id);if(el&&T.update)T.update(el,p);});
-  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;for(let i=0;i<n;i++)R.c.step(R.dynamic?2e-4:1e-3);
+  const n=R.dynamic?Math.max(1,Math.min(250,Math.round(dt/2e-4))):1;const h=R.dynamic?2e-4:1e-3;for(let i=0;i<n;i++){R.c.step(h);R.ticks.forEach(([f,el])=>f(el,h));}
   state.parts.forEach(p=>{const el=R.els.get(p.id);R.w.set(p.id,el?PARTS[p.type].watch(el,p):null);});}
 function nodeV(h){if(!run)return null;const n=run.N.of(h);if(n===run.gnd)return 0;const k=run.node.get(n);return k?run.c.v(k):null;}
 function simFrame(dt){stepRun(run,S,dt);let burnt=false;
@@ -182,7 +183,8 @@ function meter(){const body=$('bdInfoBody');if($('bdInfoTitle').textContent!=='M
   if(!hov){meterText=null;return;}
   let h=nearestHole(hov.x,hov.y,7);const p=partAt(hov.x,hov.y);if(p&&h&&!Object.values(p.holes).includes(h.h))h=null;   // over a part: the part, except on its own legs
   const w=!h&&!p&&wireAt(hov.x,hov.y);body.className='';
-  if(h){const v=nodeV(h.h);meterText={x:hov.x,y:hov.y,t:v==null?'not connected':fmtV(v)};body.innerHTML=`<div class="bd-kv"><span>Hole</span><b>${h.h}</b><span>Voltage (to −)</span><b>${v==null?'— not connected':fmtV(v)}</b></div>`;return;}
+  if(h){const v=nodeV(h.h);meterText={x:hov.x,y:hov.y,t:v==null?'not connected':fmtV(v)};const on=S.parts.find(q=>PARTS[q.type].pinNames&&Object.values(q.holes).includes(h.h)),pn=on&&Object.keys(on.holes).find(k=>on.holes[k]===h.h);
+    body.innerHTML=`<div class="bd-kv"><span>Hole</span><b>${h.h}</b>${on?`<span>Leg</span><b>${PARTS[on.type].chip} pin ${legName(on,pn)}</b>`:''}<span>Voltage (to −)</span><b>${v==null?'— not connected':fmtV(v)}</b></div>`;return;}
   if(w){const v=nodeV(w.a);meterText={x:hov.x,y:hov.y,t:v==null?'—':fmtV(v)};body.innerHTML=`<div class="bd-kv"><span>Wire</span><b>${w.a} → ${w.b}</b><span>Voltage (to −)</span><b>${v==null?'—':fmtV(v)}</b></div>`;return;}
   if(p){const ww=run.w.get(p.id);meterText=null;body.innerHTML=`<div class="bd-kv"><span>Part</span><b>${pname(p)}${p.burnt?' 🔥':''}</b>${ww?ww.info.map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join(''):''}</div>`;return;}
   meterText=null;}
@@ -231,9 +233,9 @@ $('bdSave').onclick=()=>{openModal(`<h3 class="flush">Save this circuit</h3><div
 $('bdOpen').onclick=()=>{const all=saved(),names=Object.keys(all).sort();
   openModal(`<h3 class="flush">Open a saved circuit</h3>${names.length?`<ul class="bd-saved">${names.map(n=>`<li><span>${n.replace(/</g,'&lt;')}</span><button data-n="${encodeURIComponent(n)}" class="bd-o">Open</button><button data-n="${encodeURIComponent(n)}" class="bd-d stop">🗑</button></li>`).join('')}</ul>`:'<p class="hint">Nothing saved yet: build a circuit and press 💾 Save.</p>'}<div class="bd-row"><button id="bdCancel">Close</button></div>`);
   $('bdCancel').onclick=()=>modal.hidden=true;
-  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=JSON.parse(JSON.stringify(all[n].s));sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
+  modal.querySelectorAll('.bd-o').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const before=snapState();S=migrate(JSON.parse(JSON.stringify(all[n].s)));sel=null;NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));commit(before);modal.hidden=true;status(`Opened "${n}".`);});
   modal.querySelectorAll('.bd-d').forEach(b=>b.onclick=()=>{const n=decodeURIComponent(b.dataset.n);const a2=saved();delete a2[n];try{localStorage.setItem(STORE,JSON.stringify(a2));}catch(e){}$('bdOpen').onclick();});};
-try{const cur=localStorage.getItem('buildlab:current');if(cur){S=JSON.parse(cur);NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));}}catch(e){}
+try{const cur=localStorage.getItem('buildlab:current');if(cur){S=migrate(JSON.parse(cur));NID=1+Math.max(0,...S.parts.map(p=>p.id),...S.wires.map(w=>w.id));}}catch(e){}
 
 // ---------- open a Circuits project in the lab (its final breadboard) ----------
 const LED_BY_RGB={'239,68,68':'red','34,197,94':'green','250,204,21':'yellow','59,130,246':'blue','226,232,240':'white','248,250,252':'white'};
@@ -244,18 +246,23 @@ function importLayout(L){if(!L||L.noBoard)return null;const out={parts:[],wires:
       case 'wire':if(!H(p.a)||!H(p.b))return null;out.wires.push({id:id++,a:p.a,b:p.b,color:p.c||PAL.greenDark});break;
       case 'res':add('res',{'1':H(p.a),'2':H(p.b)},{R:p.v||470});break;
       case 'led':add('led',{'+':H(p.a),'−':H(p.b)},{color:LED_BY_RGB[p.rgb||'239,68,68']||'red'});break;
-      case 'ecap':add('ecap',{'+':H(p.a),'−':H(p.b)},{C:capFrom(p.lab,100e-6)});break;
-      case 'ccap':add('ccap',{'1':H(p.a),'2':H(p.b)},{C:capFrom(p.lab,100e-9)});break;
-      case 'diode':add('d4007',{A:H(p.a),K:H(p.b)});break;
+      case 'ecap':add('cap',{'+':H(p.a),'−':H(p.b)},{kind:'electrolytic',C:capFrom(p.lab,100e-6),Vmax:25});break;
+      case 'ccap':add('cap',{'+':H(p.a),'−':H(p.b)},{kind:'ceramic',C:capFrom(p.lab,100e-9),Vmax:50});break;
+      case 'diode':add('diode',{A:H(p.a),K:H(p.b)});break;
       case 'buz':add('buz',{'+':H(p.a),'−':H(p.b)});break;
       case 'ldr':add('ldr',{'1':H(p.a),'2':H(p.b)});break;
       case 'npn':add('npn',{C:H(p.c),B:H(p.b),E:H(p.e)},{kind:L.parts.some(q=>q.t==='box'&&/motor/i.test(q.lab||''))?'SS8050':'BC547'});break;
       case 'pot':add('pot',{'1':H(p.h[0]),W:H(p.h[1]),'3':H(p.h[2])});break;
       case 'btn':add('btn',{'1a':'e'+p.col,'2a':'e'+(p.col+2),'1b':'f'+p.col,'2b':'f'+(p.col+2)});break;
-      case 'chip':if(p.n!==8||!/555/.test(p.lab||''))return null;{const c=p.col,hs={};for(let i=0;i<4;i++){hs[String(i+1)]='f'+(c+i);hs[String(8-i)]='e'+(c+i);}add('ne555',hs);}break;
+      case 'chip':{const type=Object.keys(PARTS).find(k=>PARTS[k].chip&&PARTS[k].pins.length===p.n&&(p.lab||'').toUpperCase().includes(PARTS[k].chip.replace(/^NE|^CD/,'')));
+        if(!type)return null;const c=p.col,hs={};for(let i=0;i<p.n/2;i++){hs[String(i+1)]='f'+(c+i);hs[String(p.n-i)]='e'+(c+i);}add(type,hs);break;}
       case 'batt':add('batt',{'+':H(p.plus),'−':H(p.minus)},{V:parseFloat(p.lab)||9});break;
       case 'pm':add('usb',{...PARTS.usb.fixed});break;
-      case 'box':if(/motor/i.test(p.lab||'')&&p.pins&&p.pins.length===2){add('motor',{'1':H(p.pins[0].to),'2':H(p.pins[1].to)});break;}return null;
+      case 'box':{const lab=p.lab||'',two=p.pins&&p.pins.length===2,to=k=>H(p.pins[k].to);
+        if(two&&/motor/i.test(lab)){add('motor',{'1':to(0),'2':to(1)});break;}
+        if(two&&/🔊|speaker/i.test(lab)){add('spk',{'+':to(0),'−':to(1)});break;}
+        if(two&&/audio jack/i.test(lab)){add('sig',{tip:to(0),sleeve:to(1)});break;}
+        return null;}
       case 'note':break;
       default:return null;}}catch(e){return null;}}
   return out;}

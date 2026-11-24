@@ -12,7 +12,7 @@
 <body>
 <nav class="topbar"><a href="#home" class="brand">⚡ Electronics</a><div class="links"><a href="#resistor" data-nav="components">Components</a><a href="#formulas" data-nav="formulas">Formulas</a><a href="#sensors" data-nav="sensors">Sensors</a><a href="#chips" data-nav="chips">Microchips</a><a href="#parts" data-nav="parts">Real parts</a><a href="#circuits" data-nav="circuits">Circuits</a><a href="#build" data-nav="build">Build</a><a href="#quiz" data-nav="quiz">Quiz</a></div></nav>
 
-<div class="page" id="page-home" style="--accent:#60a5fa" hidden>
+<div class="page" id="page-home" data-title="Electronics, one component at a time" style="--accent:#60a5fa" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Interactive guide</span><h1>Electronics, one component at a time</h1><p class="tag">Simple explanations, water analogies and live animations, from the resistor to real microchips.</p><div class="facts"><span>💧 Water analogies</span><span>🎛️ Interactive demos</span><span>🎸 Guitar-amp examples</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -89,7 +89,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-resistor" style="--accent:#f59e0b" hidden>
+<div class="page wide" id="page-resistor" data-title="The Resistor" style="--accent:#f59e0b" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 1 · Passive</span><h1>The Resistor</h1><p class="tag">The simplest component: it makes it harder for electricity to flow.</p><div class="facts"><span>Unit: ohm (Ω)</span><span>💧 A narrow pipe</span><span>V = I × R</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -266,7 +266,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-capacitor" style="--accent:#3b82f6" hidden>
+<div class="page wide" id="page-capacitor" data-title="The Capacitor" style="--accent:#3b82f6" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 2 · Passive</span><h1>The Capacitor</h1><p class="tag">A tiny, very fast rechargeable store of electric charge.</p><div class="facts"><span>Unit: farad (F)</span><span>💧 A rubber sheet in a pipe</span><span>Q = C × V</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -602,7 +602,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-diode" style="--accent:#f97316" hidden>
+<div class="page wide" id="page-diode" data-title="The Diode" style="--accent:#f97316" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 3 · Semiconductor</span><h1>The Diode</h1><p class="tag">A one-way valve for electricity.</p><div class="facts"><span>Forward ≈ 0.7 V</span><span>💧 A check valve</span><span>Stripe = cathode</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -715,7 +715,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-led" style="--accent:#ef4444" hidden>
+<div class="page wide" id="page-led" data-title="The LED" style="--accent:#ef4444" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 4 · Semiconductor</span><h1>The LED</h1><p class="tag">Light Emitting Diode: a one-way valve that glows.</p><div class="facts"><span>Max ≈ 20 mA</span><span>💧 A glowing paddle wheel</span><span>Always use a resistor</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -851,7 +851,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-transistor" style="--accent:#10b981" hidden>
+<div class="page wide" id="page-transistor" data-title="The Transistor" style="--accent:#10b981" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 5 · Semiconductor</span><h1>The Transistor</h1><p class="tag">A valve controlled by electricity: the building block of all modern electronics.</p><div class="facts"><span>Gain ≈ 100×</span><span>💧 A big valve, small lever</span><span>Switch or amplifier</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -979,7 +979,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-inductor" style="--accent:#d97706" hidden>
+<div class="page wide" id="page-inductor" data-title="The Inductor" style="--accent:#d97706" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 6 · Passive</span><h1>The Inductor</h1><p class="tag">A coil of wire that stores energy in a magnetic field and hates sudden changes in current.</p><div class="facts"><span>Unit: henry (H)</span><span>💧 A heavy water wheel</span><span>Mirror of the capacitor</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -1097,7 +1097,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-relay" style="--accent:#60a5fa" hidden>
+<div class="page wide" id="page-relay" data-title="The Relay" style="--accent:#60a5fa" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 7 · Electromechanical</span><h1>The Relay</h1><p class="tag">A switch flipped by an electromagnet: a small current controls a separate big one.</p><div class="facts"><span>COM · NO · NC</span><span>💧 A lever on a separate pipe</span><span>Isolated switching</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -1198,7 +1198,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-motion" style="--accent:#f472b6" hidden>
+<div class="page wide" id="page-motion" data-title="Buzzers, Speakers &amp; Motors" style="--accent:#f472b6" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Component 8 · Sound & motion</span><h1>Buzzers, Speakers &amp; Motors</h1><p class="tag">Parts that turn electricity into something you hear or feel: a coil (or a crystal) pushing on air, or on a shaft.</p><div class="facts"><span>🔔 Active · passive buzzers</span><span>🔊 8 Ω speaker</span><span>⚙ DC motor · back-EMF</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -1305,7 +1305,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-formulas" style="--accent:#38bdf8" hidden>
+<div class="page wide" id="page-formulas" data-title="Basic Formulas" style="--accent:#38bdf8" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">The maths you actually need</span><h1>Basic Formulas</h1><p class="tag">Volts, amps, ohms and watts: the handful of formulas behind every circuit on this site, with live calculators.</p><div class="facts"><span>V = R × I</span><span>P = V × I</span><span>💧 Pressure × flow</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -1447,7 +1447,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-sensors" style="--accent:#f59e0b" hidden>
+<div class="page wide" id="page-sensors" data-title="Sensors" style="--accent:#f59e0b" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Turning the world into electricity</span><h1>Sensors</h1><p class="tag">How light, heat, touch, a press or a vibrating string become a voltage your circuit can use.</p><div class="facts"><span>☀ LDR · 🌡 LM35 · ☝ Touch</span><span>⏺ Button · 🎸 Pickup · IR</span><span>💧 Gauges and taps</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -1591,7 +1591,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-chips" style="--accent:#a78bfa" hidden>
+<div class="page wide" id="page-chips" data-title="Common Microchips" style="--accent:#a78bfa" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Integrated circuits</span><h1>Common Microchips</h1><p class="tag">Fifteen classic chips: what's inside, what they're for, and how to use them.</p><div class="facts"><span>NE555 · 7805 · LM358 · LM339 · LM386 · LM3914</span><span>CD4017 · CD4511 · CD4518 · CD4013 · CD4060</span><span>74HC595 · L293D · TP4056 · ATmega328P</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -2018,7 +2018,7 @@
 </main>
 </div>
 
-<div class="page wide" id="page-parts" style="--accent:#f43f5e" hidden>
+<div class="page wide" id="page-parts" data-title="Using Real Parts" style="--accent:#f43f5e" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Practical guide</span><h1>Using Real Parts</h1><p class="tag">From a shop page and a datasheet to a working circuit. Worked examples: a 7-segment display and a 10-LED bar graph.</p><div class="facts"><span>SC39-11SURKWA 7-segment</span><span>DC10G 10-LED bar graph</span><span>Pinout · test · resistors · drivers</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 220" aria-hidden="true">
@@ -2218,7 +2218,7 @@ void loop() {
 </main>
 </div>
 
-<div class="page wide" id="page-circuits" style="--accent:#22c55e" hidden>
+<div class="page wide" id="page-circuits" data-title="Circuits to Build" style="--accent:#22c55e" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Build it yourself</span><h1>Circuits to Build</h1><p class="tag">26 breadboard projects grouped by theme (dice, siren, fuzz pedal, counter, thermometers, infrared alarm, motors and more), with parts lists and variants to try, plus two real-life builds.</p><div class="facts"><span>🧰 Parts lists</span><span>🧪 Variants to test</span><span>🔊 Buzzer · 🔋 Charger · 🌙 Night lamp</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
@@ -3000,28 +3000,8 @@ void loop() {
 </main>
 </div>
 
-<div class="page wide" id="page-build" style="--accent:#22d3ee" hidden>
-<div class="hero"><div class="hero-inner">
-  <div><span class="eyebrow">Virtual breadboard</span><h1>The Build Lab</h1><p class="tag">Drag parts onto a breadboard, wire them, press Play: LEDs light up, motors spin, and parts burn when you overload them. Try a circuit here before you build it for real.</p><div class="facts"><span>🧲 Drag & drop</span><span>▶ Live simulation</span><span>🔥 Burn, then replace</span></div></div>
-  <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
-  <defs><radialGradient id="bdglow"><stop offset="0" stop-color="#22d3ee" stop-opacity=".9"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient></defs>
-  <rect x="20" y="58" width="280" height="118" rx="8" fill="#e5e7eb"/>
-  <rect x="24" y="112" width="272" height="8" fill="#d1d5db"/>
-  <path d="M30 68h260M30 166h260" stroke="#ef4444" stroke-width="1.5"/><path d="M30 76h260M30 158h260" stroke="#3b82f6" stroke-width="1.5"/>
-  <g fill="#9ca3af">
-    <rect x="36" y="88" width="3" height="3"/><rect x="48" y="88" width="3" height="3"/><rect x="60" y="88" width="3" height="3"/><rect x="72" y="88" width="3" height="3"/><rect x="84" y="88" width="3" height="3"/><rect x="96" y="88" width="3" height="3"/><rect x="108" y="88" width="3" height="3"/><rect x="120" y="88" width="3" height="3"/><rect x="132" y="88" width="3" height="3"/><rect x="144" y="88" width="3" height="3"/><rect x="156" y="88" width="3" height="3"/><rect x="168" y="88" width="3" height="3"/><rect x="180" y="88" width="3" height="3"/><rect x="192" y="88" width="3" height="3"/><rect x="204" y="88" width="3" height="3"/><rect x="216" y="88" width="3" height="3"/><rect x="228" y="88" width="3" height="3"/><rect x="240" y="88" width="3" height="3"/><rect x="252" y="88" width="3" height="3"/><rect x="264" y="88" width="3" height="3"/><rect x="276" y="88" width="3" height="3"/>
-    <rect x="36" y="136" width="3" height="3"/><rect x="48" y="136" width="3" height="3"/><rect x="60" y="136" width="3" height="3"/><rect x="72" y="136" width="3" height="3"/><rect x="84" y="136" width="3" height="3"/><rect x="96" y="136" width="3" height="3"/><rect x="108" y="136" width="3" height="3"/><rect x="120" y="136" width="3" height="3"/><rect x="132" y="136" width="3" height="3"/><rect x="144" y="136" width="3" height="3"/><rect x="156" y="136" width="3" height="3"/><rect x="168" y="136" width="3" height="3"/><rect x="180" y="136" width="3" height="3"/><rect x="192" y="136" width="3" height="3"/><rect x="204" y="136" width="3" height="3"/><rect x="216" y="136" width="3" height="3"/><rect x="228" y="136" width="3" height="3"/><rect x="240" y="136" width="3" height="3"/><rect x="252" y="136" width="3" height="3"/><rect x="264" y="136" width="3" height="3"/><rect x="276" y="136" width="3" height="3"/>
-  </g>
-  <path d="M50 68 Q60 50 74 89" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M74 89h52" stroke="#9ca3af" stroke-width="2"/><rect x="88" y="84" width="26" height="10" rx="4" fill="#e7c99a"/>
-  <rect x="93" y="84" width="3" height="10" fill="#7c3f12"/><rect x="99" y="84" width="3" height="10" fill="#111"/><rect x="105" y="84" width="3" height="10" fill="#dc2626"/>
-  <circle cx="146" cy="78" r="30" fill="url(#bdglow)"/><path d="M138 89v-9M154 89v-9" stroke="#9ca3af" stroke-width="2"/>
-  <path d="M138 80v-10a8 8 0 0 1 16 0v10z" fill="#22d3ee"/>
-  <path d="M154 89 Q190 40 230 76 T262 158" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
-  <g transform="translate(196 92) rotate(-14)"><path d="M-14 6h28" stroke="#9ca3af" stroke-width="2"/><rect x="-10" y="1" width="20" height="10" rx="2" fill="#111827"/><rect x="5" y="1" width="3" height="10" fill="#e5e7eb"/></g>
-  <path d="M206 98l16 34-9-3-5 11-5-2 5-11-10 1z" fill="#f8fafc" stroke="#0b1120" stroke-width="1.5"/>
-  <g font-family="ui-monospace,monospace" font-size="10" fill="#22d3ee"><text x="196" y="44">▶ PLAY</text><text x="40" y="196">I = 15 mA</text><text x="214" y="196">V = 9.00 V</text></g>
-</svg></div></div></div>
+<div class="page wide" id="page-build" data-title="The Build Lab" style="--accent:#22d3ee" hidden>
+
 <main>
 <div class="cl-layout bd-layout">
   <aside class="cl-menu bd-catalog" id="bdCatalog"><!-- filled from parts.js --></aside>
@@ -3049,9 +3029,9 @@ void loop() {
     <section class="bd-help">
       <h3 class="flush">How to use the lab</h3>
       <div class="cards">
-        <div class="card"><div class="ico">🧲</div><h3>Place</h3><p>Drag a part from the catalog onto the board: it snaps to the most logical holes. Drag its body to move it, or drag one leg of a 2-leg part (resistor, LED, capacitor…) to another hole. <b>R</b> to rotate, <b>Del</b> to remove.</p></div>
+        <div class="card"><div class="ico">🧲</div><h3>Place</h3><p>Drag a part from the catalog onto the board: it snaps to the most logical holes. Drag its body to move it, or drag one leg of a 2-leg part (resistor, LED, capacitor…) to another hole. <b>R</b> to rotate, <b>Del</b> to remove. Click a part to change its value or model (diode 1N4007 or 1N4148, ceramic or electrolytic capacitor…).</p></div>
         <div class="card"><div class="ico">🔌</div><h3>Wire</h3><p>Press on a free hole (next to a leg, in the same strip) and drag to another hole. Pick the colour first in the toolbar, or click a wire to change it. To move a wire, drag one of its ends to another hole. To remove a part or a wire, drag it back onto the parts list.</p></div>
-        <div class="card"><div class="ico">▶</div><h3>Play</h3><p>The circuit comes alive: LEDs light, motors turn. Hover a hole to read its voltage. Too much current? The part burns: click it and press <b>Replace</b>.</p></div>
+        <div class="card"><div class="ico">▶</div><h3>Play</h3><p>The circuit comes alive: LEDs light, motors turn, counters count, the speaker plays. Hover a hole to read its voltage. Too much current? The part burns: click it and press <b>Replace</b>.</p></div>
         <div class="card"><div class="ico">✓</div><h3>Check</h3><p>Lists the usual mistakes: a short circuit, an LED without resistor, a part with both legs in the same strip, a loose leg…</p></div>
       </div>
       <p class="hint">The breadboard works like the real one: in each column, holes <b>a–e</b> are connected together, and so are <b>f–j</b>. The four long rails (+ and − at the top and bottom) run along the whole board. Open a project from the <a class="navlink" href="#circuits">Circuits</a> page with its <b>🔧 Build it</b> button.</p>
@@ -3063,7 +3043,7 @@ void loop() {
 </main>
 </div>
 
-<div class="page" id="page-quiz" style="--accent:#facc15" hidden>
+<div class="page" id="page-quiz" data-title="The Quiz" style="--accent:#facc15" hidden>
 <div class="hero"><div class="hero-inner">
   <div><span class="eyebrow">Test yourself</span><h1>The Quiz</h1><p class="tag">31 interactive circuit challenges: pick the part, choose the value, predict what happens, and build circuits that work.</p><div class="facts"><span>🧩 Pick the part</span><span>🎚️ Choose the value</span><span>🔮 What happens?</span><span>🛠️ Build it</span></div></div>
   <div class="illus"><svg viewBox="0 0 320 200" aria-hidden="true">
