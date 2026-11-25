@@ -5,7 +5,7 @@ TITLE = 'Mini speaker amp (LM386)'
 MENU = 'Mini amp'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Microchips</span> The core of your Ruby amp: plug in a phone or guitar. <a class="navlink" href="#s386">📖 lesson</a></p>
-  <canvas id="cp10" width="800" height="250"></canvas>'''
+  <canvas id="cp10" width="800" height="390"></canvas>'''
 # "You need" list
 NEED = [
     'LM386, 9 V battery',

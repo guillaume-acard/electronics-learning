@@ -5,7 +5,7 @@ TITLE = 'Relay clicker with two lamps'
 MENU = 'Relay clicker'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Relay</span> A small button controls a separate circuit through a relay. <a class="navlink" href="#relay">📖 lesson</a></p>
-  <canvas id="cp7" width="800" height="250"></canvas>'''
+  <canvas id="cp7" width="800" height="375"></canvas>'''
 # "You need" list
 NEED = [
     '5 V relay (or a relay module)',

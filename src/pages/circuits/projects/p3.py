@@ -5,7 +5,7 @@ TITLE = 'Polarity tester (which way is +?)'
 MENU = 'Polarity tester'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Diode</span> Two LEDs back to back show which way the current flows. <a class="navlink" href="#diode">📖 lesson</a></p>
-  <canvas id="cp3" width="800" height="250"></canvas>'''
+  <canvas id="cp3" width="800" height="360"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery',

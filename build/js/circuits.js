@@ -263,6 +263,34 @@ function mRes(ctx,x1,y1,x2,y2,lab){W(ctx,[[x1,y1],[x2,y2]],WIRE,2.5);const mx=(x
 function mGraph(ctx,x,y,w,h,series,lo,hi,label){ctx.fillStyle=PAL.panel;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.strokeRect(x,y,w,h);
   series.forEach(([arr,col,dash])=>{ctx.strokeStyle=col;ctx.lineWidth=2;ctx.setLineDash(dash||[]);ctx.beginPath();arr.forEach((v,i)=>{const px=x+i/(arr.length-1||1)*w,py=y+h-(v-lo)/(hi-lo)*h;i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();ctx.setLineDash([]);});
   if(label)txt(ctx,label,x+6,y+14,PAL.muted,11,'left');}
+// ----- a scrolling chart of values over the last few seconds (the demos' oscilloscope) -----
+// mScope(ctx, x, y, w, h, {title, span (s), lo, hi, unit, refs:[[value, label]], note, lanes,
+//   traces:[{f: t => value  or  rec: mRec(), col, lab, lo, hi}]})
+// f(t) is computed for t from CT − span to CT (demos that follow the page clock). A demo with its own state pushes
+// its values every frame with mRecPush(rec, value). lanes: one band per trace (on/off signals, each with its own lo/hi).
+function mRec(){return {d:[]};}
+function mRecPush(R,v){const d=R.d;if(d.length&&CT-d[d.length-1][0]>0.5)d.length=0;d.push([CT,v]);while(d.length&&d[0][0]<CT-30)d.shift();}
+const mFmt=(v,u)=>{const a=Math.abs(v);if(u==='V'&&a>0&&a<1)return Math.round(v*1000)+' mV';if(u==='mA'&&a>=1000)return +(v/1000).toPrecision(2)+' A';return +v.toFixed(a>=10||a===0||Number.isInteger(v)?0:1)+(u?' '+u:'');};
+function mScope(ctx,x,y,w,h,o){const span=o.span||3,L=o.lanes?78:48,top=y+20,bot=y+h-16,px0=x+L,pw=w-L-10,n=o.traces.length;
+  ctx.fillStyle=PAL.panel;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.lineWidth=1;ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);
+  if(o.title)txt(ctx,o.title,x+8,y+14,PAL.ink2,11,'left');
+  if(!o.lanes){let lx=x+w-8;[...o.traces].reverse().forEach(tr=>{if(!tr.lab)return;ctx.font='11px system-ui';const tw=ctx.measureText(tr.lab).width;txt(ctx,tr.lab,lx,y+14,tr.col,11,'right');lx-=tw+14;});}
+  for(let q=0;q<=4;q++){const gx=px0+pw*q/4;ctx.strokeStyle='rgba(148,163,184,.12)';ctx.beginPath();ctx.moveTo(gx,top);ctx.lineTo(gx,bot);ctx.stroke();}
+  txt(ctx,'−'+span+' s',px0,y+h-4,PAL.muted2,9,'left');txt(ctx,'now',px0+pw,y+h-4,PAL.muted2,9,'right');if(o.note)txt(ctx,o.note,px0+pw/2,y+h-4,PAL.muted,9);
+  o.traces.forEach((tr,i)=>{const bt=o.lanes?top+(bot-top)*i/n:top,bb=o.lanes?top+(bot-top)*(i+1)/n-4:bot,lo=tr.lo??o.lo,hi=tr.hi??o.hi,Y=v=>bb-(v-lo)/(hi-lo)*(bb-bt);
+    if(o.lanes){txt(ctx,tr.lab||'',x+8,(bt+bb)/2+4,tr.col,11,'left');ctx.strokeStyle='rgba(148,163,184,.2)';ctx.beginPath();ctx.moveTo(px0,bb);ctx.lineTo(px0+pw,bb);ctx.stroke();}
+    else if(i===0){[lo,hi].concat(lo<0&&hi>0?[0]:[]).forEach(v=>{const yy=Y(v);ctx.strokeStyle=v===0?'rgba(148,163,184,.35)':'rgba(148,163,184,.15)';ctx.beginPath();ctx.moveTo(px0,yy);ctx.lineTo(px0+pw,yy);ctx.stroke();txt(ctx,mFmt(v,o.unit),px0-5,yy+3,PAL.muted2,9,'right');});
+      (o.refs||[]).forEach(([v,lab])=>{const yy=Y(v);ctx.setLineDash([4,4]);ctx.strokeStyle=PAL.amber;ctx.beginPath();ctx.moveTo(px0,yy);ctx.lineTo(px0+pw,yy);ctx.stroke();ctx.setLineDash([]);
+        txt(ctx,mFmt(v,o.unit),px0-5,yy+3,PAL.amber,9,'right');if(lab)txt(ctx,lab,px0+4,yy-3,PAL.amber,9,'left');});}
+    ctx.save();ctx.beginPath();ctx.rect(px0,bt-3,pw,bb-bt+6);ctx.clip();ctx.strokeStyle=tr.col;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+    let started=false,k=0;const d=tr.rec&&tr.rec.d;
+    for(let c=0;c<=pw;c++){const t=CT-span+span*c/pw;let v;
+      if(tr.f)v=t<0?null:tr.f(t);else{while(k<d.length-1&&d[k+1][0]<=t)k++;v=d.length&&d[k][0]<=t?d[k][1]:null;}
+      if(v==null||isNaN(v)){started=false;continue;}const yy=Y(Math.max(lo-(hi-lo)*0.05,Math.min(hi+(hi-lo)*0.05,v)));if(started)ctx.lineTo(px0+c,yy);else{ctx.moveTo(px0+c,yy);started=true;}}
+    ctx.stroke();ctx.restore();});}
+// the 555 astable: capacitor voltage (pins 2 and 6) and output (pin 3) at time t. th, tl: high and low times (s)
+function m555(t,th,tl,vcc){const p=((t%(th+tl))+(th+tl))%(th+tl),tc=th/Math.LN2,td=tl/Math.LN2;
+  return p<th?{vc:vcc-(vcc*2/3)*Math.exp(-p/tc),out:vcc-1.7}:{vc:(vcc*2/3)*Math.exp(-(p-th)/td),out:0.1};}
 // a DC motor seen from the end (projects 23, 24, 25)
 function motorDraw(ctx,x,y,ang,col){ctx.fillStyle=PAL.chipLight;ctx.beginPath();ctx.arc(x,y,46,0,7);ctx.fill();ctx.strokeStyle=PAL.muted2;ctx.lineWidth=3;ctx.stroke();
   ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=col||PAL.yellow;ctx.fillRect(-4,-40,8,40);ctx.beginPath();ctx.moveTo(4,-40);ctx.lineTo(26,-34);ctx.lineTo(4,-26);ctx.fill();ctx.restore();
@@ -314,7 +342,11 @@ function P1(){const ctx=cv('cp1'),vals=[220,470,1000,10000],k=Math.floor(CT/2.2)
   part(ctx,'batt',80,60,80,200,{label:'9 V',left:true});wire(ctx,[[80,60],[220,60]]);part(ctx,'res',220,60,340,60,{label:fmtOhm(R),lc:Y});wire(ctx,[[340,60],[460,60],[460,95]]);
   part(ctx,'led',460,95,460,175,{glow:Math.min(1,Math.sqrt(I/20))});wire(ctx,[[460,175],[460,200],[80,200]]);dots(ctx,[[80,180],[80,60],[460,60],[460,200],[80,200]],CT*I*3);
   txt(ctx,'I = 7 V ÷ '+fmtOhm(R)+' = '+(I<10?I.toFixed(1):I.toFixed(0))+' mA',620,120,Y,15);txt(ctx,'(cycling through the 4 resistors)',620,145,PAL.muted,11);}
-loop((dt,now)=>{if(vis('cp1'))P1(dt);});
+// chart: the current over time, a step each time the resistor changes
+function G1(){const ctx=$('cp1').getContext('2d'),vals=[220,470,1000,10000];
+  mScope(ctx,15,258,770,108,{title:'LED current over time (a new resistor every 2.2 s)',span:9,lo:0,hi:35,unit:'mA',refs:[[20,'20 mA: a normal LED current']],
+    traces:[{f:t=>7/vals[Math.floor(t/2.2)%4]*1000,col:PAL.redSoft,lab:'LED current'}]});}
+loop((dt,now)=>{if(vis('cp1')){P1(dt);G1();}});
 })();
 
 // ===== p10: breadboard layout =====
@@ -335,7 +367,11 @@ function P10(){const ctx=cv('cp10'),w=Math.sin(CT*12)*0.5+Math.sin(CT*31)*0.3;
   ctx.fillStyle=PAL.ink2;ctx.fillRect(600,115,14,30);ctx.beginPath();ctx.moveTo(614,115);ctx.lineTo(640+w*4,95);ctx.lineTo(640+w*4,165);ctx.lineTo(614,145);ctx.fill();
   ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.globalAlpha=0.7-i*0.2;ctx.beginPath();ctx.arc(650,130,20+i*16+(CT*30)%16,-0.6,0.6);ctx.stroke();}ctx.globalAlpha=1;
   wire(ctx,[[607,145],[607,230],[60,230]],PAL.blue);txt(ctx,'8 Ω',580,170,PAL.muted,11);}
-loop((dt,now)=>{if(vis('cp10'))P10(dt);});
+// chart: the same wave, 20 times bigger (slowed right down: a real note repeats hundreds of times per second)
+function G10(){const ctx=$('cp10').getContext('2d'),w=t=>(Math.sin(t*12)*0.5+Math.sin(t*31)*0.3)/0.8;
+  mScope(ctx,15,250,770,132,{title:'the same wave, 20 × bigger at the output (each lane has its own scale)',span:2,lanes:true,note:'slowed down',
+    traces:[{f:t=>0.1*w(t),col:PAL.sky,lab:'in: ± 0.1 V',lo:-0.12,hi:0.12},{f:t=>4.5+2*w(t),col:Y,lab:'pin 5: 4.5 ± 2 V',lo:2,hi:7},{f:t=>2*w(t),col:PAL.green,lab:'speaker: ± 2 V',lo:-2.4,hi:2.4}]});}
+loop((dt,now)=>{if(vis('cp10')){P10(dt);G10();}});
 })();
 
 // ===== p11: breadboard layout =====
@@ -572,7 +608,12 @@ function drawCnt(dt){const ctx=cv('m19'),sp=+$('m19sp').value;if(CN.run){CN.acc+
   else txt(ctx,'units Q4 (the "8") → tens ENABLE',400,285,PAL.muted2,12);}
 $('m19run').addEventListener('click',()=>{CN.run=!CN.run;$('m19run').textContent=CN.run?'⏸ Pause':'▶ Run';$('m19run').classList.toggle('active',CN.run);});
 $('m19tick').addEventListener('click',()=>{cTick();});$('m19rst').addEventListener('click',()=>{CN.n=0;CN.acc=0;});
-loop((dt,now)=>{if(vis('m19'))drawCnt(dt);});
+// chart: a timing diagram of the units counter: Q1 flips at every pulse, Q2 every 2, Q3 every 4, Q4 at 8 and 9
+const G19R=[0,1,2,3,4].map(()=>mRec());
+function G19(){const ctx=$('m19').getContext('2d'),u=CN.n%10;mRecPush(G19R[0],CN.run&&CN.acc<0.5?1:0);[1,2,4,8].forEach((b,i)=>mRecPush(G19R[i+1],(u&b)?1:0));
+  mScope(ctx,15,300,770,132,{title:'timing diagram of the units counter',span:6,lanes:true,
+    traces:[{rec:G19R[0],col:Y,lab:'clock (555)',lo:0,hi:1}].concat([1,2,4,8].map((b,i)=>({rec:G19R[i+1],col:PAL.green,lab:'Q'+(i+1)+' (the '+b+')',lo:0,hi:1})))});}
+loop((dt,now)=>{if(vis('m19')){drawCnt(dt);G19();}});
 })();
 
 // ===== p2: breadboard layout =====
@@ -585,7 +626,12 @@ const F2={vc:0};function P2(dt){const ctx=cv('cp2'),ph=CT%6,pressed=ph<1.5;F2.vc
   part(ctx,'cap',320,60,320,210,{label:'1000 µF'});dot(ctx,320,60);dot(ctx,320,210);part(ctx,'res',480,60,480,120,{label:'470 Ω'});part(ctx,'led',480,130,480,200,{glow:F2.vc});wire(ctx,[[480,120],[480,130]]);wire(ctx,[[480,200],[480,210],[80,210]]);
   txt(ctx,pressed?'👆 button held: capacitor filling':'released: capacitor feeds the LED…',650,120,pressed?PAL.good:Y,13);
   ctx.fillStyle=PAL.raised;ctx.fillRect(250,100,12,70);ctx.fillStyle=PAL.blue;ctx.fillRect(250,100+70*(1-F2.vc),12,70*F2.vc);txt(ctx,'charge',256,186,PAL.blue,10);}
-loop((dt,now)=>{if(vis('cp2'))P2(dt);});
+// charts: the capacitor empties slowly through the LED
+const G2R={v:mRec(),i:mRec()};
+function G2(){const ctx=$('cp2').getContext('2d'),vc=9*F2.vc;mRecPush(G2R.v,vc);mRecPush(G2R.i,Math.max(0,(vc-1.9)/470*1000));
+  mScope(ctx,15,258,378,108,{title:'capacitor voltage',span:9,lo:0,hi:10,unit:'V',refs:[[1.9,'below ≈ 1.9 V the LED is off']],traces:[{rec:G2R.v,col:PAL.blue}]});
+  mScope(ctx,407,258,378,108,{title:'LED current',span:9,lo:0,hi:16,unit:'mA',traces:[{rec:G2R.i,col:PAL.redSoft}]});}
+loop((dt,now)=>{if(vis('cp2')){P2(dt);G2();}});
 })();
 
 // ===== p20: breadboard layout + demo =====
@@ -612,7 +658,11 @@ function drawTherm(dt){const ctx=cv('m20');TH.T+=((TH.hot?34:22)-TH.T)*(1-Math.e
   txt(ctx,ref<2?'1.1 V jug: fine marks, 0.1 °C resolution':'5 V jug: coarse marks, the last digit can flip-flop',340,222,PAL.muted,12);
   txt(ctx,avg?'20 readings averaged: steady':'single reading: noisy, watch the digits jitter',340,244,PAL.muted,12);}
 (()=>{const b=$('thHot');hold(b,on=>{TH.hot=on;});})();
-loop((dt,now)=>{if(vis('m20'))drawTherm(dt);});
+// chart: the sensor's voltage over time (hold 🤏 to warm it)
+const G20R=mRec();
+function G20(){const ctx=$('m20').getContext('2d');mRecPush(G20R,TH.T*0.01);
+  mScope(ctx,15,300,770,115,{title:'LM35 "S" pin: 10 mV per °C (hold the sensor to warm it)',span:30,lo:0.15,hi:0.4,unit:'V',refs:[[0.22,'22 °C'],[0.34,'34 °C']],traces:[{rec:G20R,col:PAL.orange}]});}
+loop((dt,now)=>{if(vis('m20')){drawTherm(dt);G20();}});
 })();
 
 // ===== p21: breadboard layout + demo =====
@@ -635,7 +685,12 @@ function drawBarT(dt){const ctx=cv('m21');BG21.T+=((BG21.hot?38:22)-BG21.T)*(1-M
     txt(ctx,'≥ '+(t*100).toFixed(1)+' °C',bx+130,y+4,PAL.muted,11,'left');}
   txt(ctx,'10 comparators (3 × LM339)',x0+100,yb+16,PAL.muted,11,'left');}
 (()=>{const b=$('bgHot');hold(b,on=>{BG21.hot=on;});})();
-loop((dt,now)=>{if(vis('m21'))drawBarT(dt);});
+// chart: each dashed line is one comparator's threshold: the signal crossing it lights one more bar
+const G21R=mRec();
+function G21(){const ctx=$('m21').getContext('2d'),I=+$('bgRHI').value*1e-3,refs=[];for(let k=0;k<10;k++){const v=(800+100*k)*I;if(v>0.15&&v<0.45)refs.push([v,'']);}
+  mRecPush(G21R,BG21.T*0.01);
+  mScope(ctx,15,300,770,120,{title:'LM35 signal vs the comparator thresholds (dashed)',span:30,lo:0.15,hi:0.45,unit:'V',refs,traces:[{rec:G21R,col:PAL.yellow}]});}
+loop((dt,now)=>{if(vis('m21')){drawBarT(dt);G21();}});
 })();
 
 // ===== p22: breadboard layout + demo =====
@@ -766,7 +821,11 @@ function drawQZ(dt){const ctx=cv('m26');QZ.t+=dt;QZ.t5+=dt*1.03;
   const disp=(x,lab,col,t,sub)=>{const n=Math.floor(t)%100;ctx.fillStyle='#0a0a0a';ctx.fillRect(x,140,150,90);txt(ctx,String(n).padStart(2,'0'),x+75,205,col,60);txt(ctx,lab,x+75,132,PAL.ink2,13);txt(ctx,sub,x+75,250,PAL.muted,12);};
   disp(140,'quartz version',PAL.bad,QZ.t,'±2 s per day');disp(420,'NE555 version',PAL.orange,QZ.t5,'3 % fast here');
   const diff=QZ.t5-QZ.t;txt(ctx,'after '+QZ.t.toFixed(0)+' s, the 555 is ahead by '+diff.toFixed(1)+' s',400,285,diff>1?PAL.amber:PAL.muted,13);}
-loop((dt,now)=>{if(vis('m26'))drawQZ(dt);});
+// chart: every stage is half as fast as the one before
+function G26(){const ctx=$('m26').getContext('2d'),u=t=>t-CT+QZ.t,sq=(t,f)=>Math.floor(u(t)*f*2)%2===0?1:0;
+  mScope(ctx,15,300,770,132,{title:'timing diagram: each output flips half as often as the one before',span:2,lanes:true,
+    traces:[[8,'Q12 · 8 Hz'],[4,'Q13 · 4 Hz'],[2,'Q14 · 2 Hz'],[1,'4013 · 1 Hz']].map(([f,lab],i)=>({f:t=>u(t)<0?null:sq(t,f),col:i===3?PAL.green:PAL.blue,lab,lo:0,hi:1}))});}
+loop((dt,now)=>{if(vis('m26')){drawQZ(dt);G26();}});
 })();
 
 // ===== p3: breadboard layout =====
@@ -779,7 +838,11 @@ function P3(){const ctx=cv('cp3'),flip=Math.floor(CT/2.5)%2===1;
   wire(ctx,[[400,60],[400,95]]);part(ctx,'led',400,95,400,175,{glow:flip?0:1,label:'red',left:true});wire(ctx,[[400,175],[400,210]]);
   wire(ctx,[[480,60],[480,95]]);part(ctx,'led',480,175,480,95,{glow:flip?1:0,rgb:'34,197,94',label:'green'});wire(ctx,[[480,175],[480,210]]);
   wire(ctx,[[80,210],[480,210]]);dot(ctx,400,60);dot(ctx,400,210);txt(ctx,flip?'+ at the bottom: GREEN lights':'+ at the top: RED lights',660,130,flip?PAL.green:PAL.bad,14);}
-loop((dt,now)=>{if(vis('cp3'))P3(dt);});
+// chart: one LED or the other, never both
+function G3(){const ctx=$('cp3').getContext('2d'),flip=t=>Math.floor(t/2.5)%2===1;
+  mScope(ctx,15,258,770,95,{title:'current in each LED (7 mA when it conducts)',span:10,lanes:true,
+    traces:[{f:t=>flip(t)?0:7.1,col:PAL.redSoft,lab:'red LED',lo:0,hi:8},{f:t=>flip(t)?7.1:0,col:PAL.green,lab:'green LED',lo:0,hi:8}]});}
+loop((dt,now)=>{if(vis('cp3')){P3(dt);G3();}});
 })();
 
 // ===== p4: breadboard layout =====
@@ -793,7 +856,11 @@ function P4(){const ctx=cv('cp4'),seq=[[1,0,0],[1,1,0],[0,0,1],[0,1,0]],s=seq[Ma
   part(ctx,'batt',60,40,60,220,{label:'9 V',left:true});wire(ctx,[[60,40],[600,40]]);wire(ctx,[[60,220],[600,220]]);
   [0,1,2].forEach(i=>{const x=220+i*160;part(ctx,'switch',x,40,x,90,{closed:!!s[i]});part(ctx,'res',x,90,x,140,{label:'470 Ω'});part(ctx,'led',x,145,x,210,{glow:s[i],rgb:cols[i],label:nm[i]});wire(ctx,[[x,140],[x,145]]);wire(ctx,[[x,210],[x,220]]);dot(ctx,x,40);dot(ctx,x,220);});
   txt(ctx,'one resistor per LED',700,130,PAL.muted,12);}
-loop((dt,now)=>{if(vis('cp4'))P4(dt);});
+// chart: a timing diagram, one lane per LED
+function G4(){const ctx=$('cp4').getContext('2d'),seq=[[1,0,0],[1,1,0],[0,0,1],[0,1,0]],st=(t,i)=>seq[Math.floor(t/1.8)%4][i];
+  mScope(ctx,15,258,770,110,{title:'timing diagram: which LED is on (each switch closed = 15 mA)',span:10,lanes:true,
+    traces:[['red',PAL.redSoft],['yellow',PAL.yellow],['green',PAL.green]].map(([n,c],i)=>({f:t=>st(t,i),col:c,lab:n,lo:0,hi:1}))});}
+loop((dt,now)=>{if(vis('cp4')){P4(dt);G4();}});
 })();
 
 // ===== p5: breadboard layout + demo =====
@@ -828,7 +895,11 @@ function P5(){const ctx=cv('cp5'),touch=(CT%4)<2;
   if(touch)txt(ctx,'☝️',178,122,PAL.white,26);if(touch)__PR(ctx,{t:'part',k:'res',a:[150,90],b:[150,132],o:{label:'500 kΩ'}});wire(ctx,[[150,132],[150,160],[256,160]]);npnQ(ctx,290,160,touch);wire(ctx,[[300,194],[300,200],[356,200]]);npnQ(ctx,390,200,touch);wire(ctx,[[400,234],[400,230]]);
   wire(ctx,[[300,126],[300,110],[520,110]]);wire(ctx,[[400,110],[400,166]]);part(ctx,'res',520,30,520,72,{label:'470 Ω'});part(ctx,'led',520,72,520,110,{glow:touch?1:0});
   txt(ctx,touch?'finger on the pads: LED ON':'no touch: off',590,120,touch?PAL.good:PAL.muted,14);txt(ctx,'gain ≈ 200 × 200 = 40,000',590,145,PAL.muted,11);}
-loop((dt,now)=>{if(vis('cp5'))P5(dt);});
+// chart: tiny current in the skin, big current in the LED
+function G5(){const ctx=$('cp5').getContext('2d'),touch=t=>(t%4)<2;
+  mScope(ctx,15,258,378,105,{title:'current through your finger',span:8,lo:0,hi:20,unit:'µA',traces:[{f:t=>touch(t)?17:0,col:'#d4af37'}]});
+  mScope(ctx,407,258,378,105,{title:'LED current (× 40,000 thanks to the 2 transistors)',span:8,lo:0,hi:20,unit:'mA',traces:[{f:t=>touch(t)?14.7:0,col:PAL.redSoft}]});}
+loop((dt,now)=>{if(vis('cp5')){P5(dt);G5();}});
 })();
 
 // ===== p6: breadboard layout =====
@@ -842,7 +913,12 @@ function P6(){const ctx=cv('cp6'),ph=CT%4,on=ph<2,flash=ph>=2&&ph<2.25?1-(ph-2)/
   part(ctx,'coil',400,90,400,180,{core:true,label:'coil'});wire(ctx,[[400,180],[400,210],[80,210]]);
   wire(ctx,[[400,75],[500,75],[500,95]]);part(ctx,'led',500,175,500,95,{glow:flash,label:'LED (backwards)'});wire(ctx,[[500,175],[500,195],[400,195]]);
   txt(ctx,on?'pressed: current builds up in the coil':flash>0?'released: FLASH! the kick lights the LED':'released',300,238,flash>0?Y:PAL.muted,13);}
-loop((dt,now)=>{if(vis('cp6'))P6(dt);});
+// charts (slow motion: in the real circuit the current builds in ~5 ms and the kick lasts ~1 ms)
+function G6(){const ctx=$('cp6').getContext('2d'),I0=120,i=t=>{const p=t%4;if(p<2)return I0*(1-Math.exp(-p/0.3));return I0*(1-Math.exp(-2/0.3))*Math.exp(-(p-2)/0.08);};
+  mScope(ctx,15,258,378,110,{title:'current in the coil',span:6,lo:0,hi:140,unit:'mA',note:'slow motion',traces:[{f:i,col:PAL.orange}]});
+  mScope(ctx,407,258,378,110,{title:'voltage across the coil',span:6,lo:-4,hi:10,unit:'V',note:'slow motion',refs:[[-1.9,'kick: the LED catches it']],
+    traces:[{f:t=>{const p=t%4;return p<2?9:i(t)>2?-1.9:0;},col:PAL.yellow}]});}
+loop((dt,now)=>{if(vis('cp6')){P6(dt);G6();}});
 })();
 
 // ===== p7: breadboard layout =====
@@ -865,7 +941,12 @@ function P7(){const ctx=cv('cp7'),on=(CT%3)<1.5;
   wire(ctx,[[512,90],[600,90]],PAL.violet);wire(ctx,[[512,130],[600,130]],PAL.violet);txt(ctx,'NC',520,82,PAL.redLight,10);txt(ctx,'NO',520,146,PAL.greenLight,10);
   part(ctx,'led',600,90,700,90,{glow:on?0:1});part(ctx,'led',600,130,700,130,{glow:on?1:0,rgb:'34,197,94'});wire(ctx,[[700,90],[740,90],[740,200],[450,200]],PAL.violet);wire(ctx,[[700,130],[740,130]],PAL.violet);
   txt(ctx,on?'click → green':'rest → red',620,230,on?PAL.green:PAL.bad,13);}
-loop((dt,now)=>{if(vis('cp7'))P7(dt);});
+// charts (slow motion: the real coil current takes ~1 ms to build)
+function G7(){const ctx=$('cp7').getContext('2d'),I0=70,i=t=>{const p=t%3;return p<1.5?I0*(1-Math.exp(-p/0.15)):I0*(1-Math.exp(-1.5/0.15))*Math.exp(-(p-1.5)/0.15);};
+  mScope(ctx,15,258,378,110,{title:'coil current',span:6,lo:0,hi:80,unit:'mA',note:'slow motion',refs:[[50,'the contact moves']],traces:[{f:i,col:PAL.orange}]});
+  mScope(ctx,407,258,378,110,{title:'transistor collector voltage',span:6,lo:0,hi:7,unit:'V',note:'slow motion',refs:[[5.7,'diode: max 0.7 V above +5 V']],
+    traces:[{f:t=>{const p=t%3;return p<1.5?0.1:i(t)>2?5.7:5;},col:PAL.violet}]});}
+loop((dt,now)=>{if(vis('cp7')){P7(dt);G7();}});
 })();
 
 // ===== p8: breadboard layout =====
@@ -876,7 +957,8 @@ BBL.p8={power:8,parts:[{s:1,t:'wire',a:'tp3',b:'bp3',c:W_R},{s:1,t:'wire',a:'tn4
 
 (function(){   // demo
 // P8 555
-function P8(){const ctx=cv('cp8'),on=(CT%1)<0.55;
+const T8={th:0.693*48000*10e-6,tl:0.693*47000*10e-6};   // R1 1k, R2 47k, 10 µF: 0.33 s on, 0.33 s off
+function P8(){const ctx=cv('cp8'),on=m555(CT,T8.th,T8.tl,9).out>1;
   wire(ctx,[[60,30],[620,30]],PAL.redSoft);wire(ctx,[[60,235],[620,235]],PAL.blue);txt(ctx,'+9 V',56,34,PAL.redSoft,11,'right');txt(ctx,'0 V',56,239,PAL.blue,11,'right');
   __PR(ctx,{t:'chip',x:300,y:85,w:120,h:130});ctx.fillStyle=PAL.chip;ctx.fillRect(300,85,120,130);ctx.strokeStyle=PAL.slate;ctx.lineWidth=1.5;ctx.strokeRect(300,85,120,130);txt(ctx,'NE555',360,155,PAL.ink,14);
   [['8',320,99],['4',345,99],['7',306,124,'left'],['6',306,184,'left'],['2',306,204,'left'],['3',414,154,'right'],['1',360,211]].forEach(([n,x,y,a])=>txt(ctx,n,x,y,PAL.muted,10,a||'center'));
@@ -886,7 +968,11 @@ function P8(){const ctx=cv('cp8'),on=(CT%1)<0.55;
   part(ctx,'cap',180,200,180,235,{label:'10 µF',left:true});wire(ctx,[[360,215],[360,235]]);
   wire(ctx,[[420,150],[460,150]]);part(ctx,'res',460,150,540,150,{label:'470 Ω'});wire(ctx,[[540,150],[570,150],[570,160]]);part(ctx,'led',570,160,570,225,{glow:on?1:0});wire(ctx,[[570,225],[570,235]]);
   txt(ctx,'≈ 1.5 blinks/s',700,130,Y,14);}
-loop((dt,now)=>{if(vis('cp8'))P8(dt);});
+// chart: the capacitor goes up and down between ⅓ and ⅔ of 9 V; the output flips each time it reaches one of them
+function G8(){const ctx=$('cp8').getContext('2d');
+  mScope(ctx,15,258,770,115,{title:'555 voltages over time',span:3,lo:0,hi:9,unit:'V',refs:[[3,'⅓ of 9 V: output goes HIGH'],[6,'⅔ of 9 V: output goes LOW']],
+    traces:[{f:t=>m555(t,T8.th,T8.tl,9).vc,col:PAL.blue,lab:'capacitor (pins 2 + 6)'},{f:t=>m555(t,T8.th,T8.tl,9).out,col:Y,lab:'output (pin 3) → LED'}]});}
+loop((dt,now)=>{if(vis('cp8')){P8(dt);G8();}});
 })();
 
 // ===== p9: breadboard layout =====
@@ -903,7 +989,11 @@ function P9(){const ctx=cv('cp9'),q=Math.floor(CT*4)%10;boxChip(ctx,40,90,90,80,
   wire(ctx,[[130,130],[220,130]],Y);txt(ctx,'clock (pin 3 → 14)',175,120,Y,10);
   for(let i=0;i<10;i++){const x=400+i*38,y=130;W(ctx,[[340,80+i*11],[360,80+i*11],[x,y-14]],PAL.slate,1.5);glowAt(ctx,x,y,i===q?1:0);ctx.fillStyle=i===q?PAL.bad:'#3f1d1d';ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.fill();txt(ctx,'Q'+i,x,y+30,PAL.muted,10);}
   txt(ctx,'each clock pulse → the next LED',585,200,PAL.muted,12);}
-loop((dt,now)=>{if(vis('cp9'))P9(dt);});
+// chart: a timing diagram: each rising edge of the clock moves the HIGH to the next output
+function G9(){const ctx=$('cp9').getContext('2d'),q=t=>Math.floor(t*4)%10;
+  mScope(ctx,15,250,770,142,{title:'timing diagram (9 V = HIGH)',span:3,lanes:true,
+    traces:[{f:t=>(t*4)%1<0.5?9:0,col:Y,lab:'clock (pin 14)',lo:0,hi:9}].concat([0,1,2,3].map(k=>({f:t=>q(t)===k?9:0,col:PAL.redSoft,lab:'Q'+k+' → LED '+(k+1),lo:0,hi:9})))});}
+loop((dt,now)=>{if(vis('cp9')){P9(dt);G9();}});
 })();
 
 // ===== rl1: breadboard layout =====
@@ -991,7 +1081,14 @@ function drawLD(dt){if(LDT.auto){LDT.t+=dt;$('ldL').value=(0.5+0.5*Math.cos(LDT.
   ctx.fillStyle=PAL.blue;ctx.beginPath();ctx.arc(X(Vn),gy+6,7,0,7);ctx.fill();
   txt(ctx,'sensor '+Vn.toFixed(1)+' V vs threshold '+Th.toFixed(1)+' V',gx+gw/2,gy-12,PAL.ink,11);txt(ctx,'(yellow band = hysteresis)',gx+gw/2,gy+30,PAL.muted,10);
   txt(ctx,LDT.on?'DARK: lamp ON':'BRIGHT: lamp off',720,140,PAL.white,14);}
-loop((dt,now)=>{drawLD(dt);});
+// charts: the sensor voltage must cross the whole yellow band to switch the lamp (hysteresis)
+const LDR_={v:mRec(),hi:mRec(),lo:mRec(),on:mRec()};
+function G_LD(){const ctx=$('cLight').getContext('2d'),L=+$('ldL').value,Th=+$('ldT').value,ldr=1000*Math.pow(200,1-L),Vn=12*ldr/(10000+ldr);
+  mRecPush(LDR_.v,Vn);mRecPush(LDR_.hi,Th+0.3);mRecPush(LDR_.lo,Th-0.3);mRecPush(LDR_.on,LDT.on?1:0);
+  mScope(ctx,15,348,500,115,{title:'sensor voltage vs threshold (move the light, or 🌅 Run a day)',span:30,lo:0,hi:12,unit:'V',
+    traces:[{rec:LDR_.hi,col:PAL.amber,lab:'switch-on'},{rec:LDR_.lo,col:'#a16207',lab:'switch-off'},{rec:LDR_.v,col:PAL.sky,lab:'sensor'}]});
+  mScope(ctx,527,348,258,115,{title:'lamp',span:30,lanes:true,traces:[{rec:LDR_.on,col:PAL.yellow,lab:'ON / off',lo:0,hi:1}]});}
+loop((dt,now)=>{drawLD(dt);G_LD();});
 })();
 
 // ===== Circuits page: wiring checklists, breadboard drawing (loaded after projects/*.js) =====

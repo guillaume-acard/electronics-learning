@@ -2280,7 +2280,7 @@ void loop() {
 <section id="p1" data-menu="LED brightness" data-icon="1" data-group="💡 LEDs & basics">
   <h2><span class="num">1</span>LED brightness with different resistors</h2>
   <p><span class="qtopic">Resistor</span> See how the resistor sets the current, and so the brightness. <a class="navlink" href="#resistor">📖 lesson</a></p>
-  <canvas id="cp1" width="800" height="250"></canvas>
+  <canvas id="cp1" width="800" height="375"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery + clip</li><li>1 red LED (5 mm)</li><li>Resistors: 220 Ω, 470 Ω, 1 kΩ, 10 kΩ</li><li>Breadboard + jumper wires</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The battery pushes current around one single loop: <b>+ → resistor → LED → −</b>. The resistor is the narrow pipe that sets how much current can flow, and the LED glows brighter with more current.</p><p>The red LED always "uses" about 2 V of the 9 V. The other 7 V is dropped across the resistor, so the current is <b>I = 7 V ÷ R</b>: 220 Ω gives 32 mA (too much!), 470 Ω gives 15 mA, 1 kΩ gives 7 mA, and 10 kΩ gives 0.7 mA (a faint glow).</p><p>Series resistors add up (harder to flow, dimmer). Parallel resistors give the current two paths (easier, brighter).</p></div>
@@ -2299,7 +2299,7 @@ void loop() {
 <section id="p2" data-menu="LED fade" data-icon="2">
   <h2><span class="num">2</span>LED that fades out slowly</h2>
   <p><span class="qtopic">Capacitor</span> Watch a capacitor act as an energy reserve. <a class="navlink" href="#capacitor">📖 lesson</a></p>
-  <canvas id="cp2" width="800" height="250"></canvas>
+  <canvas id="cp2" width="800" height="375"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery</li><li>Push button</li><li>Electrolytic capacitors: 100 µF, 470 µF, 1000 µF (16 V or more)</li><li>470 Ω resistor, red LED</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>While you hold the button, the battery feeds two things at once: the LED (through its resistor) and the big <b>capacitor</b>, which fills up to 9 V almost instantly.</p><p>When you let go, the battery is disconnected. The capacitor now acts like a small water tank: it empties <b>through the resistor and the LED</b>, so the LED keeps glowing.</p><p>As the capacitor empties, its voltage drops, the current drops, and the LED fades. A bigger capacitor (more water) or a bigger resistor (narrower pipe) makes the fade last longer: roughly <b>time ≈ R × C</b>.</p></div>
@@ -2318,7 +2318,7 @@ void loop() {
 <section id="p3" data-menu="Polarity tester" data-icon="3">
   <h2><span class="num">3</span>Polarity tester (which way is +?)</h2>
   <p><span class="qtopic">Diode</span> Two LEDs back to back show which way the current flows. <a class="navlink" href="#diode">📖 lesson</a></p>
-  <canvas id="cp3" width="800" height="250"></canvas>
+  <canvas id="cp3" width="800" height="360"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery</li><li>1 red + 1 green LED</li><li>1 kΩ resistor</li><li>2 test wires</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Each LED is a <b>one-way valve</b> that lights. The two LEDs are connected side by side but pointing <b>opposite ways</b>, so whichever way the current flows, exactly one of them can conduct.</p><p>If + is on test wire A, current flows A → resistor → red LED → B. Swap the wires and it flows B → green LED → resistor → A. The 1 kΩ protects both LEDs (≈ 7 mA).</p></div>
@@ -2337,7 +2337,7 @@ void loop() {
 <section id="p4" data-menu="Traffic light" data-icon="4">
   <h2><span class="num">4</span>Mini traffic light</h2>
   <p><span class="qtopic">LED</span> Three colours, each with its own resistor (and why). <a class="navlink" href="#led">📖 lesson</a></p>
-  <canvas id="cp4" width="800" height="250"></canvas>
+  <canvas id="cp4" width="800" height="375"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery (or 5 V USB)</li><li>Red, yellow, green LEDs</li><li>3 × 470 Ω resistors</li><li>3 push buttons</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Three identical, independent loops share the same battery: <b>+ → button → 470 Ω → LED → −</b>. Each button closes its own loop.</p><p>Because each LED has its <b>own</b> resistor, each gets its own ≈ 15 mA no matter how many are on. With one shared resistor, the LED with the lowest forward voltage would hog the current.</p></div>
@@ -2356,7 +2356,7 @@ void loop() {
 <section id="p5" data-menu="Touch switch" data-icon="5" data-group="🔀 Transistors & relays">
   <h2><span class="num">5</span>Touch switch (skin turns on an LED)</h2>
   <p><span class="qtopic">Transistor</span> Two transistors amplify the tiny current through your finger about 40,000×. <a class="navlink" href="#transistor">📖 lesson</a></p>
-  <canvas id="cp5" width="800" height="250"></canvas>
+  <canvas id="cp5" width="800" height="370"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery</li><li>2 × BC547 (NPN)</li><li>1 kΩ + 470 Ω resistors</li><li>LED, 2 bare wires as touch pads</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>Your skin conducts a <b>tiny</b> current (a few µA) between the two pads. That's far too little to light an LED.</p><p>Transistor 1 amplifies it about 200×, and its output feeds the base of transistor 2, which amplifies it about 200× again. Together (a <b>Darlington pair</b>) that's ×40,000: a few µA through your finger become a few mA through the LED.</p><p>The 1 kΩ protects the base if the pads touch each other directly, and the 470 Ω limits the LED current.</p></div>
@@ -2391,7 +2391,7 @@ void loop() {
 <section id="p6" data-menu="Coil kick" data-icon="6">
   <h2><span class="num">6</span>The coil kick-back (inductive spike)</h2>
   <p><span class="qtopic">Inductor</span> Make a coil's "water hammer" visible with an LED. <a class="navlink" href="#inductor">📖 lesson</a></p>
-  <canvas id="cp6" width="800" height="250"></canvas>
+  <canvas id="cp6" width="800" height="375"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>9 V battery</li><li>A relay (use its coil) or a small 10–100 mH inductor</li><li>Push button</li><li>1 LED (no resistor needed here)</li><li>1N4007 diode (for the variant)</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>While the button is pressed, current flows through the coil and builds a magnetic field (the heavy water wheel spinning up). The LED is connected <b>backwards</b>, so it stays dark.</p><p>When you release the button, the coil's current can't stop instantly. It forces a voltage spike in the <b>opposite direction</b>, which makes the backwards LED conduct for a split second: a <b>flash</b>.</p><p>A flyback diode in the same position absorbs that spike silently: that's exactly why relays and motors need one.</p></div>
@@ -2410,7 +2410,7 @@ void loop() {
 <section id="p7" data-menu="Relay clicker" data-icon="7">
   <h2><span class="num">7</span>Relay clicker with two lamps</h2>
   <p><span class="qtopic">Relay</span> A small button controls a separate circuit through a relay. <a class="navlink" href="#relay">📖 lesson</a></p>
-  <canvas id="cp7" width="800" height="250"></canvas>
+  <canvas id="cp7" width="800" height="375"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>5 V relay (or a relay module)</li><li>BC547 + 1 kΩ + 1N4007</li><li>Push button</li><li>2 LEDs + 2 × 470 Ω (as "lamps") + separate 9 V battery</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The button sends a small current through the 1 kΩ into the transistor's base. The transistor switches on and lets the bigger coil current (≈ 70 mA) flow through the relay coil.</p><p>The coil becomes an electromagnet and pulls the switch arm: <b>COM</b> leaves <b>NC</b> (red LED off) and touches <b>NO</b> (green LED on). <i>Click!</i></p><p>When you release, the coil's field collapses. The <b>flyback diode</b> catches the spike so the transistor isn't damaged. The 10 kΩ pull-down keeps the base firmly off when the button isn't pressed.</p></div>
@@ -2450,7 +2450,7 @@ void loop() {
 <section id="p8" data-menu="555 blinker" data-icon="8" data-group="⏱️ Timers & blinkers">
   <h2><span class="num">8</span>555 blinker (and buzzer)</h2>
   <p><span class="qtopic">Microchips</span> The classic first chip project. <a class="navlink" href="#s555">📖 lesson</a></p>
-  <canvas id="cp8" width="800" height="250"></canvas>
+  <canvas id="cp8" width="800" height="380"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>NE555, 9 V battery</li><li>R1 1 kΩ, R2 10–100 kΩ</li><li>C 10 µF</li><li>LED + 470 Ω</li><li>(variant) 10 nF capacitor + small speaker or piezo</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The 10 µF capacitor fills through <b>R1 + R2</b>. Inside the 555, two comparators watch its voltage.</p><p>When it reaches <b>⅔ of 9 V</b>, the 555 turns its output (pin 3) <b>off</b> and opens the discharge pin 7, which empties the capacitor through R2. When it falls to <b>⅓</b>, the output turns back <b>on</b> and filling starts again.</p><p>That endless fill/empty cycle makes the LED blink. Frequency ≈ 1.44 ÷ ((R1 + 2·R2) × C): with 1 kΩ, 47 kΩ and 10 µF, about <b>1.5 blinks per second</b>.</p></div>
@@ -2469,7 +2469,7 @@ void loop() {
 <section id="p9" data-menu="LED chaser" data-icon="9">
   <h2><span class="num">9</span>LED chaser: 555 + CD4017</h2>
   <p><span class="qtopic">Microchips</span> Make a light that runs along 10 LEDs. <a class="navlink" href="#s4017">📖 lesson</a></p>
-  <canvas id="cp9" width="800" height="250"></canvas>
+  <canvas id="cp9" width="800" height="400"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>The 555 blinker above</li><li>CD4017</li><li>10 LEDs + 10 × 470 Ω (or one shared, since only one is on at a time)</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The 555 from project 8 produces clock pulses. Each pulse arrives on the CD4017's <b>clock</b> input (pin 14).</p><p>Inside, the 4017 counts the pulses and turns on <b>exactly one</b> of its 10 outputs: Q0, then Q1… up to Q9, then back to Q0. Each output lights its LED, so the light runs along the row.</p><p>Only one LED is ever on, so a single shared resistor on the LEDs' common side is enough. Wiring an output to <b>reset</b> (pin 15) makes it count to a smaller number.</p></div>
@@ -2489,7 +2489,7 @@ void loop() {
   <h2><span class="num">26</span>Quartz stopwatch (00–99 seconds)</h2>
   <p><span class="qtopic">Timers</span> The 00–99 counter of project 19, but driven by a <b>32.768 kHz watch quartz</b> instead of the NE555: it counts <b>exactly one per second</b>. A CD4060 makes the quartz vibrate and divides its 32,768 ticks per second down to 2 Hz; a CD4013 halves that to 1 Hz.</p>
   <div class="controls"><button id="p26r">↺ Reset both</button><span class="hint">The two counters run on your real clock: the 555 version drifts (3 % fast here), the quartz one stays exact.</span></div>
-  <canvas id="m26" width="800" height="300"></canvas>
+  <canvas id="m26" width="800" height="440"></canvas>
   <p class="hint">Top: the divider chain, from the quartz to 1 Hz. The first stages are far too fast to see; the last ones blink. Bottom: a quartz stopwatch and a 555 stopwatch started together.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>32.768 kHz watch quartz (Gotronic 05220)</li><li>CD4060 oscillator + 14-stage divider (Gotronic 20318)</li><li>CD4013 dual D flip-flop (Gotronic 20273)</li><li>10 MΩ, 100 kΩ, 2 × 22 pF ceramic (Gotronic 15816)</li><li>Everything from project 19 except the 555 and its 3 timing parts</li></ul></div>
   <h3>💡 How it works</h3>
@@ -2572,7 +2572,7 @@ void loop() {
 <section id="p10" data-menu="Mini amp" data-icon="10">
   <h2><span class="num">10</span>Mini speaker amp (LM386)</h2>
   <p><span class="qtopic">Microchips</span> The core of your Ruby amp: plug in a phone or guitar. <a class="navlink" href="#s386">📖 lesson</a></p>
-  <canvas id="cp10" width="800" height="250"></canvas>
+  <canvas id="cp10" width="800" height="390"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>LM386, 9 V battery</li><li>10 kΩ pot (volume)</li><li>220 µF + 100 nF + 10 µF capacitors</li><li>8 Ω speaker, audio jack</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The volume pot is a <b>voltage divider</b>: it sends a chosen fraction of the input signal to the LM386's + input (pin 3).</p><p>The LM386 amplifies it 20× and drives the speaker with its <b>push-pull</b> output (pin 5). That output sits at 4.5 V and swings up and down around it.</p><p>The <b>220 µF</b> blocks that steady 4.5 V and passes only the music to the speaker (the coupling trick). The <b>10 Ω + 47 nF</b> (Zobel) stops high-frequency oscillation, and the <b>100 µF</b> is a local energy reserve for loud notes.</p></div>
@@ -2743,7 +2743,7 @@ void loop() {
   <h2><span class="num">19</span>2-digit counter 00–99</h2>
   <p><span class="qtopic">Counting chips</span> Two <b>SC39-11SURKWA</b> displays count from 00 to 99 by themselves: a 555 ticks, a <b>CD4518</b> counts in decimal and carries over to the tens, and two <b>CD4511</b> light the digits. A reset button brings it back to 00.</p>
   <div class="controls"><button id="m19run" class="active">⏸ Pause</button><button id="m19tick">👆 One tick</button><button id="m19rst">↺ Reset (button)</button><label class="slider">Speed<input id="m19sp" type="range" min="0.5" max="20" step="0.5" value="1.5"></label></div>
-  <canvas id="m19" width="800" height="300"></canvas>
+  <canvas id="m19" width="800" height="440"></canvas>
   <p class="hint">The 4 outputs of each counter are worth 8, 4, 2 and 1. Watch the units' "8" bit: when it drops (9 → 0), it ticks the tens. That's the carry.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>NE555 + CD4518 + 2 × CD4511</li><li>2 × SC39-11SURKWA displays</li><li>15 × 1 kΩ (14 segments + 555), 1 × 47 kΩ, 1 × 10 kΩ</li><li>10 µF electrolytic capacitor</li><li>Push button, 9 V battery + clip (or the USB power module), breadboard + plenty of jumpers</li></ul></div>
   <h3>💡 How it works</h3>
@@ -2764,7 +2764,7 @@ void loop() {
   <h2><span class="num">20</span>Digital thermometer (LM35 + Arduino)</h2>
   <p><span class="qtopic">Real parts</span> The room temperature in big red digits. An <b>LM35 temperature module</b> gives 10 mV per °C, the Arduino measures it and shows it on the two <b>SC39-11SURKWA</b> displays. The whole display side is the same wiring as the <a class="navlink" href="#p12">digital dice</a>: only the sensor and the code change.</p>
   <div class="controls"><button class="big" id="thHot">🤏 Hold to warm the sensor</button><label class="slider"><input type="checkbox" id="thRef" checked> 1.1 V reference</label><label class="slider"><input type="checkbox" id="thAvg" checked> average 20 readings</label></div>
-  <canvas id="m20" width="800" height="300"></canvas>
+  <canvas id="m20" width="800" height="425"></canvas>
   <p class="hint">Hold the button to "pinch" the sensor and watch the chain: temperature → LM35 voltage → ADC number → °C → digits. Untick the two boxes to see why the code uses the 1.1 V reference and averaging.</p>
   <h3>Wiring summary</h3>
   <table>
@@ -2836,7 +2836,7 @@ void loop() {
   <h2><span class="num">21</span>Bar-graph thermometer (no Arduino)</h2>
   <p><span class="qtopic">No microcontroller</span> A 10-segment green <b>DC10G</b> bar graph that grows with the temperature, one segment every 2 °C from 16 to 34 °C. Built with three <b>LM339</b> comparator chips, an <b>LM35</b> sensor and a ladder of resistors: you build by hand what an LM3914 does inside.</p>
   <div class="controls"><button class="big" id="bgHot">🤏 Hold to warm the sensor</button><label class="slider grow">Trimmer (ladder current)<input id="bgRHI" type="range" min="0.15" max="0.26" step="0.002" value="0.2"></label><span class="hint" id="bgI"></span></div>
-  <canvas id="m21" width="800" height="300"></canvas>
+  <canvas id="m21" width="800" height="430"></canvas>
   <div class="howbox" style="margin-top:10px"><p>📌 <b>DC10G pins</b> (from Gotronic's technical sheet): pins 1–10 = anodes of segments A–J (bottom row), pins 20–11 = their cathodes (top row, pin 20 above pin 1). Still do step 7's 10-second test: if nothing lights, the bar is the other way round, so turn it 180°. More in <a class="navlink" href="#pbar">Real parts: the DC10G</a>.</p></div>
   <p class="hint">Left: the LM35 voltage. Middle: the ladder and the 10 comparators; each one compares the signal with its own rung and pulls its segment to ground when the signal is higher. Right: the bar graph. The trimmer sets the ladder current, so the size of each step.</p>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>3 × LM339N quad comparator (Gotronic 21087)</li><li>DC10G green 10-LED bar graph (Gotronic 03142)</li><li>LM35DZ temperature sensor (Gotronic 21071)</li><li>9 × 100 Ω, 470 Ω + 330 Ω, 2 × 10 kΩ, 10 kΩ trimmer</li><li>Resistor network 8 × 470 Ω with common point (Gotronic 04482) + 2 × 470 Ω</li><li>Breadboard with its 5 V power module (USB), about 35 jumpers</li></ul></div>
@@ -2975,7 +2975,7 @@ void loop() {
     <li><b>Muscle:</b> the output → 1 kΩ → BC547 → relay coil (+ flyback diode) → its contact switches the <b>12 V lamp</b>.</li>
   </ol>
   <div class="controls"><label class="slider grow">☀️ Daylight<input id="ldL" type="range" min="0" max="1" step="0.005" value="0.8"></label><label class="slider grow">Threshold knob<input id="ldT" type="range" min="1" max="8" step="0.05" value="4.5"></label><button id="ldAuto">🌅 Run a day</button></div>
-  <canvas id="cLight" width="800" height="340"></canvas>
+  <canvas id="cLight" width="800" height="470"></canvas>
   <div class="mt-s"><h3 class="flush">🧰 You need</h3><ul><li>LDR (photoresistor) + 10 kΩ resistor</li><li>10 kΩ potentiometer (threshold)</li><li>LM358 + 1 MΩ (hysteresis) + 100 nF decoupling</li><li>BC547 + 1 kΩ + 1N4007</li><li>12 V relay (or 5 V relay + 5 V supply)</li><li>12 V lamp/LED strip + 12 V supply</li></ul></div>
   <h3>💡 How it works</h3>
   <div class="howbox"><p>The <b>10 kΩ + LDR</b> divider gives a voltage that rises as it gets darker (the LDR's resistance shoots up). The trimmer gives an adjustable <b>threshold</b> voltage.</p><p>The <b>LM358</b> compares them. Sensor above threshold means dark, so its output jumps HIGH. The <b>1 MΩ</b> feeds a little of the output back to the + input (<b>hysteresis</b>), so once it switches it stays switched, and the lamp doesn't flicker at dusk.</p><p>The HIGH output drives the <b>BC547</b> through 1 kΩ, the transistor powers the <b>relay coil</b>, and the relay's contact closes the separate <b>12 V lamp</b> circuit. The 1N4007 protects the transistor from the coil's switch-off spike.</p></div>

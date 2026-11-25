@@ -5,7 +5,7 @@ TITLE = 'LED that fades out slowly'
 MENU = 'LED fade'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Capacitor</span> Watch a capacitor act as an energy reserve. <a class="navlink" href="#capacitor">📖 lesson</a></p>
-  <canvas id="cp2" width="800" height="250"></canvas>'''
+  <canvas id="cp2" width="800" height="375"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery',

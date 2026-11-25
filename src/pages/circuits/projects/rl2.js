@@ -38,5 +38,12 @@ function drawLD(dt){if(LDT.auto){LDT.t+=dt;$('ldL').value=(0.5+0.5*Math.cos(LDT.
   ctx.fillStyle=PAL.blue;ctx.beginPath();ctx.arc(X(Vn),gy+6,7,0,7);ctx.fill();
   txt(ctx,'sensor '+Vn.toFixed(1)+' V vs threshold '+Th.toFixed(1)+' V',gx+gw/2,gy-12,PAL.ink,11);txt(ctx,'(yellow band = hysteresis)',gx+gw/2,gy+30,PAL.muted,10);
   txt(ctx,LDT.on?'DARK: lamp ON':'BRIGHT: lamp off',720,140,PAL.white,14);}
-loop((dt,now)=>{drawLD(dt);});
+// charts: the sensor voltage must cross the whole yellow band to switch the lamp (hysteresis)
+const LDR_={v:mRec(),hi:mRec(),lo:mRec(),on:mRec()};
+function G_LD(){const ctx=$('cLight').getContext('2d'),L=+$('ldL').value,Th=+$('ldT').value,ldr=1000*Math.pow(200,1-L),Vn=12*ldr/(10000+ldr);
+  mRecPush(LDR_.v,Vn);mRecPush(LDR_.hi,Th+0.3);mRecPush(LDR_.lo,Th-0.3);mRecPush(LDR_.on,LDT.on?1:0);
+  mScope(ctx,15,348,500,115,{title:'sensor voltage vs threshold (move the light, or 🌅 Run a day)',span:30,lo:0,hi:12,unit:'V',
+    traces:[{rec:LDR_.hi,col:PAL.amber,lab:'switch-on'},{rec:LDR_.lo,col:'#a16207',lab:'switch-off'},{rec:LDR_.v,col:PAL.sky,lab:'sensor'}]});
+  mScope(ctx,527,348,258,115,{title:'lamp',span:30,lanes:true,traces:[{rec:LDR_.on,col:PAL.yellow,lab:'ON / off',lo:0,hi:1}]});}
+loop((dt,now)=>{drawLD(dt);G_LD();});
 })();

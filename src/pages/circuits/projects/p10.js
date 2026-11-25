@@ -16,5 +16,9 @@ function P10(){const ctx=cv('cp10'),w=Math.sin(CT*12)*0.5+Math.sin(CT*31)*0.3;
   ctx.fillStyle=PAL.ink2;ctx.fillRect(600,115,14,30);ctx.beginPath();ctx.moveTo(614,115);ctx.lineTo(640+w*4,95);ctx.lineTo(640+w*4,165);ctx.lineTo(614,145);ctx.fill();
   ctx.strokeStyle=PAL.blue;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.globalAlpha=0.7-i*0.2;ctx.beginPath();ctx.arc(650,130,20+i*16+(CT*30)%16,-0.6,0.6);ctx.stroke();}ctx.globalAlpha=1;
   wire(ctx,[[607,145],[607,230],[60,230]],PAL.blue);txt(ctx,'8 Ω',580,170,PAL.muted,11);}
-loop((dt,now)=>{if(vis('cp10'))P10(dt);});
+// chart: the same wave, 20 times bigger (slowed right down: a real note repeats hundreds of times per second)
+function G10(){const ctx=$('cp10').getContext('2d'),w=t=>(Math.sin(t*12)*0.5+Math.sin(t*31)*0.3)/0.8;
+  mScope(ctx,15,250,770,132,{title:'the same wave, 20 × bigger at the output (each lane has its own scale)',span:2,lanes:true,note:'slowed down',
+    traces:[{f:t=>0.1*w(t),col:PAL.sky,lab:'in: ± 0.1 V',lo:-0.12,hi:0.12},{f:t=>4.5+2*w(t),col:Y,lab:'pin 5: 4.5 ± 2 V',lo:2,hi:7},{f:t=>2*w(t),col:PAL.green,lab:'speaker: ± 2 V',lo:-2.4,hi:2.4}]});}
+loop((dt,now)=>{if(vis('cp10')){P10(dt);G10();}});
 })();

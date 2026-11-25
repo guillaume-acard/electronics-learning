@@ -18,5 +18,10 @@ function P7(){const ctx=cv('cp7'),on=(CT%3)<1.5;
   wire(ctx,[[512,90],[600,90]],PAL.violet);wire(ctx,[[512,130],[600,130]],PAL.violet);txt(ctx,'NC',520,82,PAL.redLight,10);txt(ctx,'NO',520,146,PAL.greenLight,10);
   part(ctx,'led',600,90,700,90,{glow:on?0:1});part(ctx,'led',600,130,700,130,{glow:on?1:0,rgb:'34,197,94'});wire(ctx,[[700,90],[740,90],[740,200],[450,200]],PAL.violet);wire(ctx,[[700,130],[740,130]],PAL.violet);
   txt(ctx,on?'click → green':'rest → red',620,230,on?PAL.green:PAL.bad,13);}
-loop((dt,now)=>{if(vis('cp7'))P7(dt);});
+// charts (slow motion: the real coil current takes ~1 ms to build)
+function G7(){const ctx=$('cp7').getContext('2d'),I0=70,i=t=>{const p=t%3;return p<1.5?I0*(1-Math.exp(-p/0.15)):I0*(1-Math.exp(-1.5/0.15))*Math.exp(-(p-1.5)/0.15);};
+  mScope(ctx,15,258,378,110,{title:'coil current',span:6,lo:0,hi:80,unit:'mA',note:'slow motion',refs:[[50,'the contact moves']],traces:[{f:i,col:PAL.orange}]});
+  mScope(ctx,407,258,378,110,{title:'transistor collector voltage',span:6,lo:0,hi:7,unit:'V',note:'slow motion',refs:[[5.7,'diode: max 0.7 V above +5 V']],
+    traces:[{f:t=>{const p=t%3;return p<1.5?0.1:i(t)>2?5.7:5;},col:PAL.violet}]});}
+loop((dt,now)=>{if(vis('cp7')){P7(dt);G7();}});
 })();

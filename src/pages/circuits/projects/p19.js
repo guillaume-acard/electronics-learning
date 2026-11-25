@@ -13,5 +13,10 @@ function drawCnt(dt){const ctx=cv('m19'),sp=+$('m19sp').value;if(CN.run){CN.acc+
   else txt(ctx,'units Q4 (the "8") → tens ENABLE',400,285,PAL.muted2,12);}
 $('m19run').addEventListener('click',()=>{CN.run=!CN.run;$('m19run').textContent=CN.run?'⏸ Pause':'▶ Run';$('m19run').classList.toggle('active',CN.run);});
 $('m19tick').addEventListener('click',()=>{cTick();});$('m19rst').addEventListener('click',()=>{CN.n=0;CN.acc=0;});
-loop((dt,now)=>{if(vis('m19'))drawCnt(dt);});
+// chart: a timing diagram of the units counter: Q1 flips at every pulse, Q2 every 2, Q3 every 4, Q4 at 8 and 9
+const G19R=[0,1,2,3,4].map(()=>mRec());
+function G19(){const ctx=$('m19').getContext('2d'),u=CN.n%10;mRecPush(G19R[0],CN.run&&CN.acc<0.5?1:0);[1,2,4,8].forEach((b,i)=>mRecPush(G19R[i+1],(u&b)?1:0));
+  mScope(ctx,15,300,770,132,{title:'timing diagram of the units counter',span:6,lanes:true,
+    traces:[{rec:G19R[0],col:Y,lab:'clock (555)',lo:0,hi:1}].concat([1,2,4,8].map((b,i)=>({rec:G19R[i+1],col:PAL.green,lab:'Q'+(i+1)+' (the '+b+')',lo:0,hi:1})))});}
+loop((dt,now)=>{if(vis('m19')){drawCnt(dt);G19();}});
 })();

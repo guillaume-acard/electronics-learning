@@ -5,7 +5,7 @@ TITLE = 'The coil kick-back (inductive spike)'
 MENU = 'Coil kick'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Inductor</span> Make a coil's "water hammer" visible with an LED. <a class="navlink" href="#inductor">📖 lesson</a></p>
-  <canvas id="cp6" width="800" height="250"></canvas>'''
+  <canvas id="cp6" width="800" height="375"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery',

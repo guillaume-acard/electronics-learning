@@ -12,7 +12,7 @@ TOP = '''<p><span class="qtopic">Real life</span> A garden or hallway light that
     <li><b>Muscle:</b> the output → 1 kΩ → BC547 → relay coil (+ flyback diode) → its contact switches the <b>12 V lamp</b>.</li>
   </ol>
   <div class="controls"><x-slider id="ldL" min="0" max="1" step="0.005" value="0.8" grow="1">☀️ Daylight</x-slider><x-slider id="ldT" min="1" max="8" step="0.05" value="4.5" grow="1">Threshold knob</x-slider><button id="ldAuto">🌅 Run a day</button></div>
-  <canvas id="cLight" width="800" height="340"></canvas>'''
+  <canvas id="cLight" width="800" height="470"></canvas>'''
 # "You need" list
 NEED = [
     'LDR (photoresistor) + 10 kΩ resistor',

@@ -5,7 +5,7 @@ TITLE = 'LED brightness with different resistors'
 MENU = 'LED brightness'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Resistor</span> See how the resistor sets the current, and so the brightness. <a class="navlink" href="#resistor">📖 lesson</a></p>
-  <canvas id="cp1" width="800" height="250"></canvas>'''
+  <canvas id="cp1" width="800" height="375"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery + clip',

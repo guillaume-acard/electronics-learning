@@ -5,7 +5,7 @@ TITLE = 'LED chaser: 555 + CD4017'
 MENU = 'LED chaser'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Microchips</span> Make a light that runs along 10 LEDs. <a class="navlink" href="#s4017">📖 lesson</a></p>
-  <canvas id="cp9" width="800" height="250"></canvas>'''
+  <canvas id="cp9" width="800" height="400"></canvas>'''
 # "You need" list
 NEED = [
     'The 555 blinker above',

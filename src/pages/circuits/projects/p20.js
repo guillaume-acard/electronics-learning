@@ -22,5 +22,9 @@ function drawTherm(dt){const ctx=cv('m20');TH.T+=((TH.hot?34:22)-TH.T)*(1-Math.e
   txt(ctx,ref<2?'1.1 V jug: fine marks, 0.1 °C resolution':'5 V jug: coarse marks, the last digit can flip-flop',340,222,PAL.muted,12);
   txt(ctx,avg?'20 readings averaged: steady':'single reading: noisy, watch the digits jitter',340,244,PAL.muted,12);}
 (()=>{const b=$('thHot');hold(b,on=>{TH.hot=on;});})();
-loop((dt,now)=>{if(vis('m20'))drawTherm(dt);});
+// chart: the sensor's voltage over time (hold 🤏 to warm it)
+const G20R=mRec();
+function G20(){const ctx=$('m20').getContext('2d');mRecPush(G20R,TH.T*0.01);
+  mScope(ctx,15,300,770,115,{title:'LM35 "S" pin: 10 mV per °C (hold the sensor to warm it)',span:30,lo:0.15,hi:0.4,unit:'V',refs:[[0.22,'22 °C'],[0.34,'34 °C']],traces:[{rec:G20R,col:PAL.orange}]});}
+loop((dt,now)=>{if(vis('m20')){drawTherm(dt);G20();}});
 })();

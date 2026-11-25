@@ -5,7 +5,7 @@ TITLE = 'Mini traffic light'
 MENU = 'Traffic light'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">LED</span> Three colours, each with its own resistor (and why). <a class="navlink" href="#led">📖 lesson</a></p>
-  <canvas id="cp4" width="800" height="250"></canvas>'''
+  <canvas id="cp4" width="800" height="375"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery (or 5 V USB)',

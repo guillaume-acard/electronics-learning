@@ -5,7 +5,7 @@ TITLE = 'Touch switch (skin turns on an LED)'
 MENU = 'Touch switch'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Transistor</span> Two transistors amplify the tiny current through your finger about 40,000×. <a class="navlink" href="#transistor">📖 lesson</a></p>
-  <canvas id="cp5" width="800" height="250"></canvas>'''
+  <canvas id="cp5" width="800" height="370"></canvas>'''
 # "You need" list
 NEED = [
     '9 V battery',

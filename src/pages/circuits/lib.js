@@ -50,6 +50,34 @@ function mRes(ctx,x1,y1,x2,y2,lab){W(ctx,[[x1,y1],[x2,y2]],WIRE,2.5);const mx=(x
 function mGraph(ctx,x,y,w,h,series,lo,hi,label){ctx.fillStyle=PAL.panel;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.strokeRect(x,y,w,h);
   series.forEach(([arr,col,dash])=>{ctx.strokeStyle=col;ctx.lineWidth=2;ctx.setLineDash(dash||[]);ctx.beginPath();arr.forEach((v,i)=>{const px=x+i/(arr.length-1||1)*w,py=y+h-(v-lo)/(hi-lo)*h;i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();ctx.setLineDash([]);});
   if(label)txt(ctx,label,x+6,y+14,PAL.muted,11,'left');}
+// ----- a scrolling chart of values over the last few seconds (the demos' oscilloscope) -----
+// mScope(ctx, x, y, w, h, {title, span (s), lo, hi, unit, refs:[[value, label]], note, lanes,
+//   traces:[{f: t => value  or  rec: mRec(), col, lab, lo, hi}]})
+// f(t) is computed for t from CT − span to CT (demos that follow the page clock). A demo with its own state pushes
+// its values every frame with mRecPush(rec, value). lanes: one band per trace (on/off signals, each with its own lo/hi).
+function mRec(){return {d:[]};}
+function mRecPush(R,v){const d=R.d;if(d.length&&CT-d[d.length-1][0]>0.5)d.length=0;d.push([CT,v]);while(d.length&&d[0][0]<CT-30)d.shift();}
+const mFmt=(v,u)=>{const a=Math.abs(v);if(u==='V'&&a>0&&a<1)return Math.round(v*1000)+' mV';if(u==='mA'&&a>=1000)return +(v/1000).toPrecision(2)+' A';return +v.toFixed(a>=10||a===0||Number.isInteger(v)?0:1)+(u?' '+u:'');};
+function mScope(ctx,x,y,w,h,o){const span=o.span||3,L=o.lanes?78:48,top=y+20,bot=y+h-16,px0=x+L,pw=w-L-10,n=o.traces.length;
+  ctx.fillStyle=PAL.panel;ctx.fillRect(x,y,w,h);ctx.strokeStyle=PAL.line;ctx.lineWidth=1;ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);
+  if(o.title)txt(ctx,o.title,x+8,y+14,PAL.ink2,11,'left');
+  if(!o.lanes){let lx=x+w-8;[...o.traces].reverse().forEach(tr=>{if(!tr.lab)return;ctx.font='11px system-ui';const tw=ctx.measureText(tr.lab).width;txt(ctx,tr.lab,lx,y+14,tr.col,11,'right');lx-=tw+14;});}
+  for(let q=0;q<=4;q++){const gx=px0+pw*q/4;ctx.strokeStyle='rgba(148,163,184,.12)';ctx.beginPath();ctx.moveTo(gx,top);ctx.lineTo(gx,bot);ctx.stroke();}
+  txt(ctx,'−'+span+' s',px0,y+h-4,PAL.muted2,9,'left');txt(ctx,'now',px0+pw,y+h-4,PAL.muted2,9,'right');if(o.note)txt(ctx,o.note,px0+pw/2,y+h-4,PAL.muted,9);
+  o.traces.forEach((tr,i)=>{const bt=o.lanes?top+(bot-top)*i/n:top,bb=o.lanes?top+(bot-top)*(i+1)/n-4:bot,lo=tr.lo??o.lo,hi=tr.hi??o.hi,Y=v=>bb-(v-lo)/(hi-lo)*(bb-bt);
+    if(o.lanes){txt(ctx,tr.lab||'',x+8,(bt+bb)/2+4,tr.col,11,'left');ctx.strokeStyle='rgba(148,163,184,.2)';ctx.beginPath();ctx.moveTo(px0,bb);ctx.lineTo(px0+pw,bb);ctx.stroke();}
+    else if(i===0){[lo,hi].concat(lo<0&&hi>0?[0]:[]).forEach(v=>{const yy=Y(v);ctx.strokeStyle=v===0?'rgba(148,163,184,.35)':'rgba(148,163,184,.15)';ctx.beginPath();ctx.moveTo(px0,yy);ctx.lineTo(px0+pw,yy);ctx.stroke();txt(ctx,mFmt(v,o.unit),px0-5,yy+3,PAL.muted2,9,'right');});
+      (o.refs||[]).forEach(([v,lab])=>{const yy=Y(v);ctx.setLineDash([4,4]);ctx.strokeStyle=PAL.amber;ctx.beginPath();ctx.moveTo(px0,yy);ctx.lineTo(px0+pw,yy);ctx.stroke();ctx.setLineDash([]);
+        txt(ctx,mFmt(v,o.unit),px0-5,yy+3,PAL.amber,9,'right');if(lab)txt(ctx,lab,px0+4,yy-3,PAL.amber,9,'left');});}
+    ctx.save();ctx.beginPath();ctx.rect(px0,bt-3,pw,bb-bt+6);ctx.clip();ctx.strokeStyle=tr.col;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+    let started=false,k=0;const d=tr.rec&&tr.rec.d;
+    for(let c=0;c<=pw;c++){const t=CT-span+span*c/pw;let v;
+      if(tr.f)v=t<0?null:tr.f(t);else{while(k<d.length-1&&d[k+1][0]<=t)k++;v=d.length&&d[k][0]<=t?d[k][1]:null;}
+      if(v==null||isNaN(v)){started=false;continue;}const yy=Y(Math.max(lo-(hi-lo)*0.05,Math.min(hi+(hi-lo)*0.05,v)));if(started)ctx.lineTo(px0+c,yy);else{ctx.moveTo(px0+c,yy);started=true;}}
+    ctx.stroke();ctx.restore();});}
+// the 555 astable: capacitor voltage (pins 2 and 6) and output (pin 3) at time t. th, tl: high and low times (s)
+function m555(t,th,tl,vcc){const p=((t%(th+tl))+(th+tl))%(th+tl),tc=th/Math.LN2,td=tl/Math.LN2;
+  return p<th?{vc:vcc-(vcc*2/3)*Math.exp(-p/tc),out:vcc-1.7}:{vc:(vcc*2/3)*Math.exp(-(p-th)/td),out:0.1};}
 // a DC motor seen from the end (projects 23, 24, 25)
 function motorDraw(ctx,x,y,ang,col){ctx.fillStyle=PAL.chipLight;ctx.beginPath();ctx.arc(x,y,46,0,7);ctx.fill();ctx.strokeStyle=PAL.muted2;ctx.lineWidth=3;ctx.stroke();
   ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=col||PAL.yellow;ctx.fillRect(-4,-40,8,40);ctx.beginPath();ctx.moveTo(4,-40);ctx.lineTo(26,-34);ctx.lineTo(4,-26);ctx.fill();ctx.restore();

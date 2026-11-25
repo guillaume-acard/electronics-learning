@@ -8,5 +8,9 @@ function P3(){const ctx=cv('cp3'),flip=Math.floor(CT/2.5)%2===1;
   wire(ctx,[[400,60],[400,95]]);part(ctx,'led',400,95,400,175,{glow:flip?0:1,label:'red',left:true});wire(ctx,[[400,175],[400,210]]);
   wire(ctx,[[480,60],[480,95]]);part(ctx,'led',480,175,480,95,{glow:flip?1:0,rgb:'34,197,94',label:'green'});wire(ctx,[[480,175],[480,210]]);
   wire(ctx,[[80,210],[480,210]]);dot(ctx,400,60);dot(ctx,400,210);txt(ctx,flip?'+ at the bottom: GREEN lights':'+ at the top: RED lights',660,130,flip?PAL.green:PAL.bad,14);}
-loop((dt,now)=>{if(vis('cp3'))P3(dt);});
+// chart: one LED or the other, never both
+function G3(){const ctx=$('cp3').getContext('2d'),flip=t=>Math.floor(t/2.5)%2===1;
+  mScope(ctx,15,258,770,95,{title:'current in each LED (7 mA when it conducts)',span:10,lanes:true,
+    traces:[{f:t=>flip(t)?0:7.1,col:PAL.redSoft,lab:'red LED',lo:0,hi:8},{f:t=>flip(t)?7.1:0,col:PAL.green,lab:'green LED',lo:0,hi:8}]});}
+loop((dt,now)=>{if(vis('cp3')){P3(dt);G3();}});
 })();

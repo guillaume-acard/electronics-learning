@@ -6,7 +6,7 @@ MENU = 'Quartz stopwatch'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Timers</span> The 00–99 counter of project 19, but driven by a <b>32.768 kHz watch quartz</b> instead of the NE555: it counts <b>exactly one per second</b>. A CD4060 makes the quartz vibrate and divides its 32,768 ticks per second down to 2 Hz; a CD4013 halves that to 1 Hz.</p>
   <div class="controls"><button id="p26r">↺ Reset both</button><span class="hint">The two counters run on your real clock: the 555 version drifts (3 % fast here), the quartz one stays exact.</span></div>
-  <canvas id="m26" width="800" height="300"></canvas>
+  <canvas id="m26" width="800" height="440"></canvas>
   <p class="hint">Top: the divider chain, from the quartz to 1 Hz. The first stages are far too fast to see; the last ones blink. Bottom: a quartz stopwatch and a 555 stopwatch started together.</p>'''
 # "You need" list
 NEED = [

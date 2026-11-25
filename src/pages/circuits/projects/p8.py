@@ -5,7 +5,7 @@ TITLE = '555 blinker (and buzzer)'
 MENU = '555 blinker'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Microchips</span> The classic first chip project. <a class="navlink" href="#s555">📖 lesson</a></p>
-  <canvas id="cp8" width="800" height="250"></canvas>'''
+  <canvas id="cp8" width="800" height="380"></canvas>'''
 # "You need" list
 NEED = [
     'NE555, 9 V battery',

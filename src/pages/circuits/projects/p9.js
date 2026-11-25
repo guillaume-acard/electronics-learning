@@ -12,5 +12,9 @@ function P9(){const ctx=cv('cp9'),q=Math.floor(CT*4)%10;boxChip(ctx,40,90,90,80,
   wire(ctx,[[130,130],[220,130]],Y);txt(ctx,'clock (pin 3 → 14)',175,120,Y,10);
   for(let i=0;i<10;i++){const x=400+i*38,y=130;W(ctx,[[340,80+i*11],[360,80+i*11],[x,y-14]],PAL.slate,1.5);glowAt(ctx,x,y,i===q?1:0);ctx.fillStyle=i===q?PAL.bad:'#3f1d1d';ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.fill();txt(ctx,'Q'+i,x,y+30,PAL.muted,10);}
   txt(ctx,'each clock pulse → the next LED',585,200,PAL.muted,12);}
-loop((dt,now)=>{if(vis('cp9'))P9(dt);});
+// chart: a timing diagram: each rising edge of the clock moves the HIGH to the next output
+function G9(){const ctx=$('cp9').getContext('2d'),q=t=>Math.floor(t*4)%10;
+  mScope(ctx,15,250,770,142,{title:'timing diagram (9 V = HIGH)',span:3,lanes:true,
+    traces:[{f:t=>(t*4)%1<0.5?9:0,col:Y,lab:'clock (pin 14)',lo:0,hi:9}].concat([0,1,2,3].map(k=>({f:t=>q(t)===k?9:0,col:PAL.redSoft,lab:'Q'+k+' → LED '+(k+1),lo:0,hi:9})))});}
+loop((dt,now)=>{if(vis('cp9')){P9(dt);G9();}});
 })();

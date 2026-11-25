@@ -6,7 +6,7 @@ MENU = 'Thermometer'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Real parts</span> The room temperature in big red digits. An <b>LM35 temperature module</b> gives 10 mV per °C, the Arduino measures it and shows it on the two <b>SC39-11SURKWA</b> displays. The whole display side is the same wiring as the <a class="navlink" href="#p12">digital dice</a>: only the sensor and the code change.</p>
   <div class="controls"><button class="big" id="thHot">🤏 Hold to warm the sensor</button><label class="slider"><input type="checkbox" id="thRef" checked> 1.1 V reference</label><label class="slider"><input type="checkbox" id="thAvg" checked> average 20 readings</label></div>
-  <canvas id="m20" width="800" height="300"></canvas>
+  <canvas id="m20" width="800" height="425"></canvas>
   <p class="hint">Hold the button to "pinch" the sensor and watch the chain: temperature → LM35 voltage → ADC number → °C → digits. Untick the two boxes to see why the code uses the 1.1 V reference and averaging.</p>
   <h3>Wiring summary</h3>
   <table>

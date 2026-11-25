@@ -18,5 +18,10 @@ function drawBarT(dt){const ctx=cv('m21');BG21.T+=((BG21.hot?38:22)-BG21.T)*(1-M
     txt(ctx,'≥ '+(t*100).toFixed(1)+' °C',bx+130,y+4,PAL.muted,11,'left');}
   txt(ctx,'10 comparators (3 × LM339)',x0+100,yb+16,PAL.muted,11,'left');}
 (()=>{const b=$('bgHot');hold(b,on=>{BG21.hot=on;});})();
-loop((dt,now)=>{if(vis('m21'))drawBarT(dt);});
+// chart: each dashed line is one comparator's threshold: the signal crossing it lights one more bar
+const G21R=mRec();
+function G21(){const ctx=$('m21').getContext('2d'),I=+$('bgRHI').value*1e-3,refs=[];for(let k=0;k<10;k++){const v=(800+100*k)*I;if(v>0.15&&v<0.45)refs.push([v,'']);}
+  mRecPush(G21R,BG21.T*0.01);
+  mScope(ctx,15,300,770,120,{title:'LM35 signal vs the comparator thresholds (dashed)',span:30,lo:0.15,hi:0.45,unit:'V',refs,traces:[{rec:G21R,col:PAL.yellow}]});}
+loop((dt,now)=>{if(vis('m21')){drawBarT(dt);G21();}});
 })();

@@ -9,5 +9,10 @@ function P6(){const ctx=cv('cp6'),ph=CT%4,on=ph<2,flash=ph>=2&&ph<2.25?1-(ph-2)/
   part(ctx,'coil',400,90,400,180,{core:true,label:'coil'});wire(ctx,[[400,180],[400,210],[80,210]]);
   wire(ctx,[[400,75],[500,75],[500,95]]);part(ctx,'led',500,175,500,95,{glow:flash,label:'LED (backwards)'});wire(ctx,[[500,175],[500,195],[400,195]]);
   txt(ctx,on?'pressed: current builds up in the coil':flash>0?'released: FLASH! the kick lights the LED':'released',300,238,flash>0?Y:PAL.muted,13);}
-loop((dt,now)=>{if(vis('cp6'))P6(dt);});
+// charts (slow motion: in the real circuit the current builds in ~5 ms and the kick lasts ~1 ms)
+function G6(){const ctx=$('cp6').getContext('2d'),I0=120,i=t=>{const p=t%4;if(p<2)return I0*(1-Math.exp(-p/0.3));return I0*(1-Math.exp(-2/0.3))*Math.exp(-(p-2)/0.08);};
+  mScope(ctx,15,258,378,110,{title:'current in the coil',span:6,lo:0,hi:140,unit:'mA',note:'slow motion',traces:[{f:i,col:PAL.orange}]});
+  mScope(ctx,407,258,378,110,{title:'voltage across the coil',span:6,lo:-4,hi:10,unit:'V',note:'slow motion',refs:[[-1.9,'kick: the LED catches it']],
+    traces:[{f:t=>{const p=t%4;return p<2?9:i(t)>2?-1.9:0;},col:PAL.yellow}]});}
+loop((dt,now)=>{if(vis('cp6')){P6(dt);G6();}});
 })();

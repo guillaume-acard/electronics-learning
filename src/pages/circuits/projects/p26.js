@@ -16,5 +16,9 @@ function drawQZ(dt){const ctx=cv('m26');QZ.t+=dt;QZ.t5+=dt*1.03;
   const disp=(x,lab,col,t,sub)=>{const n=Math.floor(t)%100;ctx.fillStyle='#0a0a0a';ctx.fillRect(x,140,150,90);txt(ctx,String(n).padStart(2,'0'),x+75,205,col,60);txt(ctx,lab,x+75,132,PAL.ink2,13);txt(ctx,sub,x+75,250,PAL.muted,12);};
   disp(140,'quartz version',PAL.bad,QZ.t,'±2 s per day');disp(420,'NE555 version',PAL.orange,QZ.t5,'3 % fast here');
   const diff=QZ.t5-QZ.t;txt(ctx,'after '+QZ.t.toFixed(0)+' s, the 555 is ahead by '+diff.toFixed(1)+' s',400,285,diff>1?PAL.amber:PAL.muted,13);}
-loop((dt,now)=>{if(vis('m26'))drawQZ(dt);});
+// chart: every stage is half as fast as the one before
+function G26(){const ctx=$('m26').getContext('2d'),u=t=>t-CT+QZ.t,sq=(t,f)=>Math.floor(u(t)*f*2)%2===0?1:0;
+  mScope(ctx,15,300,770,132,{title:'timing diagram: each output flips half as often as the one before',span:2,lanes:true,
+    traces:[[8,'Q12 · 8 Hz'],[4,'Q13 · 4 Hz'],[2,'Q14 · 2 Hz'],[1,'4013 · 1 Hz']].map(([f,lab],i)=>({f:t=>u(t)<0?null:sq(t,f),col:i===3?PAL.green:PAL.blue,lab,lo:0,hi:1}))});}
+loop((dt,now)=>{if(vis('m26')){drawQZ(dt);G26();}});
 })();

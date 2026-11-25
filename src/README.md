@@ -88,7 +88,10 @@ the breadboard layout (`BBL.pNN`, see the breadboard map: rows a–j, rails tp/t
 then add `'pNN'` to its theme in `themes.py`. The menu, the intro table and the numbering follow.
 In a project's demo, `cv(id)` gives a cleared canvas context, `vis(id)` tells if it is on screen, and `CT` is the page
 clock in seconds (advanced before the project loops run). Shared demo pieces live in `circuits/lib.js`
-(e.g. `ddInit`/`drawDD` for the dice without Arduino, `motorDraw`, `mGraph`).
+(e.g. `ddInit`/`drawDD` for the dice without Arduino, `motorDraw`, `mGraph`). Voltage/current over time:
+`mScope(ctx, x, y, w, h, {title, span, lo, hi, unit, refs, lanes, traces})`, each trace a function of time `f: t => value`
+(for demos that follow `CT`) or a recorder (`mRec()`, filled every frame with `mRecPush`); `m555(t, th, tl, vcc)` gives the
+555's capacitor and output voltages.
 
 **A shop item** – a row in `pages/shopping/items.py`. The build warns when a project's "You need" names a part
 whose "used in" doesn't list that project.

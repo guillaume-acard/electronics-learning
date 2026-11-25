@@ -6,7 +6,7 @@ MENU = 'Counter 00–99'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">Counting chips</span> Two <b>SC39-11SURKWA</b> displays count from 00 to 99 by themselves: a 555 ticks, a <b>CD4518</b> counts in decimal and carries over to the tens, and two <b>CD4511</b> light the digits. A reset button brings it back to 00.</p>
   <div class="controls"><button id="m19run" class="active">⏸ Pause</button><button id="m19tick">👆 One tick</button><button id="m19rst">↺ Reset (button)</button><x-slider id="m19sp" min="0.5" max="20" step="0.5" value="1.5">Speed</x-slider></div>
-  <canvas id="m19" width="800" height="300"></canvas>
+  <canvas id="m19" width="800" height="440"></canvas>
   <p class="hint">The 4 outputs of each counter are worth 8, 4, 2 and 1. Watch the units' "8" bit: when it drops (9 → 0), it ticks the tens. That's the carry.</p>'''
 # "You need" list
 NEED = [

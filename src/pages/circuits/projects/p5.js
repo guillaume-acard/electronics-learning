@@ -30,5 +30,9 @@ function P5(){const ctx=cv('cp5'),touch=(CT%4)<2;
   if(touch)txt(ctx,'☝️',178,122,PAL.white,26);if(touch)__PR(ctx,{t:'part',k:'res',a:[150,90],b:[150,132],o:{label:'500 kΩ'}});wire(ctx,[[150,132],[150,160],[256,160]]);npnQ(ctx,290,160,touch);wire(ctx,[[300,194],[300,200],[356,200]]);npnQ(ctx,390,200,touch);wire(ctx,[[400,234],[400,230]]);
   wire(ctx,[[300,126],[300,110],[520,110]]);wire(ctx,[[400,110],[400,166]]);part(ctx,'res',520,30,520,72,{label:'470 Ω'});part(ctx,'led',520,72,520,110,{glow:touch?1:0});
   txt(ctx,touch?'finger on the pads: LED ON':'no touch: off',590,120,touch?PAL.good:PAL.muted,14);txt(ctx,'gain ≈ 200 × 200 = 40,000',590,145,PAL.muted,11);}
-loop((dt,now)=>{if(vis('cp5'))P5(dt);});
+// chart: tiny current in the skin, big current in the LED
+function G5(){const ctx=$('cp5').getContext('2d'),touch=t=>(t%4)<2;
+  mScope(ctx,15,258,378,105,{title:'current through your finger',span:8,lo:0,hi:20,unit:'µA',traces:[{f:t=>touch(t)?17:0,col:'#d4af37'}]});
+  mScope(ctx,407,258,378,105,{title:'LED current (× 40,000 thanks to the 2 transistors)',span:8,lo:0,hi:20,unit:'mA',traces:[{f:t=>touch(t)?14.7:0,col:PAL.redSoft}]});}
+loop((dt,now)=>{if(vis('cp5')){P5(dt);G5();}});
 })();

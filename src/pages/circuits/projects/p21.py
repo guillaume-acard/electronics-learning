@@ -6,7 +6,7 @@ MENU = 'Bar thermometer'
 # the top of the section: intro, demo controls and canvas (free HTML)
 TOP = '''<p><span class="qtopic">No microcontroller</span> A 10-segment green <b>DC10G</b> bar graph that grows with the temperature, one segment every 2 °C from 16 to 34 °C. Built with three <b>LM339</b> comparator chips, an <b>LM35</b> sensor and a ladder of resistors: you build by hand what an LM3914 does inside.</p>
   <div class="controls"><button class="big" id="bgHot">🤏 Hold to warm the sensor</button><x-slider id="bgRHI" min="0.15" max="0.26" step="0.002" value="0.2" grow="1">Trimmer (ladder current)</x-slider><span class="hint" id="bgI"></span></div>
-  <canvas id="m21" width="800" height="300"></canvas>
+  <canvas id="m21" width="800" height="430"></canvas>
   <div class="howbox" style="margin-top:10px"><p>📌 <b>DC10G pins</b> (from Gotronic's technical sheet): pins 1–10 = anodes of segments A–J (bottom row), pins 20–11 = their cathodes (top row, pin 20 above pin 1). Still do step 7's 10-second test: if nothing lights, the bar is the other way round, so turn it 180°. More in <a class="navlink" href="#pbar">Real parts: the DC10G</a>.</p></div>
   <p class="hint">Left: the LM35 voltage. Middle: the ladder and the 10 comparators; each one compares the signal with its own rung and pulls its segment to ground when the signal is higher. Right: the bar graph. The trimmer sets the ladder current, so the size of each step.</p>'''
 # "You need" list
