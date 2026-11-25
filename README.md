@@ -15,7 +15,9 @@ water analogies and live animations, from the resistor to real microchips.
 
 ## Getting started
 
-Open `build/index.html` in a browser. No install or server needed.
+**[▶ Open the site online](https://guillaume-acard.github.io/electronics-learning/build/index.html)**
+
+Or open [build/index.html](build/index.html) locally in a browser. No install or server needed.
 
 ## Editing the site
 
